@@ -1,0 +1,17 @@
+/* .vitepress/theme/index.css */
+
+.medium-zoom-overlay {
+	z-index: 30;
+}
+
+.medium-zoom-image {
+	z-index: 31;
+}
+
+:root {
+  --vp-c-brand-1: #FC5100;
+  --vp-c-brand-2: #FF9900;
+  --vp-button-brand-bg: black;
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-active-bg: var(--vp-c-brand-2);
+}
