@@ -58,32 +58,33 @@ unique ID that you will use to display Perks in your app.
 
 ```typescript
 interface UserAttributes {
-  attributes: {
-    email?: string;
-    firstname?: string;
-    lastname?: string;
-    confirmationref?: string;
-    billingzipcode?: string;
-    amount?: string;
-    paymenttype?: string;
-    ccbin?: string;
-    mobile?: string;
-    country?: string;
-    language?: string;
-    currency?: string;
-    billingaddress1?: string;
-    billingaddress2?: string;
-    age?: string;
-    gender?: string;
-    cartItems?: string;
-  };
+   email?: string;
+   firstname?: string;
+   lastname?: string;
+   confirmationref?: string;
+   billingzipcode?: string;
+   amount?: string;
+   paymenttype?: string;
+   ccbin?: string;
+   mobile?: string;
+   country?: string;
+   language?: string;
+   currency?: string;
+   billingaddress1?: string;
+   billingaddress2?: string;
+   age?: string;
+   gender?: string;
+   cartItems?: string;
+}
+interface InstanceOptions {
+  attributes?: InstanceOptions;
 }
 
-window.perksInstance = FalconSDK.createPerksInstance(
+const perksInstance = FalconSDK.createPerksInstance(
   "YOUR_PLACEMENT_ID",
   {
     attributes: {},
-  } as UserAttributes,
+  } as InstanceOptions,
 );
 ```
 
@@ -98,16 +99,20 @@ to your subscribers.
 
 Load the Perks into the Placement. This will fetch the Perks from the Falcon
 
-```javascript
-window.perksInstance.loadPerks();
+```typescript
+perksInstance.loadPerks();
 ```
 
 ## Showing Perks
 
 Once the Perks are loaded, you can present the perk unit to your subscribers.
 
-```swift
-window.perksInstance.show();
+```typescript
+interface ShowOptions {
+   title?: string;
+   subtitle?: string;
+};
+perksInstance.show({} as ShowOptions);
 ```
 
 ## Handling Perk lifecycle events
@@ -116,11 +121,11 @@ To handle the lifecycle events of the Perks unit, you can implement the
 available callbacks. The most important is the `addReadyCallback` method, which
 is called when the Perks are loaded and ready to be shown.
 
-```javascript
-window.perksInstance.addReadyCallback((isReady) => {
+```typescript
+perksInstance.addReadyCallback((isReady) => {
   // Perks are ready to be shown
 });
-window.perksInstance.addClickCallback((data) => {
+perksInstance.addClickCallback((data) => {
   // User has clicked to redeem one of the promotions and navigated outside the app to the perk providers page.
 });
 ```
