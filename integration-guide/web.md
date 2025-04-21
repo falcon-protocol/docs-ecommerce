@@ -18,7 +18,7 @@ Add the following line to your HTML file:
 ```html
 <head>
   <title>Falcon Ecommerce</title>
-  <script src="https://js.falcon.app/falcon.js" async></script>
+  <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js" async></script>
 </head>
 ```
 
@@ -29,7 +29,7 @@ To integrate the Falcon Labs SDK through NPM:
 Add the following line to your package.json:
 
 ```json
-"falcon-sdk": "https://js.falcon.app/falcon.js"
+"falcon-sdk": "https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js"
 ```
 
 ## Add the SDK Key
@@ -139,7 +139,7 @@ perksInstance.addClickCallback((data) => {
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
-  <script src="https://js.falcon.app/falcon.js"></script>
+  <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js"></script>
   <script>
     (async function () {
       await FalconSDK.init('YOUR_SDK_KEY');
