@@ -14,9 +14,15 @@ hero:
 features:
   - title: Web Integration
     details: Integrate the Falcon Perks SDK into your Web app
+    link: /integration-guide/web
+  - title: Shopify Integration
+    details: Integrate the Falcon Perks Apps into your Shopify store
+    link: /integration-guide/shopify
   - title: iOS Integration
     details: Integrate the Falcon Perks SDK into your iOS app
-  - title: Android Integration
-    details: Integrate the Falcon Perks SDK into your Android app
+    link: /integration-guide/ios/integration
+  - title: Other Integrations
+    details: Overview our integrations options
+    link: /integration-guide/overview
 ---
 

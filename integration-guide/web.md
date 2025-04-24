@@ -1,15 +1,8 @@
 # Web Integration
 
-## Download the latest SDK
-
-You have two options for integrating the SDK into your project
-
-- [Manually load the script tag](#script)
-- [package manager](#npm)
-
 ## Manually load the script tag
 
-To install by script, add the falcon.js ES Module as a script to the `<head>`
+To install by script, add the falcon-sdk.js ES Module as a script to the `<head>`
 element of your HTML. This allows any newly created Falcon objects to be
 globally accessible in your code.
 
@@ -20,16 +13,6 @@ Add the following line to your HTML file:
   <title>Falcon Ecommerce</title>
   <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js" async></script>
 </head>
-```
-
-## NPM
-
-To integrate the Falcon Labs SDK through NPM:
-
-Add the following line to your package.json:
-
-```json
-"falcon-sdk": "https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js"
 ```
 
 ## Add the SDK Key
