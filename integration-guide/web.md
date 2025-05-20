@@ -11,7 +11,7 @@ Add the following line to your HTML file:
 ```html
 <head>
   <title>Falcon Ecommerce</title>
-  <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js" async></script>
+  <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js"></script>
 </head>
 ```
 
