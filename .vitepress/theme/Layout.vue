@@ -17,5 +17,8 @@ const { page } = useData();
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
 }
 </style>
