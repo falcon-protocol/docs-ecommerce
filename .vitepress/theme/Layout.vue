@@ -6,7 +6,7 @@ const { page } = useData();
 </script>
 
 <template>
-  <DefaultTheme.Layout v-if="page.frontmatter.layout !== 'doc'" />
+  <DefaultTheme.Layout v-if="page.frontmatter.layout !== 'blank-page'" />
   <div v-else class="blank-layout">
     <Content />
   </div>
