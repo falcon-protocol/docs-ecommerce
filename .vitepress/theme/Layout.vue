@@ -2,11 +2,11 @@
 import { useData } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 
-const { page } = useData();
+const { frontmatter } = useData();
 </script>
 
 <template>
-  <DefaultTheme.Layout v-if="page.frontmatter.layout !== 'blank-page'" />
+  <DefaultTheme.Layout v-if="frontmatter.layout !== 'blank-page'" />
   <div v-else class="blank-layout">
     <Content />
   </div>
