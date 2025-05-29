@@ -13,29 +13,31 @@ export default {
 
   setup() {
     const route = useRoute();
-    const { page } = useData();
+    const { frontmatter } = useData();
 
     const initZoom = () => {
       mediumZoom("[data-zoomable]", { background: "var(--vp-c-bg)" });
     };
 
-    // Handle title for blank pages
-    watch(
-      () => page.value?.frontmatter,
-      (frontmatter) => {
-        if (frontmatter?.layout === "blank-page") {
-          document.title = frontmatter.title ?? "Terms and Conditions";
-        }
-      },
-      { immediate: true }
-    );
+    const updateTitle = () => {
+      if (frontmatter.value.layout === "blank-page") {
+        document.title = frontmatter.value.title || "Falcon Ecommerce";
+      }
+    };
 
     onMounted(() => {
       initZoom();
+      updateTitle();
     });
+
     watch(
       () => route.path,
-      () => nextTick(() => initZoom())
+      () => {
+        nextTick(() => {
+          initZoom();
+          updateTitle();
+        });
+      }
     );
   },
 };

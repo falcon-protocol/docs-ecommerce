@@ -5,13 +5,6 @@ export default defineConfig({
   title: "Falcon Ecommerce",
   base: "/",
   description: "Documentation on the Falcon Ecommerce transaction experiences",
-  transformHtml: (_, id, { pageData }) => {
-    if (pageData.frontmatter.layout === "blank-page") {
-      return {
-        title: pageData.frontmatter.title,
-      };
-    }
-  },
   themeConfig: {
     nav: [{ text: "Home", link: "https://falconlabs.us" }],
     sidebar: [
