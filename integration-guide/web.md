@@ -41,6 +41,7 @@ unique ID that you will use to display Perks in your app.
 
 ```typescript
 interface UserAttributes {
+   orderid?: string;
    email?: string;
    firstname?: string;
    lastname?: string;
