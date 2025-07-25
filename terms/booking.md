@@ -12,4 +12,4 @@ Save up to 20% available on new accommodation bookings at participating properti
 - The final amount of your reward is based on 5% of the value of your booking. This amount may exclude some taxes and fees, and is subject to currency conversion rates.
 - Your price summary will show exactly how much you'll get off your booking.
 - You are only eligible when booking a property with an instant reward badge.
-- Choose a payment option that is online or managed by [Booking.com](http://booking.com/).
+- Choose a payment option that is online or managed by <a href="http://booking.com/" style="color: var(--link-color); text-decoration: underline;">Booking.com</a>.
