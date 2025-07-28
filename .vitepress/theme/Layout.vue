@@ -58,6 +58,7 @@ const { frontmatter } = useData();
 .blank-content ul {
   margin-bottom: 1rem;
   padding-left: 1.5rem;
+  list-style-type: disc;
 }
 
 .blank-content li {
