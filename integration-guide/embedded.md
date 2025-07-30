@@ -63,7 +63,9 @@ Initialize the SDK and create an embedded instance:
   // Load and display promotional content
   const result = await embeddedInstance.loadPerks();
   if (result.isReady) {
-    embeddedInstance.show();
+    embeddedInstance.show({
+      subtitle: "CUSTOMER_NAME", // Replace with actual customer name
+    });
   }
 })();
 ```
@@ -95,7 +97,9 @@ Initialize the SDK and create an embedded instance:
     <div id="embedded-target" class="promo-container"></div>
 
     <!-- Control buttons (optional) -->
-    <button onclick="window.embeddedInstance.show()">Show Offers</button>
+    <button onclick="window.embeddedInstance.show({subtitle: 'CUSTOMER_NAME'})">
+      Show Offers
+    </button>
     <button onclick="window.embeddedInstance.hide()">Hide Offers</button>
 
     <script>
@@ -165,8 +169,17 @@ Registers a callback that fires when promotional content is closed/hidden.
 ```typescript
 {
   title?: string;     // Optional: Override promotional title
-  subtitle?: string;  // Optional: Override promotional subtitle
+  subtitle?: string;  // Optional: Override promotional subtitle (e.g., customer name)
 }
+```
+
+**Example:**
+
+```javascript
+// Display customer name in the placement
+embeddedInstance.show({
+  subtitle: "John", // Customer's name will appear in the placement
+});
 ```
 
 ### UserAttributes
