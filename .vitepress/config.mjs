@@ -22,6 +22,7 @@ export default defineConfig({
         items: [
           { text: "Overview", link: "/integration-guide/overview" },
           { text: "Web", link: "/integration-guide/web" },
+          { text: "Embedded", link: "/integration-guide/embedded" },
           { text: "Shopify", link: "/integration-guide/shopify" },
           {
             text: "iOS",
