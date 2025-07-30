@@ -1,4 +1,4 @@
-# Falcon SDK - Embedded Template Integration Documentation
+# Embedded Web Integration
 
 ## Overview
 
@@ -187,7 +187,8 @@ embeddedInstance.show({
 Available targeting attributes for personalization:
 
 ```typescript
-{
+interface UserAttributes {
+  orderid?: string;
   email?: string;
   firstname?: string;
   lastname?: string;
@@ -205,7 +206,6 @@ Available targeting attributes for personalization:
   age?: string;
   gender?: string;
   cartItems?: string;
-  orderid?: string;
 }
 ```
 
