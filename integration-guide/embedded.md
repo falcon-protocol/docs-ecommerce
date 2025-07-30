@@ -24,7 +24,7 @@ Add a container element where the promotional content will be displayed:
 ```html
 <div
   id="embedded-target"
-  style="width: 580px; height: 340px; border: 1px solid #ccc;"
+  style="width: 580px; height: 260px; border: 1px solid #ccc;"
 ></div>
 ```
 
@@ -82,7 +82,7 @@ Initialize the SDK and create an embedded instance:
         border: 1px solid #ccc;
         padding: 2px;
         margin: 20px auto;
-        height: 340px;
+        height: 260px;
         width: 580px;
         background: #f5f5f5;
       }
@@ -201,16 +201,12 @@ Available targeting attributes for personalization:
 ### Container Sizing
 
 - Provide explicit width and height for the container element
-- Recommended minimum size: 580px × 340px
+- Recommended minimum size: 580px × 260px for Desktop and 479px x 400px for Mobile view.
 - Ensure container is visible when `show()` is called
-
-### Multiple Instances
-
-Each placement ID can only have one active instance. Attempting to create multiple instances with the same placement ID will throw an error.
 
 ### Cleanup
 
-Always call `destroy()` when removing embedded content to prevent memory leaks:
+Call `destroy()` when removing embedded content to prevent memory leaks:
 
 ```javascript
 // When removing the promotional content
