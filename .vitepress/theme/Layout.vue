@@ -78,7 +78,6 @@ const { frontmatter } = useData();
   text-decoration: underline;
 }
 </style>
-=======
 .blank-content {
   width: 100%;
 }
