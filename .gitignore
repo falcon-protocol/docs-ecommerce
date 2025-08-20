@@ -7,6 +7,3 @@ Gemfile.lock
 node_modules/
 .vitepress/dist/
 .vitepress/cache/
-
-.cursor/
-PROGRESS.md

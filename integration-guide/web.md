@@ -1,4 +1,4 @@
-# Web Integration
+# Overlay Web Integration
 
 ## Manually load the script tag
 
@@ -41,35 +41,32 @@ unique ID that you will use to display Perks in your app.
 
 ```typescript
 interface UserAttributes {
-   orderid?: string;
-   email?: string;
-   firstname?: string;
-   lastname?: string;
-   confirmationref?: string;
-   billingzipcode?: string;
-   amount?: string;
-   paymenttype?: string;
-   ccbin?: string;
-   mobile?: string;
-   country?: string;
-   language?: string;
-   currency?: string;
-   billingaddress1?: string;
-   billingaddress2?: string;
-   age?: string;
-   gender?: string;
-   cartItems?: string;
+  orderid?: string;
+  email?: string;
+  firstname?: string;
+  lastname?: string;
+  confirmationref?: string;
+  billingzipcode?: string;
+  amount?: string;
+  paymenttype?: string;
+  ccbin?: string;
+  mobile?: string;
+  country?: string;
+  language?: string;
+  currency?: string;
+  billingaddress1?: string;
+  billingaddress2?: string;
+  age?: string;
+  gender?: string;
+  cartItems?: string;
 }
 interface InstanceOptions {
   attributes?: InstanceOptions;
 }
 
-const perksInstance = FalconSDK.createPerksInstance(
-  "YOUR_PLACEMENT_ID",
-  {
-    attributes: {},
-  } as InstanceOptions,
-);
+const perksInstance = FalconSDK.createPerksInstance("YOUR_PLACEMENT_ID", {
+  attributes: {},
+} as InstanceOptions);
 ```
 
 ### Options
@@ -93,9 +90,9 @@ Once the Perks are loaded, you can present the perk unit to your subscribers.
 
 ```typescript
 interface ShowOptions {
-   title?: string;
-   subtitle?: string;
-};
+  title?: string;
+  subtitle?: string;
+}
 perksInstance.show({} as ShowOptions);
 ```
 
@@ -119,46 +116,47 @@ perksInstance.addClickCallback((data) => {
 ```html
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js"></script>
+    <script>
+      (async function () {
+        await FalconSDK.init("YOUR_SDK_KEY");
 
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-  <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js"></script>
-  <script>
-    (async function () {
-      await FalconSDK.init('YOUR_SDK_KEY');
+        window.perksInstance = FalconSDK.createPerksInstance(
+          "YOUR_PLACEMENT_ID",
+          {
+            attributes: {
+              email: "test@test.com",
+              firstname: "John",
+              lastname: "Doe",
+            },
+          }
+        );
 
-      window.perksInstance = FalconSDK.createPerksInstance('YOUR_PLACEMENT_ID', {
-        attributes: {
-          email: "test@test.com",
-          firstname: "John",
-          lastname: "Doe",
-        }
-      });
+        console.log("perksInstance", window.perksInstance);
 
-      console.log("perksInstance", window.perksInstance);
+        window.perksInstance.addReadyCallback((isReady) => {
+          console.log("ready callback:", isReady);
+        });
+        window.perksInstance.addClickCallback((data) => {
+          console.log("link Clicked", data);
+        });
 
-      window.perksInstance.addReadyCallback((isReady) => {
-        console.log('ready callback:', isReady);
-      });
-      window.perksInstance.addClickCallback((data) => {
-        console.log('link Clicked', data);
-      });
+        let answer = await window.perksInstance.loadPerks();
+        console.log("answer", answer);
+        console.log("is Ready:", window.perksInstance.isReady());
+      })();
+    </script>
+  </head>
 
-      let answer = await window.perksInstance.loadPerks()
-      console.log("answer", answer);
-      console.log('is Ready:', window.perksInstance.isReady());
-    })();
-  </script>
-</head>
-
-<body>
-  <h2>Test</h2>
-  <button onclick="window.perksInstance.loadPerks()">Load Perks</button>
-  <button onclick="window.perksInstance.show()">Show</button>
-  <button onclick="window.perksInstance.hide()">Hide</button>
-  <button onclick="window.perksInstance.destroy()">Destroy</button>
-</body>
-
+  <body>
+    <h2>Test</h2>
+    <button onclick="window.perksInstance.loadPerks()">Load Perks</button>
+    <button onclick="window.perksInstance.show()">Show</button>
+    <button onclick="window.perksInstance.hide()">Hide</button>
+    <button onclick="window.perksInstance.destroy()">Destroy</button>
+  </body>
 </html>
 ```
