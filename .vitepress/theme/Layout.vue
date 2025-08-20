@@ -20,10 +20,65 @@ const { frontmatter } = useData();
   margin: 0 auto;
   padding: 2rem;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
+  line-height: 1.6;
+  background-color: white !important;
+  color: black !important;
 }
 
+.blank-layout h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: black !important;
+}
+
+.blank-layout h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: black !important;
+}
+
+.blank-layout h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: black !important;
+}
+
+.blank-layout p {
+  margin-bottom: 1rem;
+  color: black !important;
+}
+
+.blank-layout ul, .blank-layout ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  color: black !important;
+}
+
+.blank-layout li {
+  margin-bottom: 0.5rem;
+  color: black !important;
+}
+
+.blank-layout strong {
+  font-weight: 600;
+  color: black !important;
+}
+
+.blank-layout a {
+  color: #007acc !important;
+  text-decoration: none;
+}
+
+.blank-layout a:hover {
+  text-decoration: underline;
+}
+</style>
+=======
 .blank-content {
   width: 100%;
 }
