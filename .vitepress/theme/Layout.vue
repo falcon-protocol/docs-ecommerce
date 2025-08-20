@@ -77,7 +77,7 @@ const { frontmatter } = useData();
 .blank-layout a:hover {
   text-decoration: underline;
 }
-</style>
+
 .blank-content {
   width: 100%;
 }
