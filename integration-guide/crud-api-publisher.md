@@ -14,19 +14,7 @@ The Publisher API manages publisher entities with their contact information and 
 
 ## Authentication
 
-The Publisher API uses two types of authentication depending on the operation:
-
-### Service Authentication
-
-- **Used for**: Creating and listing publishers (admin operations)
-- **Header**: `Authorization: Bearer <BACKEND_SERVICE_SECRET>`
-- **Purpose**: Backend-to-backend communication for administrative operations
-
-### API Token Authentication
-
-- **Used for**: Getting, updating, deleting publishers and managing API tokens
 - **Header**: `Authorization: Bearer <API_TOKEN>`
-- **Purpose**: Publisher-specific operations with scoped access
 
 ## Response Format
 
@@ -269,32 +257,7 @@ Updates publisher information. Users can only update their own publisher data.
 
 ---
 
-### 6. Delete Publisher
-
-**DELETE** `/api/v1/publishers/{id}`
-
-Deletes a publisher and all associated data (sites, placements, etc.). Users can only delete their own publisher.
-
-**Authentication**: API Token Authentication
-
-**Path Parameters**:
-
-- `id`: Publisher ID (required, non-empty string)
-
-**Response** (200):
-
-```json
-{
-  "success": true,
-  "message": "Publisher deleted successfully"
-}
-```
-
-⚠️ **Warning**: This operation is irreversible and will delete all associated sites and placements.
-
----
-
-### 7. Get Publisher API Tokens
+### 6. Get Publisher API Tokens
 
 **GET** `/api/v1/publishers/{id}/api-tokens`
 
@@ -623,25 +586,7 @@ curl -X PUT http://localhost:4000/api/v1/publishers/cm1x2y3z4a5b6c7d8e9f0g1h \
 
 ---
 
-### 6. Delete Publisher (API Token Authentication)
-
-```bash
-curl -X DELETE http://localhost:4000/api/v1/publishers/cm1x2y3z4a5b6c7d8e9f0g1h \
-  -H "Authorization: Bearer falcon_sk_xyz789abc123def456ghi789jkl012mno345"
-```
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "message": "Publisher deleted successfully"
-}
-```
-
----
-
-### 7. Get Publisher API Tokens (API Token Authentication)
+### 6. Get Publisher API Tokens (API Token Authentication)
 
 ```bash
 curl -X GET http://localhost:4000/api/v1/publishers/cm1x2y3z4a5b6c7d8e9f0g1h/api-tokens \
