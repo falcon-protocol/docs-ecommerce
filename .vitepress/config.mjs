@@ -46,13 +46,6 @@ export default defineConfig({
           },
           { text: "Android", link: "/integration-guide/android" },
           { text: "Flutter", link: "/integration-guide/flutter" },
-          {
-            text: "Affiliation",
-            link: "/integration-guide/affiliation/",
-            items: [
-              { text: "Awin", link: "/integration-guide/affiliation/awin" },
-            ],
-          },
         ],
       },
     ],

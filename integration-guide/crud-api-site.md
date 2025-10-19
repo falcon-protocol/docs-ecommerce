@@ -17,8 +17,6 @@ The Site API manages site entities that belong to publishers. Sites contain demo
 All Site API endpoints require **API Token Authentication**.
 
 - **Header**: `Authorization: Bearer <API_TOKEN>`
-- **Access Control**: Users can only access sites that belong to their publisher
-- **Token Validation**: API tokens are validated against the ApiToken entity in the database
 
 ## Response Format
 

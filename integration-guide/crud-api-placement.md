@@ -17,8 +17,6 @@ The Placement API manages ad placement entities that belong to sites. Placements
 All Placement API endpoints require **API Token Authentication**.
 
 - **Header**: `Authorization: Bearer <API_TOKEN>`
-- **Access Control**: Users can only access placements that belong to their publisher's sites
-- **Token Validation**: API tokens are validated against the ApiToken entity in the database
 
 ## Response Format
 
