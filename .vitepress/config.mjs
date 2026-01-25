@@ -46,7 +46,7 @@ export default defineConfig({
             ],
           },
           { text: "Android", link: "/integration-guide/android" },
-          { text: "Flutter", link: "/integration-guide/flustter" },
+          { text: "Flutter", link: "/integration-guide/flutter" },
         ],
       },
     ],
