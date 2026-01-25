@@ -21,6 +21,9 @@ features:
   - title: iOS Integration
     details: Add the Falcon Perks SDK to your iOS app for native support.
     link: /integration-guide/ios/integration
+  - title: Wix Integration
+    details: Integrate Falcon Perks into your Wix store effortlessly.
+    link: /integration-guide/wix
   - title: Other Integrations
     details: Explore our full range of integration options.
     link: /integration-guide/overview
