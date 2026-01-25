@@ -30,6 +30,7 @@ export default defineConfig({
             ],
           },
           { text: "Shopify", link: "/integration-guide/shopify" },
+          { text: "Wix", link: "/integration-guide/wix" },
           {
             text: "iOS",
             link: "/integration-guide/ios/integration",
@@ -45,7 +46,7 @@ export default defineConfig({
             ],
           },
           { text: "Android", link: "/integration-guide/android" },
-          { text: "Flutter", link: "/integration-guide/flutter" },
+          { text: "Flutter", link: "/integration-guide/flustter" },
         ],
       },
     ],
