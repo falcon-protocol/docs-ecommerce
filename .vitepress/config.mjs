@@ -49,7 +49,7 @@ export default defineConfig({
           {
             text: "Partner Integration",
             link: "/integration-guide/partner-integration/overview",
-            collapsed: false,
+            collapsed: true,
             items: [
               {
                 text: "Prerequisites",
