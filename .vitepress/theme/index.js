@@ -14,9 +14,13 @@ export default {
   setup() {
     const route = useRoute();
     const { frontmatter } = useData();
+    let zoomInstance = null;
 
     const initZoom = () => {
-      mediumZoom("[data-zoomable]", { background: "var(--vp-c-bg)" });
+      if (zoomInstance) zoomInstance.detach();
+      zoomInstance = mediumZoom(".vp-doc img", {
+        background: "var(--vp-c-bg)",
+      });
     };
 
     const updateTitle = () => {
