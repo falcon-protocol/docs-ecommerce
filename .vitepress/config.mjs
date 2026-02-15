@@ -28,7 +28,16 @@ export default defineConfig({
               { text: "Embedded", link: "/integration-guide/embedded" },
             ],
           },
-          { text: "Shopify", link: "/integration-guide/shopify" },
+          {
+            text: "Shopify",
+            link: "/integration-guide/shopify",
+            items: [
+              {
+                text: "Step by step",
+                link: "/integration-guide/shopify/shopify-step-by-step",
+              },
+            ],
+          },
           { text: "Wix", link: "/integration-guide/wix" },
           {
             text: "iOS",
