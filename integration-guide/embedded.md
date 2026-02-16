@@ -17,7 +17,7 @@ Add the Falcon embedded SDK script to your HTML page:
 ```html
 <head>
   <title>Your Website</title>
-  <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/embedded-sdk.js"></script>
+  <script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/embedded-sdk.js"></script>
 </head>
 ```
 
@@ -61,7 +61,7 @@ That's it! The SDK will automatically:
   <head>
     <meta charset="UTF-8" />
     <title>Falcon Ads - Embedded Integration</title>
-    <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/embedded-sdk.js"></script>
+    <script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/embedded-sdk.js"></script>
     <style>
       .perks-container {
         border: 1px solid #e0e0e0;
@@ -156,6 +156,7 @@ interface FalconAdsConfig {
   apiKey: string; // Your Falcon API key (required)
   containerId: string; // HTML element ID for the container (required)
   placementId: string; // Your placement ID from Falcon (required)
+  attributes?: object; // Order/customer data (optional)
 }
 ```
 
@@ -168,6 +169,45 @@ FalconAds.init({
   placementId: "placement_xyz789",
 });
 ```
+
+## Passing Order Attributes
+
+You can pass order and customer data via the `attributes` field. These attributes are used for personalization, analytics, and offer targeting.
+
+```javascript
+FalconAds.init({
+  apiKey: "YOUR_API_KEY",
+  containerId: "falcon-ads-container",
+  placementId: "YOUR_PLACEMENT_ID",
+  attributes: {
+    orderId: "ORD-123456",
+    email: "customer@example.com",
+    amount: "99.99",
+    currency: "USD",
+    firstname: "John",
+    lastname: "Doe",
+    country: "US",
+    language: "en",
+    billingzipcode: "10001",
+  },
+});
+```
+
+### Attribute Reference
+
+| Attribute        | Priority    | Description                      | Format                                      |
+| ---------------- | ----------- | -------------------------------- | ------------------------------------------- |
+| `orderId`        | Required    | Unique order identifier          | String, no special characters (#, @, ., spaces) |
+| `email`          | Required    | Customer email                   | Valid email string                           |
+| `amount`         | Recommended | Order total                      | Numeric string (e.g. `"99.99"`)             |
+| `currency`       | Recommended | Currency code                    | ISO 4217 (e.g. `"USD"`, `"EUR"`)            |
+| `firstname`      | Recommended | Customer first name              | String                                       |
+| `lastname`       | Recommended | Customer last name               | String                                       |
+| `country`        | Optional    | Customer country                 | ISO 3166-1 alpha-2 (e.g. `"US"`, `"GB"`)   |
+| `language`       | Optional    | Customer language                | ISO 639-1 (e.g. `"en"`, `"fr"`)            |
+| `billingzipcode` | Optional    | Billing zip/postal code          | String                                       |
+
+> **Note:** All attribute values must be strings. The `attributes` field is optional — the SDK works without it, but passing attributes enables better offer targeting and analytics.
 
 ## Error Handling
 
@@ -237,7 +277,7 @@ Ensure the container element is in the DOM before calling `FalconAds.init()`:
 ```html
 <!-- ✅ Good: Container exists before script -->
 <div id="falcon-ads-container"></div>
-<script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/embedded-sdk.js"></script>
+<script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/embedded-sdk.js"></script>
 <script>
   FalconAds.init({
     apiKey: "YOUR_API_KEY",
@@ -265,7 +305,7 @@ For best performance, place the SDK script and initialization at the bottom of y
   <div id="falcon-ads-container"></div>
 
   <!-- SDK at the end -->
-  <script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/embedded-sdk.js"></script>
+  <script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/embedded-sdk.js"></script>
   <script>
     FalconAds.init({
       /* ... */
@@ -378,7 +418,7 @@ typeof FalconAds;
 
 ```html
 <!-- ✅ Correct order -->
-<script src="https://falconlabs.s3.us-east-2.amazonaws.com/sdk/embedded-sdk.js"></script>
+<script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/embedded-sdk.js"></script>
 <script>
   FalconAds.init({
     /* ... */
