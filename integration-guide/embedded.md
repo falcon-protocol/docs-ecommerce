@@ -195,17 +195,17 @@ FalconAds.init({
 
 ### Attribute Reference
 
-| Attribute        | Priority    | Description                      | Format                                          |
-| ---------------- | ----------- | -------------------------------- | ----------------------------------------------- |
-| `orderId`        | Required    | Unique order identifier          | String, no special characters (#, @, ., spaces) |
-| `email`          | Required    | Customer email                   | Valid email string                              |
-| `amount`         | Recommended | Order total                      | Numeric string (e.g. `"99.99"`)                 |
-| `firstname`      | Recommended | Customer first name              | String                                          |
-| `lastname`       | Recommended | Customer last name               | String                                          |
-| `currency`       | Optional    | Currency code                    | ISO 4217 (e.g. `"USD"`, `"EUR"`)                |
-| `country`        | Optional    | Customer country                 | ISO 3166-1 alpha-2 (e.g. `"US"`, `"GB"`)        |
-| `language`       | Optional    | Customer language                | ISO 639-1 (e.g. `"en"`, `"fr"`)                 |
-| `billingzipcode` | Optional    | Billing zip/postal code          | String                                          |
+| Attribute        | Priority    | Description             | Format                                          |
+| ---------------- | ----------- | ----------------------- | ----------------------------------------------- |
+| `orderId`        | Required    | Unique order identifier | String, no special characters (#, @, ., spaces) |
+| `email`          | Required    | Customer email          | Valid email string                              |
+| `amount`         | Recommended | Order total             | Numeric string (e.g. `"99.99"`)                 |
+| `firstname`      | Recommended | Customer first name     | String                                          |
+| `lastname`       | Recommended | Customer last name      | String                                          |
+| `currency`       | Optional    | Currency code           | ISO 4217 (e.g. `"USD"`, `"EUR"`)                |
+| `country`        | Optional    | Customer country        | ISO 3166-1 alpha-2 (e.g. `"US"`, `"GB"`)        |
+| `language`       | Optional    | Customer language       | ISO 639-1 (e.g. `"en"`, `"fr"`)                 |
+| `billingzipcode` | Optional    | Billing zip/postal code | String                                          |
 
 > **Note:** All attribute values must be strings. The `attributes` field is optional — the SDK works without it, but passing attributes enables better offer targeting and analytics.
 
@@ -239,8 +239,6 @@ FalconAds.init({
 [FalconAds] Init failed: [error details]
 → General initialization error (check console for details)
 ```
-
----
 
 ## Best Practices
 
@@ -338,8 +336,6 @@ Each placement should have its own unique container:
 </script>
 ```
 
----
-
 ## Troubleshooting
 
 ### Perks don't display
@@ -348,32 +344,32 @@ Each placement should have its own unique container:
 
 1. **Container element exists:**
 
-    ```javascript
-    // Open browser console and run:
-    document.getElementById("falcon-ads-container");
-    // Should return the HTML element, not null
-    ```
+   ```javascript
+   // Open browser console and run:
+   document.getElementById("falcon-ads-container");
+   // Should return the HTML element, not null
+   ```
 
 2. **Container has dimensions:**
 
-    ```javascript
-    // Check container size:
-    const container = document.getElementById("falcon-ads-container");
-    console.log(container.offsetWidth, container.offsetHeight);
-    // Should be greater than 0
-    ```
+   ```javascript
+   // Check container size:
+   const container = document.getElementById("falcon-ads-container");
+   console.log(container.offsetWidth, container.offsetHeight);
+   // Should be greater than 0
+   ```
 
 3. **Check console for errors:**
 
-    Open your browser's developer console (F12) and look for messages starting with `[FalconAds]`
+   Open your browser's developer console (F12) and look for messages starting with `[FalconAds]`
 
 4. **Verify SDK script loaded:**
 
-    ```javascript
-    // In browser console:
-    typeof FalconAds;
-    // Should return "object", not "undefined"
-    ```
+   ```javascript
+   // In browser console:
+   typeof FalconAds;
+   // Should return "object", not "undefined"
+   ```
 
 ### Common Issues and Solutions
 
@@ -441,8 +437,6 @@ Each placement should have its own unique container:
 - Check if offers have geographic or other targeting restrictions
 - Test with different user scenarios
 
----
-
 ## Integration Checklist
 
 Before going live, verify:
@@ -459,8 +453,6 @@ Before going live, verify:
 - [ ] Tested on major browsers (Chrome, Firefox, Safari, Edge)
 - [ ] Page loads without errors when no offers are available
 
----
-
 ## Additional Features
 
 Need more control over the integration? The SDK also supports an advanced API with:
@@ -472,8 +464,6 @@ Need more control over the integration? The SDK also supports an advanced API wi
 - Support for dynamic content updates
 
 **Contact your Falcon Labs account manager** to learn about advanced integration options.
-
----
 
 ## Support
 
