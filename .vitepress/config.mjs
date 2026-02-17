@@ -101,12 +101,8 @@ export default defineConfig({
                 link: "/integration-guide/partner-integration/reporting-api",
               },
               {
-                text: "Adjustable Template for Shopify",
-                link: "/integration-guide/partner-integration/adjustable-template-for-shopify",
-              },
-              {
-                text: "Fallback Template for Shopify",
-                link: "/integration-guide/partner-integration/fallback-template-for-shopify",
+                text: "Shopify Configurable Ad Unit",
+                link: "/integration-guide/partner-integration/shopify-configurable-ad-unit",
               },
               {
                 text: "Complete Integration Example",
