@@ -40,21 +40,23 @@ export default defineConfig({
           },
           { text: "Wix", link: "/integration-guide/wix" },
           {
-            text: "iOS",
-            link: "/integration-guide/ios/integration",
+            text: "Mobile",
+            link: "/integration-guide/mobile/overview",
             items: [
               {
-                text: "Integration",
-                link: "/integration-guide/ios/integration",
+                text: "Overview",
+                link: "/integration-guide/mobile/overview",
               },
               {
-                text: "Manual SDK Integration",
-                link: "/integration-guide/ios/manual",
+                text: "iOS",
+                link: "/integration-guide/mobile/ios",
+              },
+              {
+                text: "Android",
+                link: "/integration-guide/mobile/android",
               },
             ],
           },
-          { text: "Android", link: "/integration-guide/android" },
-          { text: "Flutter", link: "/integration-guide/flutter" },
           {
             text: "Partner Integration",
             link: "/integration-guide/partner-integration/overview",

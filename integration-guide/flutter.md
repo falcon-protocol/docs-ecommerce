@@ -1,4 +1,12 @@
-# Flutter Integration
+---
+title: Flutter SDK Integration (Deprecated)
+---
+
+# Flutter SDK Integration
+
+::: warning Deprecated
+This Flutter SDK integration guide is deprecated. For mobile integration, use the WebView approach instead: [iOS](/integration-guide/mobile/ios) | [Android](/integration-guide/mobile/android). The WebView integration works with any native app framework including Flutter.
+:::
 
 The Falcon Flutter SDK supports both iOS and Android applications.
 

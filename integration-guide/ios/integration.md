@@ -1,4 +1,12 @@
-# iOS Integration
+---
+title: iOS Native SDK Integration (Deprecated)
+---
+
+# iOS Native SDK Integration
+
+::: warning Deprecated
+This native SDK integration guide is deprecated. For mobile integration, use the [WebView Integration](/integration-guide/mobile/ios) approach instead, which uses a standard WKWebView and does not require a native SDK download.
+:::
 
 ## Download the latest SDK
 
