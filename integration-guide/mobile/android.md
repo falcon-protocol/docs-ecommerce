@@ -117,9 +117,32 @@ class PerksActivity : AppCompatActivity() {
 }
 ```
 
+## Custom Attributes
+
+Pass user and order attributes to improve offer targeting. Use `Uri.Builder` to safely encode all parameters:
+
+```kotlin
+fun loadPerks(apiKey: String, placementId: String, email: String? = null, firstName: String? = null, orderId: String? = null) {
+    val sessionId = UUID.randomUUID().toString()
+    val uri = Uri.parse("https://promo.falconlabs.us/ui/webview").buildUpon()
+        .appendQueryParameter("placement", placementId)
+        .appendQueryParameter("apiKey", apiKey)
+        .appendQueryParameter("sessionId", sessionId)
+        .apply {
+            email?.let { appendQueryParameter("at.email", it) }
+            firstName?.let { appendQueryParameter("at.firstname", it) }
+            orderId?.let { appendQueryParameter("at.orderId", it) }
+        }
+        .build()
+    webView.loadUrl(uri.toString())
+}
+```
+
+See the [overview](/integration-guide/mobile/overview) for the full list of supported `at.*` attributes.
+
 ## Complete Example
 
-Here is a complete activity with the bridge and URL configuration:
+Here is a complete activity with the bridge, attribute passing, and click handling via `Intent(ACTION_VIEW)` (opens in the system browser, outside the WebView):
 
 ```kotlin
 import android.annotation.SuppressLint
@@ -139,11 +162,24 @@ class FalconPerksActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_API_KEY = "api_key"
         private const val EXTRA_PLACEMENT_ID = "placement_id"
+        private const val EXTRA_EMAIL = "email"
+        private const val EXTRA_FIRST_NAME = "first_name"
+        private const val EXTRA_ORDER_ID = "order_id"
 
-        fun newIntent(context: Context, apiKey: String, placementId: String): Intent {
+        fun newIntent(
+            context: Context,
+            apiKey: String,
+            placementId: String,
+            email: String? = null,
+            firstName: String? = null,
+            orderId: String? = null
+        ): Intent {
             return Intent(context, FalconPerksActivity::class.java).apply {
                 putExtra(EXTRA_API_KEY, apiKey)
                 putExtra(EXTRA_PLACEMENT_ID, placementId)
+                putExtra(EXTRA_EMAIL, email)
+                putExtra(EXTRA_FIRST_NAME, firstName)
+                putExtra(EXTRA_ORDER_ID, orderId)
             }
         }
     }
@@ -166,14 +202,24 @@ class FalconPerksActivity : AppCompatActivity() {
 
         val apiKey = intent.getStringExtra(EXTRA_API_KEY) ?: return
         val placementId = intent.getStringExtra(EXTRA_PLACEMENT_ID) ?: return
+        val email = intent.getStringExtra(EXTRA_EMAIL)
+        val firstName = intent.getStringExtra(EXTRA_FIRST_NAME)
+        val orderId = intent.getStringExtra(EXTRA_ORDER_ID)
+
+        // Build URL with attributes
         val sessionId = UUID.randomUUID().toString()
+        val uri = Uri.parse("https://promo.falconlabs.us/ui/webview").buildUpon()
+            .appendQueryParameter("placement", placementId)
+            .appendQueryParameter("apiKey", apiKey)
+            .appendQueryParameter("sessionId", sessionId)
+            .apply {
+                email?.let { appendQueryParameter("at.email", it) }
+                firstName?.let { appendQueryParameter("at.firstname", it) }
+                orderId?.let { appendQueryParameter("at.orderId", it) }
+            }
+            .build()
 
-        val url = "https://promo.falconlabs.us/ui/webview" +
-            "?placement=$placementId" +
-            "&apiKey=$apiKey" +
-            "&sessionId=$sessionId"
-
-        webView.loadUrl(url)
+        webView.loadUrl(uri.toString())
     }
 
     inner class FalconBridge {
@@ -189,6 +235,7 @@ class FalconPerksActivity : AppCompatActivity() {
                     type == "event" && name == "click" -> {
                         val clickUrl = data?.optString("clickUrl") ?: ""
                         if (clickUrl.isNotEmpty()) {
+                            // Open in the system browser (outside the WebView)
                             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl)))
                         }
                     }
@@ -211,11 +258,14 @@ class FalconPerksActivity : AppCompatActivity() {
 **Usage from your app:**
 
 ```kotlin
-// Launch the perks screen
+// Launch the perks screen with attributes
 val intent = FalconPerksActivity.newIntent(
     context = this,
     apiKey = "YOUR_API_KEY",
-    placementId = "YOUR_PLACEMENT_ID"
+    placementId = "YOUR_PLACEMENT_ID",
+    email = "user@example.com",
+    firstName = "John",
+    orderId = "ORD-123"
 )
 startActivity(intent)
 ```

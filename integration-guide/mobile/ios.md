@@ -88,9 +88,39 @@ func userContentController(
 }
 ```
 
+## Custom Attributes
+
+Pass user and order attributes to improve offer targeting. Build the URL using `URLComponents` to safely encode all parameters:
+
+```swift
+func loadPerks(apiKey: String, placementId: String, email: String?, firstName: String?, orderId: String?) {
+    let sessionId = UUID().uuidString
+    var components = URLComponents(string: "https://promo.falconlabs.us/ui/webview")!
+    components.queryItems = [
+        URLQueryItem(name: "placement", value: placementId),
+        URLQueryItem(name: "apiKey", value: apiKey),
+        URLQueryItem(name: "sessionId", value: sessionId),
+    ]
+    if let email = email {
+        components.queryItems?.append(URLQueryItem(name: "at.email", value: email))
+    }
+    if let firstName = firstName {
+        components.queryItems?.append(URLQueryItem(name: "at.firstname", value: firstName))
+    }
+    if let orderId = orderId {
+        components.queryItems?.append(URLQueryItem(name: "at.orderId", value: orderId))
+    }
+    if let url = components.url {
+        webView.load(URLRequest(url: url))
+    }
+}
+```
+
+See the [overview](/integration-guide/mobile/overview) for the full list of supported `at.*` attributes.
+
 ## Complete Example
 
-Here is a complete, self-contained view controller:
+Here is a complete, self-contained view controller with attribute passing and click handling via `SFSafariViewController`:
 
 ```swift
 import UIKit
@@ -103,10 +133,17 @@ class FalconPerksViewController: UIViewController,
     private var webView: WKWebView!
     private let apiKey: String
     private let placementId: String
+    private let email: String?
+    private let firstName: String?
+    private let orderId: String?
 
-    init(apiKey: String, placementId: String) {
+    init(apiKey: String, placementId: String,
+         email: String? = nil, firstName: String? = nil, orderId: String? = nil) {
         self.apiKey = apiKey
         self.placementId = placementId
+        self.email = email
+        self.firstName = firstName
+        self.orderId = orderId
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -133,14 +170,25 @@ class FalconPerksViewController: UIViewController,
             webView.isInspectable = true
         }
 
-        // Load perks
+        // Build URL with attributes
         let sessionId = UUID().uuidString
-        let urlString = "https://promo.falconlabs.us/ui/webview"
-            + "?placement=\(placementId)"
-            + "&apiKey=\(apiKey)"
-            + "&sessionId=\(sessionId)"
+        var components = URLComponents(string: "https://promo.falconlabs.us/ui/webview")!
+        components.queryItems = [
+            URLQueryItem(name: "placement", value: placementId),
+            URLQueryItem(name: "apiKey", value: apiKey),
+            URLQueryItem(name: "sessionId", value: sessionId),
+        ]
+        if let email = email {
+            components.queryItems?.append(URLQueryItem(name: "at.email", value: email))
+        }
+        if let firstName = firstName {
+            components.queryItems?.append(URLQueryItem(name: "at.firstname", value: firstName))
+        }
+        if let orderId = orderId {
+            components.queryItems?.append(URLQueryItem(name: "at.orderId", value: orderId))
+        }
 
-        if let url = URL(string: urlString) {
+        if let url = components.url {
             webView.load(URLRequest(url: url))
         }
     }
@@ -163,6 +211,7 @@ class FalconPerksViewController: UIViewController,
         case "click":
             if let clickUrl = data?["clickUrl"] as? String,
                let url = URL(string: clickUrl) {
+                // Open in SFSafariViewController (outside the WebView)
                 let safari = SFSafariViewController(url: url)
                 present(safari, animated: true)
             }
@@ -187,7 +236,10 @@ class FalconPerksViewController: UIViewController,
 ```swift
 let perksVC = FalconPerksViewController(
     apiKey: "YOUR_API_KEY",
-    placementId: "YOUR_PLACEMENT_ID"
+    placementId: "YOUR_PLACEMENT_ID",
+    email: "user@example.com",
+    firstName: "John",
+    orderId: "ORD-123"
 )
 present(perksVC, animated: true)
 ```

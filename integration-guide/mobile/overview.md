@@ -49,6 +49,48 @@ All messages follow this structure:
 
 When you receive a `click` event, open the `clickUrl` in the system browser or an in-app browser (e.g., `SFSafariViewController` on iOS, `CustomTabsIntent` on Android).
 
+## Custom Attributes
+
+You can pass user and order attributes to improve offer targeting and personalization. Attributes are passed as `at.*` query parameters on the WebView URL:
+
+```
+https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&sessionId=SESSION_ID&at.email=user@example.com&at.firstname=John&at.country=US&at.orderId=ORD-123&at.amount=99.99
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `at.email` | Customer email |
+| `at.firstname` | First name |
+| `at.lastname` | Last name |
+| `at.orderId` | Order/transaction ID |
+| `at.amount` | Order total (e.g. "99.99") |
+| `at.country` | ISO country code (e.g. "US") |
+| `at.language` | ISO language code (e.g. "en") |
+| `at.currency` | ISO currency code (e.g. "USD") |
+| `at.confirmationref` | Merchant/seller name (shown in headline) |
+| `at.billingzipcode` | Billing ZIP code |
+| `at.paymenttype` | Payment method (e.g. "credit_card") |
+| `at.ccbin` | Credit card BIN (first 6 digits) |
+| `at.mobile` | Phone number |
+| `at.billingaddress1` | Billing address line 1 |
+| `at.billingaddress2` | Billing address line 2 |
+| `at.age` | Customer age |
+| `at.gender` | Customer gender |
+| `at.cartItems` | Cart items (JSON string) |
+
+> **Note:** The more attributes you provide, the better the offer targeting and personalization.
+
+## Event Lifecycle
+
+Understanding the full lifecycle of events helps you integrate correctly:
+
+1. **Load** - Your app loads the WebView URL. The page calls the `/odata` endpoint to fetch offers for this placement.
+2. **Impression** - When offers are displayed to the user, an impression is automatically tracked (beacon pixel).
+3. **Click** - When the user clicks an offer, a `click` event is sent to your native app via the bridge. The `clickUrl` in the event data is a tracking URL that redirects to the advertiser's page. Your app should open this URL in the system browser (not inside the WebView).
+4. **Close** - When the user closes the offers view, a `close` event is sent to your native app via the bridge.
+
+> **Note:** Impression tracking happens automatically inside the WebView. Click and close events are sent to your native app so you can handle navigation and cleanup.
+
 ## Platform Guides
 
 - [iOS Integration](/integration-guide/mobile/ios) - Swift + WKWebView
