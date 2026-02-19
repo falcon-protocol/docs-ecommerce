@@ -94,7 +94,11 @@ class PerksActivity : AppCompatActivity() {
                     val data = json.optJSONObject("data")
                     val clickUrl = data?.optString("clickUrl") ?: ""
                     if (clickUrl.isNotEmpty()) {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl)))
+                        // @JavascriptInterface runs on a background thread —
+                        // dispatch UI work to the main thread
+                        runOnUiThread {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl)))
+                        }
                     }
                 }
 
@@ -235,8 +239,11 @@ class FalconPerksActivity : AppCompatActivity() {
                     type == "event" && name == "click" -> {
                         val clickUrl = data?.optString("clickUrl") ?: ""
                         if (clickUrl.isNotEmpty()) {
-                            // Open in the system browser (outside the WebView)
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl)))
+                            // @JavascriptInterface runs on a background thread —
+                            // dispatch UI work to the main thread
+                            runOnUiThread {
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl)))
+                            }
                         }
                     }
                     type == "event" && name == "close" -> {
@@ -302,9 +309,12 @@ fun FalconPerksWebView(apiKey: String, placementId: String) {
                                 val data = json.optJSONObject("data")
                                 val clickUrl = data?.optString("clickUrl") ?: ""
                                 if (clickUrl.isNotEmpty()) {
-                                    ctx.startActivity(
-                                        Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl))
-                                    )
+                                    // @JavascriptInterface runs on a background thread
+                                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                        ctx.startActivity(
+                                            Intent(Intent.ACTION_VIEW, Uri.parse(clickUrl))
+                                        )
+                                    }
                                 }
                             }
                         } catch (e: Exception) {
