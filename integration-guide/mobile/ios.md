@@ -39,6 +39,12 @@ class FalconPerksViewController: UIViewController, WKScriptMessageHandler {
             webView.isInspectable = true
         }
     }
+
+    deinit {
+        // Break the retain cycle: WKUserContentController retains its message handlers
+        webView.configuration.userContentController
+            .removeScriptMessageHandler(forName: "iosNativeListener")
+    }
 }
 ```
 
@@ -227,6 +233,11 @@ class FalconPerksViewController: UIViewController,
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!,
                  withError error: Error) {
         print("WebView error: \(error.localizedDescription)")
+    }
+
+    deinit {
+        webView.configuration.userContentController
+            .removeScriptMessageHandler(forName: "iosNativeListener")
     }
 }
 ```
