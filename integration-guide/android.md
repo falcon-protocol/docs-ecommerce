@@ -1,3 +1,9 @@
-# Android Integration
+---
+title: Android Native SDK (Deprecated)
+---
 
-<span style="color: green; font-weight:bold;">[Coming soon]</span>  
+# Android Native SDK
+
+::: warning Deprecated
+This page is deprecated. For Android integration, use the [WebView Integration](/integration-guide/mobile/android) approach instead.
+:::
