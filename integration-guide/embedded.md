@@ -107,7 +107,7 @@ That's it! The SDK will automatically:
 
 ## API Reference
 
-### `FalconAds.init(config: FalconAdsConfig): void`
+### `FalconAds.init(config: FalconAdsConfig): Promise<void>`
 
 Initializes and displays embedded promotional content with a single method call.
 
@@ -142,7 +142,7 @@ The SDK handles errors internally and logs them to console:
 
 - Container must exist in the DOM before calling `init()`
 - If no offers are available, the container remains empty (no error)
-- The method is fire-and-forget (no return value or callbacks)
+- The method returns a `Promise<void>` but is fire-and-forget — all errors are handled internally, so `await` is not required
 - Multiple calls with different placements will work, but avoid duplicate placement IDs
 
 ## Configuration
@@ -168,6 +168,66 @@ FalconAds.init({
   containerId: "falcon-ads-container",
   placementId: "placement_xyz789",
 });
+```
+
+## TypeScript
+
+Types for the SDK (add once, e.g. in `falcon-ads.d.ts`):
+
+```typescript
+declare const FalconAds: {
+  init(config: FalconAdsConfig): Promise<void>;
+};
+
+interface FalconAdsConfig {
+  /** Your Falcon API key */
+  apiKey: string;
+  /** HTML element ID of the container where ads will render */
+  containerId: string;
+  /** Your placement ID from Falcon */
+  placementId: string;
+  /** Optional order/customer data for offer targeting */
+  attributes?: FalconAdsAttributes;
+}
+
+interface FalconAdsAttributes {
+  /** Unique order identifier (no special characters: #, @, ., spaces) */
+  orderId?: string;
+  /** Customer email address */
+  email?: string;
+  /** Order total as a string (e.g. "99.99") */
+  amount?: string;
+  /** Customer first name */
+  firstname?: string;
+  /** Customer last name */
+  lastname?: string;
+  /** ISO 4217 currency code (e.g. "USD", "EUR") */
+  currency?: string;
+  /** ISO 3166-1 alpha-2 country code (e.g. "US", "GB") */
+  country?: string;
+  /** ISO 639-1 language code (e.g. "en", "fr") */
+  language?: string;
+  /** Billing ZIP or postal code */
+  billingzipcode?: string;
+  /** Merchant/seller name — displayed in offer headline */
+  confirmationref?: string;
+  /** Payment method (e.g. "credit_card", "paypal") */
+  paymenttype?: string;
+  /** First 6 digits of credit card (BIN) */
+  ccbin?: string;
+  /** Customer mobile phone number */
+  mobile?: string;
+  /** Billing address line 1 */
+  billingaddress1?: string;
+  /** Billing address line 2 */
+  billingaddress2?: string;
+  /** Customer age */
+  age?: string;
+  /** Customer gender */
+  gender?: string;
+  /** Cart items as a JSON string */
+  cartItems?: string;
+}
 ```
 
 ## Passing Order Attributes
@@ -198,7 +258,7 @@ FalconAds.init({
 | Attribute        | Priority    | Description             | Format                                          |
 | ---------------- | ----------- | ----------------------- | ----------------------------------------------- |
 | `orderId`        | Required    | Unique order identifier | String, no special characters (#, @, ., spaces) |
-| `email`          | Required    | Customer email          | Valid email string                              |
+| `email`          | Required    | Customer email          | Valid email string                               |
 | `amount`         | Recommended | Order total             | Numeric string (e.g. `"99.99"`)                 |
 | `firstname`      | Recommended | Customer first name     | String                                          |
 | `lastname`       | Recommended | Customer last name      | String                                          |
