@@ -193,8 +193,10 @@ interface FalconAdsConfig {
 interface FalconAdsAttributes {
   /** Unique order identifier (no special characters: #, @, ., spaces) */
   orderId?: string;
-  /** Customer email address */
+  /** Customer email address (SDK hashes it automatically before sending) */
   email?: string;
+  /** Pre-hashed email — SHA-256 hex of lowercase trimmed email. Use instead of `email` if you prefer to hash on your side */
+  hashedEmail?: string;
   /** Order total as a string (e.g. "99.99") */
   amount?: string;
   /** Customer first name */
@@ -258,7 +260,8 @@ FalconAds.init({
 | Attribute        | Priority    | Description             | Format                                          |
 | ---------------- | ----------- | ----------------------- | ----------------------------------------------- |
 | `orderId`        | Required    | Unique order identifier | String, no special characters (#, @, ., spaces) |
-| `email`          | Required    | Customer email          | Valid email string                              |
+| `email`          | Required    | Customer email          | Valid email string (SDK hashes automatically)    |
+| `hashedEmail`    | Optional    | Pre-hashed email        | SHA-256 hex of lowercase trimmed email (use instead of `email`) |
 | `amount`         | Recommended | Order total             | Numeric string (e.g. `"99.99"`)                 |
 | `firstname`      | Recommended | Customer first name     | String                                          |
 | `lastname`       | Recommended | Customer last name      | String                                          |
