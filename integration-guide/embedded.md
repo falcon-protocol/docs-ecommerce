@@ -170,6 +170,66 @@ FalconAds.init({
 });
 ```
 
+## TypeScript
+
+Types for the SDK (add once, e.g. in `falcon-ads.d.ts`):
+
+```typescript
+declare const FalconAds: {
+  init(config: FalconAdsConfig): Promise<void>;
+};
+
+interface FalconAdsConfig {
+  /** Your Falcon API key */
+  apiKey: string;
+  /** HTML element ID of the container where ads will render */
+  containerId: string;
+  /** Your placement ID from Falcon */
+  placementId: string;
+  /** Optional order/customer data for offer targeting */
+  attributes?: FalconAdsAttributes;
+}
+
+interface FalconAdsAttributes {
+  /** Unique order identifier (no special characters: #, @, ., spaces) */
+  orderId?: string;
+  /** Customer email address */
+  email?: string;
+  /** Order total as a string (e.g. "99.99") */
+  amount?: string;
+  /** Customer first name */
+  firstname?: string;
+  /** Customer last name */
+  lastname?: string;
+  /** ISO 4217 currency code (e.g. "USD", "EUR") */
+  currency?: string;
+  /** ISO 3166-1 alpha-2 country code (e.g. "US", "GB") */
+  country?: string;
+  /** ISO 639-1 language code (e.g. "en", "fr") */
+  language?: string;
+  /** Billing ZIP or postal code */
+  billingzipcode?: string;
+  /** Merchant/seller name — displayed in offer headline */
+  confirmationref?: string;
+  /** Payment method (e.g. "credit_card", "paypal") */
+  paymenttype?: string;
+  /** First 6 digits of credit card (BIN) */
+  ccbin?: string;
+  /** Customer mobile phone number */
+  mobile?: string;
+  /** Billing address line 1 */
+  billingaddress1?: string;
+  /** Billing address line 2 */
+  billingaddress2?: string;
+  /** Customer age */
+  age?: string;
+  /** Customer gender */
+  gender?: string;
+  /** Cart items as a JSON string */
+  cartItems?: string;
+}
+```
+
 ## Passing Order Attributes
 
 You can pass order and customer data via the `attributes` field. These attributes are used for personalization, analytics, and offer targeting.
