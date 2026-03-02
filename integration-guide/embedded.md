@@ -107,7 +107,7 @@ That's it! The SDK will automatically:
 
 ## API Reference
 
-### `FalconAds.init(config: FalconAdsConfig): void`
+### `FalconAds.init(config: FalconAdsConfig): Promise<void>`
 
 Initializes and displays embedded promotional content with a single method call.
 
@@ -193,10 +193,8 @@ interface FalconAdsConfig {
 interface FalconAdsAttributes {
   /** Unique order identifier (no special characters: #, @, ., spaces) */
   orderId?: string;
-  /** Customer email address (SDK hashes it automatically before sending) */
+  /** Customer email address (SDK hashes it automatically via SHA-256 before sending — plaintext never leaves the browser) */
   email?: string;
-  /** Pre-hashed email — SHA-256 hex of lowercase trimmed email. Use instead of `email` if you prefer to hash on your side */
-  hashedEmail?: string;
   /** Order total as a string (e.g. "99.99") */
   amount?: string;
   /** Customer first name */
@@ -260,8 +258,7 @@ FalconAds.init({
 | Attribute        | Priority    | Description             | Format                                          |
 | ---------------- | ----------- | ----------------------- | ----------------------------------------------- |
 | `orderId`        | Required    | Unique order identifier | String, no special characters (#, @, ., spaces) |
-| `email`          | Required    | Customer email          | Valid email string (SDK hashes automatically)    |
-| `hashedEmail`    | Optional    | Pre-hashed email        | SHA-256 hex of lowercase trimmed email (use instead of `email`) |
+| `email`          | Required    | Customer email          | Valid email string (SDK hashes automatically via SHA-256) |
 | `amount`         | Recommended | Order total             | Numeric string (e.g. `"99.99"`)                 |
 | `firstname`      | Recommended | Customer first name     | String                                          |
 | `lastname`       | Recommended | Customer last name      | String                                          |
