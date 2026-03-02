@@ -64,6 +64,11 @@ Pass customer and order data with the `at.` prefix for better targeting and anal
 - `at.paymenttype` or `at.payment_type` (string): Payment method
 - Valid values: `creditCard`, `debitCard`, `paypal`, `applePay`, `googlePay`, `bankTransfer`, `crypto`, `other`
 
+**Client Context:**
+
+- `at.clientIp` (string): Client IP address override (IPv4 or IPv6, used for geo-targeting)
+- `at.userAgent` (string): Client user agent override (max 500 chars, used for device detection)
+
 **Supported Currencies:**
 USD, EUR, GBP, CAD, AUD, JPY, CNY, NZD, CHF, SEK, NOK, DKK, PLN, CZK, HUF, RON, BGN, HRK, RUB, TRY, BRL, MXN, ARS, CLP, COP, PEN, UYU, INR, IDR, MYR, PHP, SGD, THB, VND, KRW, HKD, TWD, SAR, AED, ILS, EGP, ZAR, NGN, KES, GHS
 
