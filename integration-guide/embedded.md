@@ -142,7 +142,7 @@ The SDK handles errors internally and logs them to console:
 
 - Container must exist in the DOM before calling `init()`
 - If no offers are available, the container remains empty (no error)
-- The method is fire-and-forget (no return value or callbacks)
+- The method returns a `Promise<void>` but is fire-and-forget — all errors are handled internally, so `await` is not required
 - Multiple calls with different placements will work, but avoid duplicate placement IDs
 
 ## Configuration
