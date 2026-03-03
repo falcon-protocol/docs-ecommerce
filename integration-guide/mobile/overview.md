@@ -77,6 +77,8 @@ https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&ses
 | `at.age` | Customer age |
 | `at.gender` | Customer gender |
 | `at.cartItems` | Cart items (JSON string) |
+| `at.clientIp` | Client IP address (overrides auto-detected IP) |
+| `at.userAgent` | Client user agent string (overrides auto-detected UA) |
 
 > **Note:** The more attributes you provide, the better the offer targeting and personalization.
 
