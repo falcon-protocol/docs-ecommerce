@@ -1,4 +1,4 @@
-# Shopify Configurable Ad Unit
+# Shopify Configurable Ad Unit Integration
 
 ## Overview
 
@@ -6,26 +6,93 @@ This guide walks you through integrating the Falcon configurable ad template int
 
 ## 1. Repository Access
 
-Before starting, every developer on your team who will work with this repository must be granted access.
+Template files are distributed via a private GitHub repository. Access is managed through SSH deploy keys — no individual GitHub accounts need to be added.
 
-1. Collect **GitHub usernames** of all developers who will clone, pull, or build the project (including CI/CD service accounts if applicable).
-2. Send the list to your **Falcon contact** — we will grant read access to each person.
-3. Let us know which Falcon team members should have access to **your** repository (for support and debugging).
+1. Request a **deploy key** from your Falcon contact. You will receive a private key file.
+2. Save the file as `falcon_deploy_key` in your project root.
+3. Add `falcon_deploy_key` to your `.gitignore`:
+
+   ```text
+   falcon_deploy_key
+   ```
+
+4. Every developer who needs to pull templates should have this file in their project root.
 
 ## 2. Prerequisites
 
-- `react` ^18.0.0
-- `@shopify/ui-extensions-react` 2025.7.x
+- `react`
+- `@shopify/ui-extensions-react`
 
 ## 3. Installation
 
-Add the templates as a git submodule:
+First, create two helper scripts in your project root and add them to `package.json`.
+
+> **Important:** In both scripts and in `package.json`, replace `<your-preferred-path>` with the actual path where you want the templates (e.g., `src/falcon-templates`).
+
+**`falcon-init.sh`:**
 
 ```bash
-git submodule add https://github.com/falcon-partners/shopify-templates.git <your-preferred-path>
+#!/bin/bash
+set -e
+
+# ⬇️ Change this to your preferred submodule path
+SUBMODULE_PATH="<your-preferred-path>"
+
+DEPLOY_KEY="$(pwd)/falcon_deploy_key"
+
+if [ ! -f "$DEPLOY_KEY" ]; then
+  echo "Error: falcon_deploy_key not found in project root"
+  exit 1
+fi
+
+chmod 600 "$DEPLOY_KEY"
+GIT_SSH_COMMAND="ssh -i $DEPLOY_KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+  git submodule add git@github.com:falcon-partners/shopify-templates.git "$SUBMODULE_PATH"
+
+echo "Submodule added at $SUBMODULE_PATH"
 ```
 
-> **Note:** Do not create `<your-preferred-path>` manually before running the command — `git submodule add` creates the directory for you. If the directory already exists, the command will fail.
+**`falcon-sync.sh`:**
+
+```bash
+#!/bin/bash
+set -e
+
+# ⬇️ Change this to your preferred submodule path
+SUBMODULE_PATH="<your-preferred-path>"
+
+DEPLOY_KEY="$(pwd)/falcon_deploy_key"
+
+if [ ! -f "$DEPLOY_KEY" ]; then
+  echo "Error: falcon_deploy_key not found in project root"
+  exit 1
+fi
+
+chmod 600 "$DEPLOY_KEY"
+GIT_SSH_COMMAND="ssh -i $DEPLOY_KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+  git submodule update --remote --merge "$SUBMODULE_PATH"
+
+echo "Templates synced"
+```
+
+Add to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "falcon:init": "bash ./falcon-init.sh",
+    "falcon:sync": "bash ./falcon-sync.sh"
+  }
+}
+```
+
+Then install the submodule:
+
+```bash
+npm run falcon:init
+```
+
+> **Note:** Do not create the submodule path manually before running the command — the script creates the directory for you. If the directory already exists, the command will fail.
 
 **Recommended:** Add the submodule path to `.prettierignore`:
 
@@ -47,13 +114,15 @@ The submodule contains the following files:
 | `renderer.tsx` | Template router (selects 21 or 15)    |
 | `skeleton.tsx` | Loading skeleton                      |
 
+---
+
 ### `provider.tsx` — FeatureManagementProvider
 
 A React context provider that must wrap the template. It handles feature delivery internally — the provider makes a request to our server and manages feature flags, A/B testing, and configuration updates. This means new features and experiments are delivered to your users **without any code changes on your side**.
 
-### Props (FeatureManagementProvider)
+#### Props (provider.tsx)
 
-```tsx
+```typescript
 interface FeatureManagementProviderProps {
   // Required
   publicKey: string; // Falcon API public key
@@ -68,9 +137,9 @@ interface FeatureManagementProviderProps {
 }
 ```
 
-### FeatureManagementUserContext
+#### FeatureManagementUserContext
 
-```tsx
+```typescript
 interface FeatureManagementUserContext {
   // Required
   placementId: string; // The placement ID for this extension
@@ -108,9 +177,9 @@ If you have questions about where to obtain any of these values, reach out to th
 
 The primary configurable ad template. Its layout, element parameters, and positioning are all controlled remotely through our proxy — changes take effect without pulling updates from GitHub.
 
-### Props (Template21)
+#### Props (index.tsx)
 
-```tsx
+```typescript
 interface TemplateProps {
   showIcon: boolean; // Show icon flag, from Falcon API
   templateData: TemplateData; // Template configuration (84 parameters), from Falcon API
@@ -157,7 +226,7 @@ Handles template routing — automatically selects Template21 or Template15 base
 
 The Renderer accepts the same props as the templates, plus one additional prop:
 
-```tsx
+```typescript
 interface RendererProps extends TemplateProps {
   templateId: number; // Template ID from Falcon API
 }
@@ -184,21 +253,21 @@ Use it in two ways:
 
 ## 5. Usage Example
 
-```jsx
-import { FeatureManagementProvider } from "<your-preferred-path>/provider";
-import { Renderer } from "<your-preferred-path>/renderer";
-import { TemplateDefaultSkeleton } from "<your-preferred-path>/skeleton";
+```tsx
+import { FeatureManagementProvider } from '<your-preferred-path>/provider';
+import { Renderer } from '<your-preferred-path>/renderer';
+import { TemplateDefaultSkeleton } from '<your-preferred-path>/skeleton';
 
 function App() {
-  const publicKey = "your-public-key"; // The same public key you use for requesting odata
-  const apiEndpoint = "https://pr-api.falconlabs.us/api/features/evaluate";
+  const publicKey = 'your-public-key'; // The same public key you use for requesting odata
+  const apiEndpoint = 'https://pr-api.falconlabs.us/api/features/evaluate';
 
   const [sessionId] = useState(generateUUID());
   const { hashedCustomerShopifyId, hashedPhone, hashedEmail, firstName } =
     useShopifyApi();
   const { templateId, showIcon, templateData, activeOffer } = useFalconApi();
-  const { reachedEndOfOffers, handleClick, handleDecline } = useFalconFlow();
 
+  const { reachedEndOfOffers, handleClick, handleDecline } = useFalconFlow();
   // You can use handleClick and handleDecline for your own custom logic.
   // reachedEndOfOffers should be true when offers are ended
   // (offers can be found within the odata response).
@@ -209,7 +278,7 @@ function App() {
   //   order status page: '@shopify/ui-extensions-react/customer-account'
 
   const userContext = {
-    placementId: "extension-placement-id",
+    placementId: 'extension-placement-id',
     sessionId: sessionId,
     hashedCustomerShopifyId: hashedCustomerShopifyId,
     hashedPhone: hashedPhone,
@@ -217,7 +286,7 @@ function App() {
     templateId: templateId,
   };
 
-  const extensionTarget = "purchase.thank-you.block.render";
+  const extensionTarget = 'purchase.thank-you.block.render';
   // Or 'customer-account.order-status.block.render' for order status page
 
   return (
@@ -247,29 +316,79 @@ function App() {
 
 ## 6. Updating Templates
 
-**Manual:**
-
-```bash
-cd <your-preferred-path>
-git pull origin main
-```
-
-**npm script (recommended):**
-
-Add to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "falcon:sync": "git submodule update --remote --merge ./<your-preferred-path>"
-  }
-}
-```
-
-Then run:
+Run the sync script (set up in step 3):
 
 ```bash
 npm run falcon:sync
 ```
 
+This pulls the latest templates from the Falcon repository using your deploy key.
+
 > **Tip:** Add `falcon:sync` to your pre-commit hook (e.g., via Husky) to keep templates up to date automatically.
+
+## 7. CI/CD Setup
+
+Your CI/CD environment (CodeBuild, GitHub Actions, etc.) does not have access to the private template repository by default. When your pipeline clones your repo, it won't be able to fetch the submodule — you need to configure the same deploy key on the server.
+
+The idea is simple: before your build runs `git submodule update`, the deploy key must be available as an SSH identity. How you do this depends on your CI/CD provider — store the key in your provider's secrets manager, write it to a file at build time, and point SSH to it.
+
+### Example: AWS CodeBuild
+
+**1. Store the key in Secrets Manager:**
+
+```bash
+aws secretsmanager create-secret \
+  --name "falcon-deploy-key" \
+  --secret-string file://falcon_deploy_key
+```
+
+**2. Add to your `buildspec.yml`:**
+
+```yaml
+env:
+  secrets-manager:
+    DEPLOY_KEY: 'falcon-deploy-key'
+
+phases:
+  install:
+    commands:
+      - mkdir -p ~/.ssh
+      - echo "$DEPLOY_KEY" > ~/.ssh/falcon_deploy
+      - chmod 600 ~/.ssh/falcon_deploy
+      - export GIT_SSH_COMMAND="ssh -i ~/.ssh/falcon_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=no"
+      - git submodule update --init --recursive
+```
+
+### Example: GitHub Actions
+
+**1. Store the key as a repository secret:**
+
+Go to your repo → Settings → Secrets and variables → Actions → **New repository secret**:
+
+- **Name:** `FALCON_DEPLOY_KEY`
+- **Value:** paste the full contents of `falcon_deploy_key`
+
+**2. Add to your workflow** (e.g., `.github/workflows/deploy.yml`):
+
+```yaml
+steps:
+  - name: Setup deploy key
+    run: |
+      mkdir -p ~/.ssh
+      echo "${{ secrets.FALCON_DEPLOY_KEY }}" > ~/.ssh/falcon_deploy
+      chmod 600 ~/.ssh/falcon_deploy
+
+  - name: Checkout
+    uses: actions/checkout@v4
+
+  - name: Fetch submodules
+    run: |
+      GIT_SSH_COMMAND="ssh -i ~/.ssh/falcon_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=no" \
+        git submodule update --init --recursive
+```
+
+> **Note:** Do not use `submodules: recursive` in `actions/checkout` — it overrides SSH with its own HTTPS authentication, which does not have access to the private template repository.
+
+## Support
+
+For questions or issues, contact **Falcon Labs**.
