@@ -95,11 +95,16 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
       "beaconUrl": "https://pr-api.falconlabs.us/vdata?...",
       "closeUrl": "https://pr-api.falconlabs.us/close?...",
       "termsUrl": "https://brand.com/terms",
-      "icon": {
-        "url": "https://cdn.example.com/icon.png",
-        "width": 120,
-        "height": 120
-      }
+      "images": [
+          {
+              "publicUrl": "https://images.falconlabs.us/demand/...",
+              "width": 2000,
+              "height": 390,
+              "aspectRatio": 5.128205,
+              "type": "icon",
+              "tags": []
+          }
+      ]
     },
     {
       "bannerId": "12346",
@@ -111,6 +116,16 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
       "clickUrl": "https://pr-api.falconlabs.us/click?...",
       "beaconUrl": "https://pr-api.falconlabs.us/vdata?...",
       "closeUrl": "https://pr-api.falconlabs.us/close?..."
+      "images": [
+          {
+              "publicUrl": "https://images.falconlabs.us/demand/...",
+              "width": 2000,
+              "height": 390,
+              "aspectRatio": 5.128205,
+              "type": "icon",
+              "tags": []
+          }
+      ]
     }
   ],
   "adDisplayDelay": 0,
