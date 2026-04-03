@@ -1,8 +1,8 @@
-# Shopify Configurable Ad Unit Integration
+# Shopify Ad Unit (Preact)
 
 ## Overview
 
-This guide walks you through integrating the Falcon configurable ad template into your Shopify app. The setup is straightforward and requires minimal ongoing maintenance — everything is powered by git submodules, so updates are pulled in with a single command.
+This guide walks you through integrating the Falcon ad template into your Shopify app using Preact and Shopify's web components (API version 2025-10+). The setup is straightforward and requires minimal ongoing maintenance — everything is powered by git submodules, so updates are pulled in with a single command.
 
 ## 1. Repository Access
 
@@ -20,8 +20,8 @@ Template files are distributed via a private GitHub repository. Access is manage
 
 ## 2. Prerequisites
 
-- `react`
-- `@shopify/ui-extensions-react`
+- `preact`
+- `@shopify/ui-extensions`
 
 ## 3. Installation
 
@@ -35,7 +35,7 @@ First, create two helper scripts in your project root and add them to `package.j
 #!/bin/bash
 set -e
 
-# ⬇️ Change this to your preferred submodule path
+# Change this to your preferred submodule path
 SUBMODULE_PATH="<your-preferred-path>"
 
 DEPLOY_KEY="$(pwd)/falcon_deploy_key"
@@ -58,7 +58,7 @@ echo "Submodule added at $SUBMODULE_PATH"
 #!/bin/bash
 set -e
 
-# ⬇️ Change this to your preferred submodule path
+# Change this to your preferred submodule path
 SUBMODULE_PATH="<your-preferred-path>"
 
 DEPLOY_KEY="$(pwd)/falcon_deploy_key"
@@ -100,25 +100,21 @@ npm run falcon:init
 <your-preferred-path>
 ```
 
-This prevents Prettier from reformatting submodule files. If you accidentally modified files inside the submodule, discard the changes — the submodule does not need to be pushed separately.
-
 ## 4. File Overview
 
-The submodule contains the following files:
+The `preact/` folder contains:
 
-| File           | Description                           |
-| -------------- | ------------------------------------- |
-| `provider.tsx` | Feature management provider           |
-| `index.tsx`    | Template21 — configurable ad template |
-| `fallback.tsx` | Template15 — fallback template        |
-| `renderer.tsx` | Template router (selects 21 or 15)    |
-| `skeleton.tsx` | Loading skeleton                      |
+| File           | Description                 |
+| -------------- | --------------------------- |
+| `provider.tsx` | Feature management provider |
+| `index.tsx`    | Ad template                 |
+| `skeleton.tsx` | Loading skeleton            |
 
 ---
 
 ### `provider.tsx` — FeatureManagementProvider
 
-A React context provider that must wrap the template. It handles feature delivery internally — the provider makes a request to our server and manages feature flags, A/B testing, and configuration updates. This means new features and experiments are delivered to your users **without any code changes on your side**.
+A Preact context provider that must wrap the template. It handles feature delivery internally — the provider makes a request to our server and manages feature flags, A/B testing, and configuration updates. This means new features and experiments are delivered to your users **without any code changes on your side**.
 
 #### Props (provider.tsx)
 
@@ -130,10 +126,11 @@ interface FeatureManagementProviderProps {
   userContext: FeatureManagementUserContext; // User targeting context (see below)
   extensionTarget: string; // Shopify extension target (see below)
   storage: Storage; // Shopify storage object from useStorage()
-  children: ReactNode; // Child components
+  children: ComponentChildren; // Child components
 
   // Optional
   loadingElement?: JSX.Element; // Component shown during loading
+  preventEvaluateRequest?: boolean; // Skip API call (default: false)
 }
 ```
 
@@ -153,12 +150,12 @@ interface FeatureManagementUserContext {
   // Optional — Targeting attributes
   templateId?: number; // from Falcon API
   timezone?: string; // User timezone
-  amount?: number; // Order amount, from useApi()
-  orderId?: string; // Order ID, from useApi()
-  paymentType?: string; // Payment type, from useApi()
+  amount?: number; // Order amount
+  orderId?: string; // Order ID
+  paymentType?: string; // Payment type
   age?: number; // User age
   gender?: string; // User gender
-  billingZipCode?: string; // Billing zip code, from useApi()
+  billingZipCode?: string; // Billing zip code
   referrer?: string; // Referrer URL
   screenWidth?: number; // Screen width in pixels
   screenHeight?: number; // Screen height in pixels
@@ -173,16 +170,16 @@ If you have questions about where to obtain any of these values, reach out to th
 
 ---
 
-### `index.tsx` — Template21 (Configurable Template)
+### `index.tsx` — Template
 
-The primary configurable ad template. Its layout, element parameters, and positioning are all controlled remotely through our proxy — changes take effect without pulling updates from GitHub.
+The ad template built with Preact and Shopify web components (`s-box`, `s-text`, `s-button`, etc.).
 
 #### Props (index.tsx)
 
 ```typescript
 interface TemplateProps {
   showIcon: boolean; // Show icon flag, from Falcon API
-  templateData: TemplateData; // Template configuration (84 parameters), from Falcon API
+  templateData: TemplateData; // Template configuration, from Falcon API
   activeOffer: Offer; // Current active offer, from Falcon API
   reachedEndOfOffers: boolean; // Whether all offers have been shown
   clickOffer: () => void; // Handler for offer click (primary CTA)
@@ -201,7 +198,7 @@ interface TemplateProps {
 **Prop details:**
 
 - **`activeOffer`** — The current offer object to display.
-- **`templateData`** — Configuration object including `templateConfig` (84 parameters) that control the template layout and styling.
+- **`templateData`** — Configuration object including template styling and content settings.
 - **`extensionTarget`** — Identifies the extension point:
   - `"purchase.thank-you.block.render"` — Thank you page
   - `"customer-account.order-status.block.render"` — Order status page
@@ -214,37 +211,9 @@ If you have questions about any of these props, reach out to the Falcon Labs tec
 
 ---
 
-### `fallback.tsx` — Template15 (Fallback Template)
+### `skeleton.tsx` — TemplateSimpleSkeleton
 
-A simplified fallback template with a predefined layout. It accepts the same props as Template21. The Renderer component (below) handles switching between templates automatically.
-
----
-
-### `renderer.tsx` — Renderer
-
-Handles template routing — automatically selects Template21 or Template15 based on the `templateId` from the Falcon proxy API. You don't need to implement any switching logic yourself.
-
-The Renderer accepts the same props as the templates, plus one additional prop:
-
-```typescript
-interface RendererProps extends TemplateProps {
-  templateId: number; // Template ID from Falcon API
-}
-```
-
-`templateId` is provided by the Falcon proxy API alongside `templateData` and `activeOffer`.
-
-| `templateId` | Template              |
-| ------------ | --------------------- |
-| `21`         | Template21            |
-| `15`         | Template15            |
-| any other    | Template15 (fallback) |
-
----
-
-### `skeleton.tsx` — TemplateDefaultSkeleton
-
-A loading skeleton component. No props required.
+A loading skeleton component. No props required. Shows a card with a spinner while the provider loads.
 
 Use it in two ways:
 
@@ -254,12 +223,21 @@ Use it in two ways:
 ## 5. Usage Example
 
 ```tsx
-import { FeatureManagementProvider } from '<your-preferred-path>/provider';
-import { Renderer } from '<your-preferred-path>/renderer';
-import { TemplateDefaultSkeleton } from '<your-preferred-path>/skeleton';
+import '@shopify/ui-extensions/preact';
+import { render } from 'preact';
+import { useState } from 'preact/hooks';
+import { useStorage } from '@shopify/ui-extensions/checkout/preact';
+
+import { FeatureManagementProvider } from '<your-preferred-path>/preact/provider';
+import { Template15 } from '<your-preferred-path>/preact/index';
+import { TemplateSimpleSkeleton } from '<your-preferred-path>/preact/skeleton';
+
+export default function extension() {
+  render(<App />, document.body);
+}
 
 function App() {
-  const publicKey = 'your-public-key'; // The same public key you use for requesting odata
+  const publicKey = 'your-public-key';
   const apiEndpoint = 'https://pr-api.falconlabs.us/api/features/evaluate';
 
   const [sessionId] = useState(generateUUID());
@@ -268,14 +246,8 @@ function App() {
   const { templateId, showIcon, templateData, activeOffer } = useFalconApi();
 
   const { reachedEndOfOffers, handleClick, handleDecline } = useFalconFlow();
-  // You can use handleClick and handleDecline for your own custom logic.
-  // reachedEndOfOffers should be true when offers are ended
-  // (offers can be found within the odata response).
 
   const storage = useStorage();
-  // Import from Shopify extension storage API depending on your target:
-  //   thank you page:   '@shopify/ui-extensions-react/checkout'
-  //   order status page: '@shopify/ui-extensions-react/customer-account'
 
   const userContext = {
     placementId: 'extension-placement-id',
@@ -287,19 +259,17 @@ function App() {
   };
 
   const extensionTarget = 'purchase.thank-you.block.render';
-  // Or 'customer-account.order-status.block.render' for order status page
 
   return (
     <FeatureManagementProvider
       publicKey={publicKey}
       apiEndpoint={apiEndpoint}
       userContext={userContext}
-      loadingElement={<TemplateDefaultSkeleton />}
+      loadingElement={<TemplateSimpleSkeleton />}
       storage={storage}
       extensionTarget={extensionTarget}
     >
-      <Renderer
-        templateId={templateId}
+      <Template15
         showIcon={showIcon}
         templateData={templateData}
         activeOffer={activeOffer}
@@ -323,8 +293,6 @@ npm run falcon:sync
 ```
 
 This pulls the latest templates from the Falcon repository using your deploy key.
-
-> **Tip:** Add `falcon:sync` to your pre-commit hook (e.g., via Husky) to keep templates up to date automatically.
 
 ## 7. CI/CD Setup
 
