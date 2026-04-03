@@ -1,12 +1,12 @@
-## Reporting API
+# Reporting API
 
-### Overview
+## Overview
 
 The Reporting API provides analytics and performance data for your placements and sites.
 
 ### Base Endpoint
 
-```
+```text
 https://pr-api.falconlabs.us/api/report
 ```
 
@@ -14,7 +14,7 @@ https://pr-api.falconlabs.us/api/report
 
 Use the publisher’s **Private Key**:
 
-```
+```text
 Authorization: Bearer PUBLISHER_PRIVATE_KEY
 ```
 
@@ -24,7 +24,7 @@ Retrieves performance metrics for placements or sites.
 
 ### Endpoint
 
-```
+```text
 GET /api/report
 ```
 

@@ -103,8 +103,12 @@ export default defineConfig({
                 link: "/integration-guide/partner-integration/reporting-api",
               },
               {
-                text: "Shopify Configurable Ad Unit",
-                link: "/integration-guide/partner-integration/shopify-configurable-ad-unit",
+                text: "Shopify Ad Unit (React)",
+                link: "/integration-guide/partner-integration/shopify-ad-unit-react",
+              },
+              {
+                text: "Shopify Ad Unit (Preact)",
+                link: "/integration-guide/partner-integration/shopify-ad-unit-preact",
               },
               {
                 text: "Complete Integration Example",
