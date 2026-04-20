@@ -5,6 +5,7 @@ export default defineConfig({
   title: "Falcon Ecommerce",
   base: "/",
   description: "Documentation on the Falcon Ecommerce transaction experiences",
+  srcExclude: ["**/_shared/**"],
   themeConfig: {
     nav: [{ text: "Home", link: "https://falconlabs.us" }],
     sidebar: [
@@ -58,6 +59,39 @@ export default defineConfig({
             ],
           },
           {
+            text: "Publisher Integration",
+            link: "/integration-guide/publisher-integration/overview",
+            collapsed: true,
+            items: [
+              {
+                text: "Overview",
+                link: "/integration-guide/publisher-integration/overview",
+              },
+              {
+                text: "OData API",
+                link: "/integration-guide/publisher-integration/odata-api",
+              },
+              {
+                text: "Click API",
+                link: "/integration-guide/publisher-integration/click-api",
+              },
+              {
+                text: "Impression API",
+                link: "/integration-guide/publisher-integration/impression-api",
+              },
+            ],
+          },
+          {
+            text: "Advanced",
+            collapsed: true,
+            items: [
+              {
+                text: "Reporting API",
+                link: "/integration-guide/reporting-api",
+              },
+            ],
+          },
+          {
             text: "Partner Integration",
             link: "/integration-guide/partner-integration/overview",
             collapsed: true,
@@ -93,6 +127,14 @@ export default defineConfig({
               {
                 text: "OData API",
                 link: "/integration-guide/partner-integration/odata-api",
+              },
+              {
+                text: "Click API",
+                link: "/integration-guide/partner-integration/click-api",
+              },
+              {
+                text: "Impression API",
+                link: "/integration-guide/partner-integration/impression-api",
               },
               {
                 text: "Lifecycle Webhooks",
