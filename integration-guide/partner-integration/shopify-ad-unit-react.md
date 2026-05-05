@@ -134,6 +134,7 @@ interface FeatureManagementProviderProps {
 
   // Optional
   loadingElement?: JSX.Element; // Component shown during loading
+  disableClientImpressions?: boolean; // Disable automatic impression beacon firing (default: false)
 }
 ```
 
@@ -184,19 +185,22 @@ interface TemplateProps {
   showIcon: boolean; // Show icon flag, from Falcon API
   templateData: TemplateData; // Template configuration (84 parameters), from Falcon API
   activeOffer: Offer; // Current active offer, from Falcon API
+  offers: Offer[]; // Full array of offers, from Falcon API
+  activeOfferIndex: number; // Index of the current offer in the offers array
   reachedEndOfOffers: boolean; // Whether all offers have been shown
   clickOffer: () => void; // Handler for offer click (primary CTA)
   handleNoThanks: () => void; // Handler for declining an offer
   extensionTarget: ExtensionTarget; // Shopify extension target
   firstName?: string; // Customer first name, from Shopify API
+  email?: string; // Customer email, from Shopify API
 }
 ```
 
 **Where data comes from:**
 
-- `showIcon`, `templateData`, `activeOffer` — provided by the Falcon proxy API (we will supply the endpoint).
-- `extensionTarget`, `firstName` — obtained from Shopify APIs on your side.
-- `reachedEndOfOffers`, `clickOffer`, `handleNoThanks` — handled by your application logic.
+- `showIcon`, `templateData`, `activeOffer`, `offers` — provided by the Falcon proxy API (we will supply the endpoint).
+- `extensionTarget`, `firstName`, `email` — obtained from Shopify APIs on your side.
+- `activeOfferIndex`, `reachedEndOfOffers`, `clickOffer`, `handleNoThanks` — handled by your application logic.
 
 **Prop details:**
 
@@ -205,9 +209,12 @@ interface TemplateProps {
 - **`extensionTarget`** — Identifies the extension point:
   - `"purchase.thank-you.block.render"` — Thank you page
   - `"customer-account.order-status.block.render"` — Order status page
-- **`clickOffer`** — Called when the primary CTA button is clicked.
+- **`offers`** — The full array of offers from the Falcon API response. Used internally by the template for the Inspired tease bar feature.
+- **`activeOfferIndex`** — The index of the currently displayed offer within the `offers` array.
+- **`clickOffer`** — Called when the primary CTA button is clicked. See [Inspired offer behavior](#6-inspired-offer-behavior) below.
 - **`handleNoThanks`** — Called when the decline button is clicked.
 - **`firstName`** — Used for personalization (e.g., _"John, thank you for your purchase"_).
+- **`email`** — Customer email address, displayed in the template when email feature is enabled.
 - **`reachedEndOfOffers`** — Set to `true` to hide the component when no more offers are available.
 
 If you have questions about any of these props, reach out to the Falcon Labs technical team.
@@ -303,18 +310,98 @@ function App() {
         showIcon={showIcon}
         templateData={templateData}
         activeOffer={activeOffer}
+        offers={offers}
+        activeOfferIndex={activeOfferIndex}
         reachedEndOfOffers={reachedEndOfOffers}
         clickOffer={handleClick}
         handleNoThanks={handleDecline}
         extensionTarget={extensionTarget}
         firstName={firstName}
+        email={email}
       />
     </FeatureManagementProvider>
   );
 }
 ```
 
-## 6. Updating Templates
+## 6. Inspired Offer Behavior
+
+Some Falcon API responses include an "Inspired" offer — a special final offer in the carousel. When this feature is active, the API response will contain:
+
+- `templateData.hasInspired: true` — indicates the last offer in the array is an Inspired offer
+- `templateData.teaseMessage` — a tease message displayed as a bar above the footer (e.g., "See what's next!")
+
+The template handles the **tease bar rendering** automatically — it shows the bar when `teaseMessage` exists, hides it on non-block targets, and hides it when the user reaches the last (Inspired) offer.
+
+However, the **offer navigation logic** is your responsibility. Your `clickOffer` handler must implement the "jump to last offer" behavior:
+
+```typescript
+function clickOffer() {
+  // ... your existing click tracking logic ...
+
+  const lastIndex = offers.length - 1;
+
+  // If already on the last offer, mark end of offers
+  if (activeOfferIndex >= lastIndex) {
+    setReachedEndOfOffers(true);
+    return;
+  }
+
+  // If hasInspired, jump directly to the last (Inspired) offer
+  if (templateData.hasInspired) {
+    setActiveOfferIndex(lastIndex);
+    return;
+  }
+
+  // Default: advance to next offer
+  setActiveOfferIndex(activeOfferIndex + 1);
+}
+```
+
+**Key points:**
+
+- When `hasInspired` is true, clicking the CTA should skip intermediate offers and jump directly to the last offer
+- The tease bar and offer index update should happen in the same state update to avoid visual flicker
+- `handleNoThanks` should always advance to the next offer sequentially (no jumping)
+
+## 7. Impression Tracking
+
+The SDK fires impression beacons automatically — no action required on your side. Each time the active offer changes, the template sends a request to `activeOffer.beaconUrl` to register that the offer was seen.
+
+### Server-side impressions (opt-out)
+
+If you fire impressions yourself via a server-side proxy (e.g. to forward the real end-user IP and User-Agent), pass `disableClientImpressions` to the provider to prevent double-counting:
+
+```tsx
+<FeatureManagementProvider
+  publicKey={publicKey}
+  apiEndpoint={apiEndpoint}
+  userContext={userContext}
+  storage={storage}
+  extensionTarget={extensionTarget}
+  disableClientImpressions
+>
+  ...
+</FeatureManagementProvider>
+```
+
+When firing the beacon server-side, you must forward the real end-user IP and User-Agent as query parameters — otherwise the backend records your server's IP and UA instead:
+
+| Query param    | Value                    |
+| -------------- | ------------------------ |
+| `at.clientIp`  | Real end-user IP address |
+| `at.userAgent` | Real end-user User-Agent |
+
+Example server-side beacon call:
+
+```http
+GET {activeOffer.beaconUrl}&at.clientIp=1.2.3.4&at.userAgent=Mozilla%2F5.0...
+Authorization: Bearer {publicKey}
+```
+
+> **Important:** Use exactly `at.clientIp` and `at.userAgent` as the parameter names. Other names (e.g. `userIp`, `userAgent`) are not recognized and will be silently ignored.
+
+## 8. Updating Templates
 
 Run the sync script (set up in step 3):
 
@@ -326,7 +413,7 @@ This pulls the latest templates from the Falcon repository using your deploy key
 
 > **Tip:** Add `falcon:sync` to your pre-commit hook (e.g., via Husky) to keep templates up to date automatically.
 
-## 7. CI/CD Setup
+## 9. CI/CD Setup
 
 Your CI/CD environment (CodeBuild, GitHub Actions, etc.) does not have access to the private template repository by default. When your pipeline clones your repo, it won't be able to fetch the submodule — you need to configure the same deploy key on the server.
 
