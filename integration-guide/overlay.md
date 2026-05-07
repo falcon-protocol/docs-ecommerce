@@ -8,8 +8,6 @@ The modal can also be minimized to a **floating button** — a small persistent 
 
 Typical use case: show offers on the order confirmation page after a purchase is complete.
 
----
-
 ## Quick Start
 
 Add this to your **order confirmation page** (or any page where you want to show offers). The modal will appear automatically when the page loads:
@@ -49,8 +47,6 @@ Add this to your **order confirmation page** (or any page where you want to show
 That's it. The modal will appear with available offers.
 
 > **Get your credentials:** Contact your Falcon Labs account manager to obtain your SDK key and placement ID.
-
----
 
 ## Framework Examples
 
@@ -214,8 +210,6 @@ import Script from "next/script";
 
 Make sure to add `"use client"` to components that use the SDK.
 
----
-
 ## Custom Attributes
 
 Pass user and order data for personalized offer targeting. The more attributes you provide, the better the targeting.
@@ -287,8 +281,6 @@ interface CustomAttributes {
 }
 ```
 
----
-
 ## Show Options
 
 Customize the modal header when calling `show()`:
@@ -301,8 +293,6 @@ perks.show({
 ```
 
 Both fields are optional.
-
----
 
 ## Callbacks
 
@@ -348,8 +338,6 @@ perks.addUIStateCallback((state) => {
 });
 ```
 
----
-
 ## Error Handling
 
 The SDK throws on invalid operations. Common errors you may encounter:
@@ -362,8 +350,6 @@ The SDK throws on invalid operations. Common errors you may encounter:
 | `Perks already shown`             | `show()` or `loadPerks()` was called while the modal is visible            |
 | `Perks loading`                   | `loadPerks()` was called while a previous load is still in progress        |
 
----
-
 ## Best Practices
 
 1. **Initialize once** — call `FalconSDK.init()` a single time when your page loads, not on every interaction
@@ -371,8 +357,6 @@ The SDK throws on invalid operations. Common errors you may encounter:
 3. **Check `isReady`** — always check `result.isReady` before calling `show()`, as there may not be offers available for this user
 4. **Clean up in SPAs** — call `destroy()` when navigating away from the page to avoid `"Placement already in use"` errors
 5. **One placement = one instance** — don't create multiple instances with the same placement ID
-
----
 
 ## Troubleshooting
 
