@@ -24,6 +24,8 @@ Authorization: Bearer <PUBLISHER_TOKEN>
 
 Creates a new placement (ad unit).
 
+> Default behavior — test mode: Newly created placements default to **test mode** (`isLiveMode: false`). In test mode the OData endpoint returns non-production mock offers — they are **not** real offers from the Falcon network and will not generate revenue or attribution. This is the expected default on the staging environment and for initial UA / test stores you spin up in production while validating an integration. When you create real publishers in production that should serve actual offers, you must explicitly pass `isLiveMode: true` on the create request (or flip the flag later via the Update Placement endpoint).
+
 ### Endpoint
 
 ```
@@ -59,9 +61,9 @@ POST /api/placements
 - `shopifyUrl`: Optional, valid URL or domain
 - `pageType`: Optional, must be valid PageType enum value
   - Valid values: `THANK_YOU_PAGE`, `ORDER_PAGE`
-- `isLiveMode`: Optional, boolean (defaults to false)
-  - `false` (default): Returns non-production mock/test ads for development
-  - `true`: Returns real production offers (use only in production)
+- `isLiveMode`: Optional, boolean (defaults to `false`)
+  - `false` (default): Placement is in **test mode** — OData returns non-production mock/test ads. Expected for staging and for initial UA/test stores in production.
+  - `true`: Placement serves **real offers** from the Falcon network. Required for any real publisher in production that should generate impressions, clicks, and revenue.
 - `template`: Optional, integer between 1 and 21
 - `data`: Optional, custom data object for placement configuration
 

@@ -59,7 +59,7 @@ export default defineConfig({
             ],
           },
           {
-            text: "Publisher Integration",
+            text: "Custom Publisher Integration",
             link: "/integration-guide/publisher-integration/overview",
             collapsed: true,
             items: [
@@ -153,7 +153,7 @@ export default defineConfig({
                 link: "/integration-guide/partner-integration/shopify-ad-unit-preact",
               },
               {
-                text: "Complete Integration Example",
+                text: "Complete Custom Integration Example",
                 link: "/integration-guide/partner-integration/complete-integration-example",
               },
               {
