@@ -258,7 +258,7 @@ FalconAds.init({
 | Attribute        | Priority    | Description             | Format                                          |
 | ---------------- | ----------- | ----------------------- | ----------------------------------------------- |
 | `orderId`        | Required    | Unique order identifier | String, no special characters (#, @, ., spaces) |
-| `email`          | Required    | Customer email          | Valid email string                               |
+| `email`          | Required    | Customer email          | Valid email string                              |
 | `amount`         | Recommended | Order total             | Numeric string (e.g. `"99.99"`)                 |
 | `firstname`      | Recommended | Customer first name     | String                                          |
 | `lastname`       | Recommended | Customer last name      | String                                          |
