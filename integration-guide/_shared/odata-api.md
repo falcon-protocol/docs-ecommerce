@@ -25,7 +25,7 @@ Authorization: Bearer PUBLIC_KEY
 ### Required Parameters
 
 - `placementId` (string): Placement ID from placement creation
-- `sessionId` (string): Unique session identifier for the customer (can use email, hashed email, or orderId)
+- `sessionId` (string): Unique session identifier for the customer (e.g., email or hashed email — distinct from `at.orderid`, which represents a specific order)
 - `at.email` (string): Customer email address (plain or SHA-256 hashed)
 - `at.orderid` (string): Order ID
 - `at.clientIp` (string): Client IP address (IPv4 or IPv6) — used for geo-targeting
