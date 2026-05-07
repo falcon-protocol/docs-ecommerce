@@ -23,10 +23,11 @@ export default defineConfig({
         items: [
           {
             text: "Web",
-            link: "/integration-guide/web",
+            link: "/integration-guide/overlay",
             items: [
-              { text: "Overlay", link: "/integration-guide/web" },
+              { text: "Overlay", link: "/integration-guide/overlay" },
               { text: "Embedded", link: "/integration-guide/embedded" },
+              { text: "Unified", link: "/integration-guide/unified" },
             ],
           },
           {
