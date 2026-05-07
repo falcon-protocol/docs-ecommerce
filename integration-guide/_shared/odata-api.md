@@ -25,11 +25,15 @@ Authorization: Bearer PUBLIC_KEY
 ### Required Parameters
 
 - `placementId` (string): Placement ID from placement creation
-- `sessionId` (string): Unique session identifier for the customer (can use email, hashed email, or orderId)
+- `sessionId` (string): Unique session identifier for the customer (e.g., email or hashed email — distinct from `at.orderid`, which represents a specific order)
 - `at.email` (string): Customer email address (plain or SHA-256 hashed)
 - `at.orderid` (string): Order ID
+- `at.clientIp` (string): Client IP address (IPv4 or IPv6) — used for geo-targeting
+- `at.userAgent` (string): Client user agent string (max 500 chars) — used for device detection
 
 > Note: At minimum, you must provide placementId, sessionId, and either at.email or at.orderid for proper tracking.
+
+> Proxying through a server: If you call OData from a backend or proxy rather than directly from the end user's browser, the request's source IP and User-Agent header will be your server's, not the customer's. In that case you must read the original client IP from the `X-Forwarded-For` header (typically the first IP in the list) and the original `User-Agent` header from the inbound request, and forward them explicitly via `at.clientIp` and `at.userAgent`. Otherwise every request will appear to come from your server, breaking geo and device targeting for all users.
 
 ### Optional Parameters
 
@@ -63,11 +67,6 @@ Pass customer and order data with the `at.` prefix for better targeting and anal
 - `at.billingzipcode` (string): Billing ZIP code (max 20 chars)
 - `at.paymenttype` or `at.payment_type` (string): Payment method
 - Valid values: `creditCard`, `debitCard`, `paypal`, `applePay`, `googlePay`, `bankTransfer`, `crypto`, `other`
-
-**Client Context:**
-
-- `at.clientIp` (string): Client IP address override (IPv4 or IPv6, used for geo-targeting)
-- `at.userAgent` (string): Client user agent override (max 500 chars, used for device detection)
 
 **Supported Currencies:**
 USD, EUR, GBP, CAD, AUD, JPY, CNY, NZD, CHF, SEK, NOK, DKK, PLN, CZK, HUF, RON, BGN, HRK, RUB, TRY, BRL, MXN, ARS, CLP, COP, PEN, UYU, INR, IDR, MYR, PHP, SGD, THB, VND, KRW, HKD, TWD, SAR, AED, ILS, EGP, ZAR, NGN, KES, GHS
