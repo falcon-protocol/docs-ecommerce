@@ -90,6 +90,10 @@ export default defineConfig({
                 text: "Reporting API",
                 link: "/integration-guide/reporting-api",
               },
+              {
+                text: "Embedded SDK Callbacks",
+                link: "/integration-guide/embedded-sdk-callbacks",
+              },
             ],
           },
           {
@@ -168,6 +172,16 @@ export default defineConfig({
               {
                 text: "Frequently Asked Questions",
                 link: "/integration-guide/partner-integration/frequently-asked-questions",
+              },
+              {
+                text: "Advanced",
+                collapsed: true,
+                items: [
+                  {
+                    text: "Embedded SDK Callbacks",
+                    link: "/integration-guide/partner-integration/advanced/embedded-sdk-callbacks",
+                  },
+                ],
               },
             ],
           },
