@@ -1,5 +1,9 @@
 # iOS Integration
 
+This page covers the native **FalconSDK** Swift package (recommended). For the
+manual WebView integration see the
+[iOS WebView guide](/integration-guide/mobile/ios).
+
 ## Requirements
 
 - iOS 14.0 or later
@@ -13,7 +17,7 @@
    https://github.com/falcon-protocol/falcon-ios-sdk.git
    ```
 3. Under **Dependency Rule**, select **Up to Next Major Version**.
-4. Add the `Falcon` library to your app target.
+4. Add the `FalconSDK` library to your app target.
 
 ## Initialize
 
@@ -125,15 +129,15 @@ Falcon.execute(
 Override the visual appearance of a placement by passing a `FalconStyle` value.
 All fields are optional; omit a field to keep the placement's built-in default.
 
-| Field | Type | Default |
+| Field | Type | If omitted |
 |---|---|---|
-| `widgetBackgroundColor` | `UIColor?` | `.clear` |
-| `slotBackgroundColor` | `UIColor?` | `.white` |
-| `slotPadding` | `Int?` | — |
-| `acceptButtonBackgroundColor` | `UIColor?` | `#008363` |
-| `acceptButtonTextColor` | `UIColor?` | `.white` |
-| `promoCodeBackgroundColor` | `UIColor?` | `#2DA784` |
-| `fontFamily` | `String?` | Roboto |
+| `widgetBackgroundColor` | `UIColor?` | server default (typically `.clear`) |
+| `slotBackgroundColor` | `UIColor?` | server default (typically `.white`) |
+| `slotPadding` | `Int?` | server default |
+| `acceptButtonBackgroundColor` | `UIColor?` | server default (typically `#008363`) |
+| `acceptButtonTextColor` | `UIColor?` | server default (typically `.white`) |
+| `promoCodeBackgroundColor` | `UIColor?` | server default (typically `#2DA784`) |
+| `fontFamily` | `String?` | server default (typically Roboto) |
 
 ```swift
 let style = FalconStyle(
@@ -159,7 +163,7 @@ updates.
 
 | Callback | Description |
 |---|---|
-| `onLoad` | Called once when the placement has rendered content and become visible. |
+| `onLoad` | Called once when the placement has rendered content. |
 | `onUnload` | Called when the placement is removed from the UI. |
 | `onError` | Called with a `FalconError` when the placement cannot be shown. |
 | `onShouldShowLoadingIndicator` | Called immediately when `execute` begins — show your loading UI now. |
@@ -248,7 +252,6 @@ struct OrderStatusView: View {
             FalconEmbeddedSwiftUIView(
                 attributes: attributes,
                 style: nil,
-                config: FalconConfig(),
                 onLoad: { print("loaded") },
                 onUnload: { print("unloaded") },
                 onError: { error in print("error: \(error)") },
@@ -279,4 +282,6 @@ Falcon.initSdk(apiKey: "YOUR_API_KEY", config: config)
 
 The `placementMapping` dictionary maps the `view` (or `layout_id`) values in
 your attributes dictionary to Falcon placement identifiers. When no mapping is
-provided the raw `view` value is used as the placement id.
+provided the raw `view` value is used as the placement id. Keys are looked up
+in order: `"<layout_id>/<view>"` → `"<view>"` → `"<layout_id>"` → raw `view`
+value as fallback.
