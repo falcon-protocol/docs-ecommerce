@@ -1,142 +1,282 @@
----
-title: iOS Native SDK Integration (Deprecated)
----
+# iOS Integration
 
-# iOS Native SDK Integration
+## Requirements
 
-::: warning Deprecated
-This native SDK integration guide is deprecated. For mobile integration, use the [WebView Integration](/integration-guide/mobile/ios) approach instead, which uses a standard WKWebView and does not require a native SDK download.
-:::
+- iOS 14.0 or later
+- Xcode 16 or later
 
-## Download the latest SDK
+## Install via Swift Package Manager
 
-You have three options for integrating the SDK into your project
+1. In Xcode, choose **File > Add Package Dependencies…**
+2. Enter the repository URL:
+   ```
+   https://github.com/falcon-labs/falcon-ios-sdk.git
+   ```
+3. Under **Dependency Rule**, select **Up to Next Major Version**.
+4. Add the `Falcon` library to your app target.
 
-- [CocoaPods](#cocoapods)
-- [Manual integration](/integration-guide/ios/manual)
-- [Swift Package Manager (Coming soon)](#)
+## Initialize
 
-The SDK requires the minimum iOS deployment target to be `iOS 13.0` or above. It
-also requires Xcode version `15` or above.
-
-To receive release updates, subscribe to the Falcon Labs iOS SDK GitHub
-repository.
-
-## CocoaPods
-
-**Coming Soon**
-
-<!-- To integrate the Falcon Labs SDK through CocoaPods:
-
-Add the following line to your Podfile:
-
-```ruby
-pod 'FalconSDK'
-```
-
-Run the following on the command line:
-
-```bash
-pod install --repo-update
-``` -->
-
-## Add the SDK Key
-
-1. Contact your Falcon Labs account manager to get your SDK key.
-2. Self serve [<span style="color: green; font-weight:bold; ">coming
-   soon</span>]
-
-## Import SDK
-```swift
-import FalconSDK
-```
-
-## Initialize the Falcon SDK
-
-Initialize the Falcon SDK with the initialization configuration object. Do this
-at startup. This maximizes the time the SDK can take to cache Perks, which
-results in a better user experience.
+Call `Falcon.initSdk(apiKey:)` once at app launch, before any placement is
+executed. The recommended place is `application(_:didFinishLaunchingWithOptions:)`
+in your `AppDelegate`.
 
 ```swift
-FLSdk.initSDK(key: "YOUR_SDK_KEY") { result in
-    switch result {
-    case .success:
-        // Start using the SDK
-    case let .failure(error):
-        // Handle error
+import UIKit
+import Falcon
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        Falcon.initSdk(apiKey: "YOUR_API_KEY")
+        return true
     }
 }
 ```
 
-Once the SDK is loaded you are ready to call any of its method to surface Perk
-offerings in your application.
+Contact your Falcon Labs account manager to obtain your API key.
 
-## Create Placement
+## Add an Inline Placement
 
-Placements are the containers that hold Perks. They are used to group Perks
-together based on their business logic. For example, you may have a Placement
-for "New Subscribers" and another for "Lapsed Subscribers". Each placement has a
-unique ID that you will use to display Perks in your app.
+The `FalconEmbeddedView` is a `UIView` subclass that renders a placement inside
+a `WKWebView` and automatically updates its own height constraint to match the
+rendered content.
+
+### Storyboard
+
+1. Drag a plain **View** onto your scene.
+2. In the **Identity Inspector** set the **Custom Class** to `FalconEmbeddedView`
+   and the **Module** to `Falcon`.
+3. Add **top**, **leading**, and **trailing** constraints to position the view.
+4. Add a **height** constraint and set its constant to `0`. The SDK updates this
+   constraint automatically once the placement content is rendered.
+
+### Programmatic
 
 ```swift
-let instance = try FLSdk.createPerksInstance(placement: "YOUR_PLACEMENT_ID")
+let embeddedView = FalconEmbeddedView()
+embeddedView.translatesAutoresizingMaskIntoConstraints = false
+view.addSubview(embeddedView)
+
+NSLayoutConstraint.activate([
+    embeddedView.topAnchor.constraint(equalTo: someAnchor),
+    embeddedView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+    embeddedView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+    embeddedView.heightAnchor.constraint(equalToConstant: 0),
+])
 ```
 
-After instantiating a Placement, you can then load perks into it to be presented
-to your subscribers.
+The height constraint constant starts at `0` and is updated by the SDK when
+content loads.
 
-## Load Perks
-Load the Perks into the Placement. This will fetch the Perks from the Falcon
+## Execute
+
+Call `Falcon.execute` to load and render a placement. Pass the `FalconEmbeddedView`
+you wired up above along with an attributes dictionary describing the user and
+the desired placement.
 
 ```swift
-instance.loadPerks { result in
-  switch result {
-  case .success:
-      // Perks are ready to be shown
-  case let .failure(error):
-      // Handle error. Reload to try again.
-  }
+import UIKit
+import Falcon
+
+class OrderStatusViewController: UIViewController {
+
+    @IBOutlet weak var embeddedView: FalconEmbeddedView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let attributes: [String: Any] = [
+            "user_details": [
+                "email": "user@example.com",
+                "first_name": "Jane",
+                "last_name": "Smith"
+            ],
+            "placement_details": [
+                "layout_id": "APP_NATIVE_ESSENTIAL_0.1",
+                "view": "ORDER_STATUS"
+            ]
+        ]
+
+        Falcon.execute(attributes: attributes, placement: .inline(embeddedView))
+    }
 }
 ```
 
-## Showing Perks
-Once the Perks are loaded, you can present the perk unit to your subscribers.
+## Sandbox Mode
+
+Pass `isSandbox: true` while developing and testing. Set it to `false` (the
+default) before releasing to production.
+
 ```swift
-instance.show { result in
-  switch result {
-  case .success:
-      // Perks are shown
-  case let .failure(error):
-      // Handle error.
-  }
+Falcon.execute(
+    attributes: attributes,
+    placement: .inline(embeddedView),
+    isSandbox: true   // development only
+)
+```
+
+## Style
+
+Override the visual appearance of a placement by passing a `FalconStyle` value.
+All fields are optional; omit a field to keep the placement's built-in default.
+
+| Field | Type | Default |
+|---|---|---|
+| `widgetBackgroundColor` | `UIColor?` | `.clear` |
+| `slotBackgroundColor` | `UIColor?` | `.white` |
+| `slotPadding` | `Int?` | — |
+| `acceptButtonBackgroundColor` | `UIColor?` | `#008363` |
+| `acceptButtonTextColor` | `UIColor?` | `.white` |
+| `promoCodeBackgroundColor` | `UIColor?` | `#2DA784` |
+| `fontFamily` | `String?` | Roboto |
+
+```swift
+let style = FalconStyle(
+    widgetBackgroundColor: .clear,
+    slotBackgroundColor: .white,
+    acceptButtonBackgroundColor: UIColor(red: 0, green: 0.514, blue: 0.388, alpha: 1),
+    acceptButtonTextColor: .white,
+    promoCodeBackgroundColor: UIColor(red: 0.176, green: 0.655, blue: 0.518, alpha: 1),
+    fontFamily: "Roboto"
+)
+
+Falcon.execute(
+    attributes: attributes,
+    placement: .inline(embeddedView),
+    style: style
+)
+```
+
+## Callbacks
+
+All callbacks are dispatched on the **main thread** and are safe to use for UI
+updates.
+
+| Callback | Description |
+|---|---|
+| `onLoad` | Called once when the placement has rendered content and become visible. |
+| `onUnload` | Called when the placement is removed from the UI. |
+| `onError` | Called with a `FalconError` when the placement cannot be shown. |
+| `onShouldShowLoadingIndicator` | Called immediately when `execute` begins — show your loading UI now. |
+| `onShouldHideLoadingIndicator` | Called once the placement has settled (loaded or determined no-fill) — hide your loading UI. |
+
+```swift
+Falcon.execute(
+    attributes: attributes,
+    placement: .inline(embeddedView),
+    onLoad: {
+        print("placement loaded")
+    },
+    onUnload: {
+        print("placement unloaded")
+    },
+    onError: { error in
+        print("placement error: \(error)")
+    },
+    onShouldShowLoadingIndicator: {
+        mySpinner.startAnimating()
+    },
+    onShouldHideLoadingIndicator: {
+        mySpinner.stopAnimating()
+    }
+)
+```
+
+### Errors
+
+| Case | Meaning |
+|---|---|
+| `FalconError.initNotCalled` | `Falcon.execute` was called before `Falcon.initSdk`. |
+| `FalconError.placementLoadError` | The placement failed to load from the Falcon backend. |
+
+## Events
+
+Subscribe to lifecycle events for a specific placement via
+`Falcon.events(layoutId:handler:)`. Pass the same `layout_id` string you include
+in the attributes dictionary.
+
+```swift
+Falcon.events(layoutId: "APP_NATIVE_ESSENTIAL_0.1") { event in
+    switch event {
+    case .placementInteractive:
+        print("placement is interactive")
+    case .placementCompleted:
+        print("placement completed")
+    case .placementFailure(let error):
+        print("placement failed: \(error)")
+    }
 }
 ```
 
-## Handling Perk lifecycle events
-To handle the lifecycle events of the Perks unit, you can implement the 
-`PerksDelegate` protocol. The most important is the `didReadyChange` method,
-which is called when the Perks are loaded and ready to be shown.
+| Event | Description |
+|---|---|
+| `.placementInteractive` | More than 50% of the placement has been visible on screen for at least 1 second. Fired at most once per `execute` call. |
+| `.placementCompleted` | The placement was engaged with and removed from the UI. |
+| `.placementFailure(Error)` | The placement failed to load. |
+
+## SwiftUI
+
+`FalconEmbeddedSwiftUIView` is a SwiftUI-native wrapper around
+`FalconEmbeddedView`. It sizes itself automatically using the same
+height-constraint mechanism.
 
 ```swift
-class DelegateListener: FLPerksDelegate {
-    
-    func didClick(index: Int) {
-        // User has clicked to redeem one of the promotions and navigated outside the app to the perk providers page.
-    }
-    
-    func didReadyChange(isReady: Bool) {
-        // The Perks are loaded and ready to be shown
-    }
-    
-    func didOpen() {
-        // The Perks unit has been opened
-    }
-    
-    func didClose() {
-        // The Perks unit has been closed
+import SwiftUI
+import Falcon
+
+struct OrderStatusView: View {
+
+    let attributes: [String: Any] = [
+        "user_details": [
+            "email": "user@example.com",
+            "first_name": "Jane",
+            "last_name": "Smith"
+        ],
+        "placement_details": [
+            "layout_id": "APP_NATIVE_ESSENTIAL_0.1",
+            "view": "ORDER_STATUS"
+        ]
+    ]
+
+    var body: some View {
+        VStack {
+            FalconEmbeddedSwiftUIView(
+                attributes: attributes,
+                style: nil,
+                config: FalconConfig(),
+                onLoad: { print("loaded") },
+                onUnload: { print("unloaded") },
+                onError: { error in print("error: \(error)") },
+                onShouldShowLoadingIndicator: { print("show loading") },
+                onShouldHideLoadingIndicator: { print("hide loading") },
+                isSandbox: false
+            )
+        }
     }
 }
-
-// Register the delegate to the placement instance
-instance.setDelegate(DelegateListener())
 ```
+
+## Configuration
+
+Pass a `FalconConfig` to `Falcon.initSdk(apiKey:config:)` to supply a placement
+mapping. Your account manager will provide the mapping values specific to your
+integration.
+
+```swift
+let config = FalconConfig(
+    placementMapping: [
+        "ORDER_STATUS": "your-falcon-placement-id"
+    ]
+)
+
+Falcon.initSdk(apiKey: "YOUR_API_KEY", config: config)
+```
+
+The `placementMapping` dictionary maps the `view` (or `layout_id`) values in
+your attributes dictionary to Falcon placement identifiers. When no mapping is
+provided the raw `view` value is used as the placement id.
