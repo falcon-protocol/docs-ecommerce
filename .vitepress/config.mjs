@@ -57,6 +57,20 @@ export default defineConfig({
                 text: "Android",
                 link: "/integration-guide/mobile/android",
               },
+              {
+                text: "iOS Native SDK",
+                link: "/integration-guide/ios/integration",
+                items: [
+                  {
+                    text: "Integration",
+                    link: "/integration-guide/ios/integration",
+                  },
+                  {
+                    text: "Manual Integration (legacy)",
+                    link: "/integration-guide/ios/manual",
+                  },
+                ],
+              },
             ],
           },
           {
