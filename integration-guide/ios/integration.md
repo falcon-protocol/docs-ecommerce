@@ -10,7 +10,7 @@
 1. In Xcode, choose **File > Add Package Dependencies…**
 2. Enter the repository URL:
    ```
-   https://github.com/falcon-labs/falcon-ios-sdk.git
+   https://github.com/falcon-protocol/falcon-ios-sdk.git
    ```
 3. Under **Dependency Rule**, select **Up to Next Major Version**.
 4. Add the `Falcon` library to your app target.
@@ -23,7 +23,7 @@ in your `AppDelegate`.
 
 ```swift
 import UIKit
-import Falcon
+import FalconSDK
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -50,7 +50,7 @@ rendered content.
 
 1. Drag a plain **View** onto your scene.
 2. In the **Identity Inspector** set the **Custom Class** to `FalconEmbeddedView`
-   and the **Module** to `Falcon`.
+   and the **Module** to `FalconSDK`.
 3. Add **top**, **leading**, and **trailing** constraints to position the view.
 4. Add a **height** constraint and set its constant to `0`. The SDK updates this
    constraint automatically once the placement content is rendered.
@@ -81,7 +81,7 @@ the desired placement.
 
 ```swift
 import UIKit
-import Falcon
+import FalconSDK
 
 class OrderStatusViewController: UIViewController {
 
@@ -227,7 +227,7 @@ height-constraint mechanism.
 
 ```swift
 import SwiftUI
-import Falcon
+import FalconSDK
 
 struct OrderStatusView: View {
 
