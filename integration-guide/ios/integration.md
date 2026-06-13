@@ -360,6 +360,78 @@ name, and purchase history as shared with Falcon only if your integration
 actually passes those attributes. No App Tracking Transparency (ATT) prompt is
 required for FalconSDK.
 
+## Diagnostics
+
+FalconSDK 1.3.0 and later adds observability so you (and Falcon Labs) can see
+**why** a placement failed instead of only a generic error. It works through
+three channels. This is purely additive — the existing `onError` callback and
+`FalconError` cases are unchanged.
+
+### Host delegate (opt-in)
+
+Set `Falcon.diagnosticsDelegate` once at launch to receive a `FalconDiagnostic`
+for every SDK failure. Route it into Sentry, Datadog, or your own logging. The
+delegate is unset by default, and setting it changes nothing else about the
+SDK's behavior.
+
+```swift
+import FalconSDK
+
+class MyDiagnosticsHandler: FalconDiagnosticsDelegate {
+    func falconDidEncounter(_ diagnostic: FalconDiagnostic) {
+        // diagnostic.code     — FalconDiagnosticCode (granular reason)
+        // diagnostic.message  — human-readable description (local only)
+        // diagnostic.placement, diagnostic.layoutId — routing context
+        MyErrorTracker.capture(diagnostic.code.rawValue)
+    }
+}
+
+// In your AppDelegate or app init:
+Falcon.diagnosticsDelegate = MyDiagnosticsHandler()
+```
+
+`FalconDiagnosticCode` cases:
+
+| Code | When |
+|---|---|
+| `initNotCalled` | `execute` called before `initSdk` |
+| `attributeMappingFailed` | attributes did not resolve to a placement |
+| `urlConstructionFailed` | the webview URL could not be built |
+| `webviewNavigationFailed` | `WKWebView` navigation error |
+| `webviewProvisionalNavigationFailed` | `WKWebView` provisional navigation error |
+| `bridgeReportedError` | the JS bridge posted an `error` event |
+| `noPresenter` | an overlay found no frontmost view controller |
+
+### Error beacons
+
+On failure the SDK also POSTs a small, PII-free diagnostic to Falcon Labs so we
+can spot integration issues proactively. Beacons are **on by default**. To
+disable them (e.g. for privacy-sensitive environments):
+
+```swift
+Falcon.initSdk(
+    apiKey: "YOUR_API_KEY",
+    config: FalconConfig(diagnosticBeaconsEnabled: false)
+)
+```
+
+A beacon contains **no user data** — no user attributes, email, API key, or
+free-form message text. It carries only:
+`{ sdkv, code, placement, layoutId, platform, ts }`. Beacons are
+fire-and-forget and silently drop on network failure.
+
+> **Important:** the `placement` and `layoutId` fields come from your
+> `placement_details.view` and `placement_details.layout_id`. Because they are
+> sent in diagnostics, **do not put user data in `view` or `layout_id`**. (Each
+> is capped at 128 characters.)
+
+### System log
+
+Diagnostics are also written to the Apple unified log under subsystem
+`us.falconlabs.FalconSDK` (category `diagnostics`). In **Console.app**, filter
+by that subsystem to see them. The diagnostic `code` is logged publicly; the
+human-readable `message` stays on-device.
+
 ## SDK Version
 
 From 1.1.0 the SDK exposes its version as a public constant. Include it in
