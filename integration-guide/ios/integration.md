@@ -124,6 +124,60 @@ Falcon.execute(
 )
 ```
 
+## Add an Overlay Placement
+
+An overlay placement presents the Falcon offer as a **full-screen modal that the
+SDK presents itself** — there is no view to add to your layout and no
+`FalconEmbeddedView` to wire up. Pass `.overlay` as the placement and call
+`Falcon.execute` from any action, such as a button tap. The web content owns
+dismissal: the modal closes when the user closes the offer.
+
+Callbacks (`onLoad`, `onUnload`, `onError`) and per-placement events
+(`.placementInteractive`, `.placementCompleted`, `.placementFailure`) behave
+exactly as they do for an inline placement.
+
+### UIKit
+
+Call `Falcon.execute` from a button action (or any other event handler):
+
+```swift
+@IBAction func showOffer(_ sender: UIButton) {
+    Falcon.execute(
+        attributes: attributes,
+        placement: .overlay,
+        onLoad: {
+            print("overlay loaded")
+        },
+        onUnload: {
+            print("overlay dismissed")
+        },
+        onError: { error in
+            print("overlay error: \(error)")
+        }
+    )
+}
+```
+
+### SwiftUI
+
+Call `Falcon.execute` inside a button action — no wrapper view is required:
+
+```swift
+Button("Show offer") {
+    Falcon.execute(
+        attributes: attributes,
+        placement: .overlay,
+        onLoad: { print("overlay loaded") },
+        onUnload: { print("overlay dismissed") },
+        onError: { error in print("overlay error: \(error)") }
+    )
+}
+```
+
+The SDK locates the frontmost view controller automatically and presents the
+full-screen modal. If no presenter is available, `onError` is called with
+`FalconError.placementLoadError`.
+
 ## Style
 
 Override the visual appearance of a placement by passing a `FalconStyle` value.
