@@ -1,0 +1,105 @@
+backend:
+  name: github
+  repo: falcon-protocol/docs-ecommerce
+  branch: main
+  # Cloudflare Worker OAuth proxy (deployed from promo-ad-unit#1040).
+  # Worker: falcon-cms-auth, route cms-auth.falconlabs.us/*.
+  # GitHub OAuth App callback must be https://cms-auth.falconlabs.us/callback.
+  base_url: https://cms-auth.falconlabs.us
+
+# Media uploaded via the CMS lands in /public/uploads/ and is served at /uploads/.
+# Existing images under /images/ (referenced from markdown as ./images/foo.png) are
+# untouched — this only governs new uploads made through the CMS.
+media_folder: public/uploads
+public_folder: /uploads
+
+site_url: https://docs.falconlabs.us
+
+collections:
+  # ─── Root-level overview pages ───────────────────────────────────────────────
+  - name: overview
+    label: Overview Pages
+    label_singular: Overview page
+    files:
+      - name: home
+        label: Home page (index.md)
+        file: index.md
+        fields:
+          - { name: layout, widget: hidden, default: home }
+          - name: hero
+            label: Hero
+            widget: object
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Text, name: text, widget: string }
+              - { label: Tagline, name: tagline, widget: string }
+              - name: actions
+                label: Call-to-action buttons
+                widget: list
+                fields:
+                  - { label: Theme, name: theme, widget: string, default: brand }
+                  - { label: Button text, name: text, widget: string }
+                  - { label: Link, name: link, widget: string }
+          - name: features
+            label: Features
+            widget: list
+            fields:
+              - { label: Title, name: title, widget: string }
+              - { label: Details, name: details, widget: string }
+              - { label: Link, name: link, widget: string }
+          - { label: Body (below frontmatter), name: body, widget: markdown, required: false }
+
+      - { name: merchant, label: Merchants, file: merchant.md, fields: [{ label: Body, name: body, widget: markdown }] }
+      - { name: publisher, label: Publishers, file: publisher.md, fields: [{ label: Body, name: body, widget: markdown }] }
+      - { name: soft, label: Soft bundles, file: soft.md, fields: [{ label: Body, name: body, widget: markdown }] }
+      - { name: bundle-modes, label: Bundle modes, file: bundle-modes.md, fields: [{ label: Body, name: body, widget: markdown }] }
+      - { name: bundle-types, label: Bundle types, file: bundle-types.md, fields: [{ label: Body, name: body, widget: markdown }] }
+      - { name: api-examples, label: API examples, file: api-examples.md, fields: [{ label: Body, name: body, widget: markdown }] }
+
+  # ─── Getting Started ─────────────────────────────────────────────────────────
+  - name: getting-started
+    label: Getting Started
+    label_singular: Getting Started page
+    folder: getting-started
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false }
+      - { label: Body, name: body, widget: markdown }
+
+  # ─── Integration Guide (nested, preserves subdirectory structure) ───────────
+  - name: integration-guide
+    label: Integration Guide
+    label_singular: Integration guide page
+    folder: integration-guide
+    create: true
+    # Allow editors to create/edit files anywhere in integration-guide/,
+    # including partner-integration/, mobile/, shopify/, publisher-integration/,
+    # ios/, and _shared/ (used for reusable snippets).
+    nested:
+      depth: 4
+      summary: '{{title}}'
+    path: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false }
+      - { label: Body, name: body, widget: markdown }
+
+  # ─── Terms & Legal ───────────────────────────────────────────────────────────
+  - name: terms
+    label: Terms & Legal
+    label_singular: Terms page
+    folder: terms
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Layout, name: layout, widget: string, required: false, default: blank-page, hint: "Use 'blank-page' for standalone terms pages." }
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Body, name: body, widget: markdown }
