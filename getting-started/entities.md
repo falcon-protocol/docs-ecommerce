@@ -1,3 +1,7 @@
+---
+title: "Core concepts"
+---
+
 # Core concepts
 
 In order to best use Falcon, it is recommended to first understand the core data

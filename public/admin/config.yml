@@ -2,6 +2,11 @@ backend:
   name: github
   repo: falcon-protocol/docs-ecommerce
   branch: main
+  # Manual publishing: saves commit with a [skip ci] prefix (no auto-deploy).
+  # Editors click "Publish Changes" in the CMS header, which fires a
+  # repository_dispatch (sveltia-cms-publish) that .github/workflows/deploy.yml
+  # listens for. Lets edits accumulate and go live only on an explicit publish.
+  skip_ci: true
   # Cloudflare Worker OAuth proxy (deployed from promo-ad-unit#1040).
   # Worker: falcon-cms-auth, route cms-auth.falconlabs.us/*.
   # GitHub OAuth App callback must be https://cms-auth.falconlabs.us/callback.
@@ -49,14 +54,19 @@ collections:
               - { label: Link, name: link, widget: string }
           - { label: Body (below frontmatter), name: body, widget: markdown, required: false }
 
-      - { name: merchant, label: Merchants, file: merchant.md, fields: [{ label: Body, name: body, widget: markdown }] }
-      - { name: publisher, label: Publishers, file: publisher.md, fields: [{ label: Body, name: body, widget: markdown }] }
-      - { name: soft, label: Soft bundles, file: soft.md, fields: [{ label: Body, name: body, widget: markdown }] }
-      - { name: bundle-modes, label: Bundle modes, file: bundle-modes.md, fields: [{ label: Body, name: body, widget: markdown }] }
-      - { name: bundle-types, label: Bundle types, file: bundle-types.md, fields: [{ label: Body, name: body, widget: markdown }] }
-      - { name: api-examples, label: API examples, file: api-examples.md, fields: [{ label: Body, name: body, widget: markdown }] }
+      # These body-only pages use raw Markdown editing (modes: [raw]) so Sveltia
+      # stores the body verbatim — the visual editor re-serializes on save and
+      # would mangle any custom syntax (see soft.md / api-examples.md).
+      - { name: merchant, label: Merchants, file: merchant.md, fields: [{ label: Body, name: body, widget: markdown, modes: [raw] }] }
+      - { name: publisher, label: Publishers, file: publisher.md, fields: [{ label: Body, name: body, widget: markdown, modes: [raw] }] }
+      - { name: soft, label: Soft bundles, file: soft.md, fields: [{ label: Body, name: body, widget: markdown, modes: [raw] }] }
+      - { name: bundle-modes, label: Bundle modes, file: bundle-modes.md, fields: [{ label: Body, name: body, widget: markdown, modes: [raw] }] }
+      - { name: bundle-types, label: Bundle types, file: bundle-types.md, fields: [{ label: Body, name: body, widget: markdown, modes: [raw] }] }
+      - { name: api-examples, label: API examples, file: api-examples.md, fields: [{ label: Body, name: body, widget: markdown, modes: [raw] }] }
 
   # ─── Getting Started ─────────────────────────────────────────────────────────
+  # Raw Markdown editing: these pages use ::: containers; the visual editor would
+  # mangle them, so modes: [raw] keeps the body verbatim.
   - name: getting-started
     label: Getting Started
     label_singular: Getting Started page
@@ -67,18 +77,19 @@ collections:
     format: frontmatter
     fields:
       - { label: Title, name: title, widget: string, required: false }
-      - { label: Description, name: description, widget: string, required: false }
-      - { label: Body, name: body, widget: markdown }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
 
-  # ─── Integration Guide (nested, preserves subdirectory structure) ───────────
+  # ─── Integration Guide (nested; preserves subdirectory structure) ────────────
+  # Raw Markdown editing: these pages use ::: containers, raw HTML, JSX and
+  # <!--@include--> snippets. modes: [raw] preserves all of it verbatim on save.
+  # _shared/ snippets are included via <!--@include--> and are left out of nav,
+  # but remain editable here as raw Markdown.
   - name: integration-guide
     label: Integration Guide
     label_singular: Integration guide page
     folder: integration-guide
     create: true
-    # Allow editors to create/edit files anywhere in integration-guide/,
-    # including partner-integration/, mobile/, shopify/, publisher-integration/,
-    # ios/, and _shared/ (used for reusable snippets).
     nested:
       depth: 4
       summary: '{{title}}'
@@ -87,15 +98,19 @@ collections:
     format: frontmatter
     fields:
       - { label: Title, name: title, widget: string, required: false }
-      - { label: Description, name: description, widget: string, required: false }
-      - { label: Body, name: body, widget: markdown }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
 
   # ─── Terms & Legal ───────────────────────────────────────────────────────────
+  # Plain prose edited by non-devs → keep the friendly visual (WYSIWYG) editor.
   - name: terms
     label: Terms & Legal
     label_singular: Terms page
     folder: terms
     create: true
+    # Many terms pages share the same title ("Terms and Conditions"), so label
+    # entries in the list by filename (disney, audiobooks, …) to disambiguate.
+    summary: '{{filename}}'
     slug: '{{slug}}'
     extension: md
     format: frontmatter
