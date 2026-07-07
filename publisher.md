@@ -40,5 +40,3 @@ commissions you receive from merchants.
    bundle. In this scenario Falcon Protocol will handle the discounting
    calculations and provide this data during the bundle presentation and
    purchase from to the end consumer.
-
-this is an edit
