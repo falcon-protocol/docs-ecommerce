@@ -14,7 +14,8 @@ manual WebView integration see the
 
 ## Install via Gradle
 
-Add the Falcon Maven repository and the dependency:
+The SDK is published to **Maven Central** (`us.falconlabs:falcon`) — no extra repository
+block is needed:
 
 ```kotlin
 // settings.gradle.kts
@@ -22,15 +23,21 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://raw.githubusercontent.com/falcon-protocol/falcon-android-sdk/main/repo") }
     }
 }
 
 // app/build.gradle.kts
 dependencies {
-    implementation("us.falconlabs:falcon:1.0.0")
+    implementation("us.falconlabs:falcon:1.1.0")
 }
 ```
+
+::: tip Upgrading from 1.0.0
+Versions up to 1.0.0 were served from a raw-URL Maven repo
+(`https://raw.githubusercontent.com/falcon-protocol/falcon-android-sdk/main/repo`). That repo
+remains available as a byte-identical mirror of Central, so existing builds keep working — but
+new integrations should use Maven Central alone.
+:::
 
 The SDK's runtime dependencies (`androidx.browser` for Chrome Custom Tabs, and
 Compose UI/foundation via the Compose BOM) are resolved transitively — you do
