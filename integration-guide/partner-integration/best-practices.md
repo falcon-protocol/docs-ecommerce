@@ -1,3 +1,7 @@
+---
+title: "Best Practices"
+---
+
 ## Best Practices
 
 ### 1. Secure Key Storage

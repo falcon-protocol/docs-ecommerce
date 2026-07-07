@@ -1,3 +1,7 @@
+---
+title: "Error Handling Reference"
+---
+
 ## Error Handling Reference
 
 ### **Error Response Format**
