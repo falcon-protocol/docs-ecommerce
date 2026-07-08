@@ -1,3 +1,7 @@
+---
+title: "Mobile Integration"
+---
+
 # Mobile Integration
 
 Falcon Perks can be displayed in native iOS and Android apps using a **WebView**. Your app loads a Falcon-hosted page inside a WebView, and communication between the WebView and your native code happens through a JavaScript bridge.

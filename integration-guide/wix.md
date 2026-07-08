@@ -1,3 +1,7 @@
+---
+title: "Installing Falcon Wix App"
+---
+
 # Installing Falcon Wix App
 
 Boost your Wix store by adding our advertising widget in just a few simple steps.
