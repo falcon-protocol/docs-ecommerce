@@ -129,8 +129,11 @@ Falcon.execute(
 An overlay placement presents the Falcon offer as a **full-screen modal that the
 SDK presents itself** — there is no view to add to your layout and no
 `FalconEmbeddedView` to wire up. Pass `.overlay` as the placement and call
-`Falcon.execute` from any action, such as a button tap. The web content owns
-dismissal: the modal closes when the user closes the offer.
+`Falcon.execute` from any action, such as a button tap. The modal closes when
+the user closes the offer (the web content owns dismissal). From SDK 1.3.1 the
+overlay also dismisses itself automatically if the placement fails to load or
+produces no content within 15 seconds, so a broken placement can never leave
+the user stuck on a full-screen modal; `onError` fires in that case.
 
 Callbacks (`onLoad`, `onUnload`, `onError`) and per-placement events
 (`.placementInteractive`, `.placementCompleted`, `.placementFailure`) behave
