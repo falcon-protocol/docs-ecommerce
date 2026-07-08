@@ -309,9 +309,9 @@ value as fallback.
 ## Privacy
 
 FalconSDK 1.1.0 and later ships an Apple privacy manifest
-(`PrivacyInfo.xcprivacy`) inside the package. Xcode discovers it automatically
-and includes it in your app's privacy report when you archive — no extra setup
-is required.
+(`PrivacyInfo.xcprivacy`) inside the Swift package. Xcode discovers it
+automatically and includes it in your app's privacy report when you archive —
+no extra setup is required.
 
 **What the manifest declares:**
 
@@ -319,6 +319,7 @@ is required.
 |---|---|
 | Tracking (`NSPrivacyTracking`) | `false`. FalconSDK does not link user data from your app with data from other companies' apps or websites, and does not share data with data brokers. |
 | Collected data | Email address, name, and purchase history — **only if your app passes them** as attributes to `Falcon.execute`. Each is declared as linked to the user's identity, **not** used for tracking, with the purpose "third-party advertising" (displaying promotional offers). |
+| Diagnostic data | Other diagnostic data (not linked to the user's identity, not used for tracking, purpose "app functionality") — covers the SDK's PII-free error beacons, see [Diagnostics](#diagnostics). |
 | Required-reason APIs | None. The SDK does not use UserDefaults, file timestamps, system uptime, disk space, or keyboard APIs. |
 
 **App Store submission.** In your app's privacy nutrition label, declare email,
@@ -328,9 +329,9 @@ required for FalconSDK.
 
 ## SDK Version
 
-From 1.1.0 the SDK exposes its version as a public constant. Include it in
-support requests and diagnostic logs.
+The SDK exposes its version as a public constant. Include it in support
+requests and diagnostic logs.
 
 ```swift
-print("FalconSDK \(Falcon.version)")  // e.g. "1.1.0"
+print("FalconSDK \(Falcon.version)")  // e.g. "1.3.1"
 ```
