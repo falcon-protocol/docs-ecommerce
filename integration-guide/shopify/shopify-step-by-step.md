@@ -1,3 +1,7 @@
+---
+title: "How to get started with Falcon on Shopify?"
+---
+
 # How to get started with Falcon on Shopify?
 
 Getting started with Falcon is super easy, and should take less than 10 minutes 🚀

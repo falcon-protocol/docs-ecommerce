@@ -1,3 +1,7 @@
+---
+title: "Rate Limits"
+---
+
 ## Rate Limits
 
 ### API Rate Limiting Policy

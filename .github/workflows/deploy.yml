@@ -11,6 +11,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  # Fired by the Sveltia CMS "Publish Changes" button. CMS edits commit with a
+  # [skip ci] prefix (backend.skip_ci in public/admin/config.yml), so pushes do
+  # NOT deploy; an editor clicks "Publish Changes" to trigger this event instead.
+  repository_dispatch:
+    types: [sveltia-cms-publish]
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read

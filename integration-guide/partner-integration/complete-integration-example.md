@@ -1,3 +1,7 @@
+---
+title: "Complete Integration Example"
+---
+
 ## Complete Custom Integration Example
 
 This is a complete walkthrough of the **custom integration path** — creating the entity hierarchy as a partner, then rendering offers yourself by calling OData directly and wiring up the click and impression URLs returned in the response. If you have full control over the surface and don't need to customize rendering, prefer the [Embedded Web SDK](/integration-guide/embedded) — it handles fetching, rendering, impression tracking, and click handling for you. This guide is for cases where you're rendering offers in your own UI.
