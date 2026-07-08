@@ -346,6 +346,8 @@ Your account manager will provide the values specific to your integration.
 |---|---|---|---|
 | `baseURL` | `URL` | `https://pr.falconlabs.us` | Base URL of the Falcon web frontend. Keep the default unless your account manager tells you otherwise. |
 | `placementMapping` | `[String: String]` | `[:]` | Maps the `layout_id` / `view` values in your attributes dictionary to Falcon placement identifiers. |
+| `diagnosticBeaconsEnabled` | `Bool` | `true` | When `true`, the SDK POSTs PII-free error beacons on placement failure (see [Diagnostics](#diagnostics)). |
+| `diagnosticsURL` | `URL?` | `nil` | Overrides the beacon endpoint. When `nil`, beacons go to the Falcon backend. |
 
 ```swift
 let config = FalconConfig(
@@ -423,6 +425,8 @@ Falcon.diagnosticsDelegate = MyDiagnosticsHandler()
 | `urlConstructionFailed` | the webview URL could not be built |
 | `webviewNavigationFailed` | `WKWebView` navigation error |
 | `webviewProvisionalNavigationFailed` | `WKWebView` provisional navigation error |
+| `webviewHTTPError` | the main-frame response had an HTTP status of 400 or higher; the placement fails (1.3.1+) |
+| `webviewLoadTimedOut` | the placement produced no signal within 15 seconds of starting the load; the placement fails and an overlay dismisses itself (1.3.1+) |
 | `bridgeReportedError` | the JS bridge posted an `error` event |
 | `noPresenter` | an overlay found no frontmost view controller |
 
@@ -442,7 +446,13 @@ Falcon.initSdk(
 A beacon contains **no user data** — no user attributes, email, API key, or
 free-form message text. It carries only:
 `{ sdkv, code, placement, layoutId, platform, ts }`. Beacons are
-fire-and-forget and silently drop on network failure.
+fire-and-forget and silently drop on network failure. They are only sent after
+`Falcon.initSdk` has been called — the `initNotCalled` diagnostic never reaches
+the network (it surfaces through the delegate and the system log only).
+
+If you route SDK telemetry through your own infrastructure, override the beacon
+endpoint with `FalconConfig(diagnosticsURL:)`; when unset, beacons go to the
+Falcon backend.
 
 > **Important:** the `placement` and `layoutId` fields come from your
 > `placement_details.view` and `placement_details.layout_id`. Because they are
