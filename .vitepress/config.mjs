@@ -71,6 +71,10 @@ export default defineConfig({
                   },
                 ],
               },
+              {
+                text: "Android Native SDK",
+                link: "/integration-guide/android",
+              },
             ],
           },
           {
