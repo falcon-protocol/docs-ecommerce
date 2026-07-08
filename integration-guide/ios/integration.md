@@ -223,11 +223,21 @@ Falcon.events(layoutId: "APP_NATIVE_ESSENTIAL_0.1") { event in
 | `.placementCompleted` | The placement was engaged with and removed from the UI. |
 | `.placementFailure(Error)` | The placement failed to load. |
 
+Handlers retain whatever they capture (often a view controller) until removed
+or overwritten — call `Falcon.removeEventsHandler(layoutId:)` when you no
+longer need the subscription:
+
+```swift
+Falcon.removeEventsHandler(layoutId: "APP_NATIVE_ESSENTIAL_0.1")
+```
+
 ## SwiftUI
 
 `FalconEmbeddedSwiftUIView` is a SwiftUI-native wrapper around
 `FalconEmbeddedView`. It sizes itself automatically using the same
-height-constraint mechanism.
+height-constraint mechanism. Execution starts on the next main-queue turn after
+the view is mounted, so callbacks never fire during a SwiftUI view update and
+can safely mutate `@State`.
 
 ```swift
 import SwiftUI
@@ -264,11 +274,21 @@ struct OrderStatusView: View {
 }
 ```
 
+::: info
+The initializer also accepts a `config:` parameter for API parity; it is
+currently inert — the active configuration always comes from
+`Falcon.initSdk(apiKey:config:)`.
+:::
+
 ## Configuration
 
-Pass a `FalconConfig` to `Falcon.initSdk(apiKey:config:)` to supply a placement
-mapping. Your account manager will provide the mapping values specific to your
-integration.
+Pass a `FalconConfig` to `Falcon.initSdk(apiKey:config:)` to override defaults.
+Your account manager will provide the values specific to your integration.
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `baseURL` | `URL` | `https://pr.falconlabs.us` | Base URL of the Falcon web frontend. Keep the default unless your account manager tells you otherwise. |
+| `placementMapping` | `[String: String]` | `[:]` | Maps the `layout_id` / `view` values in your attributes dictionary to Falcon placement identifiers. |
 
 ```swift
 let config = FalconConfig(
