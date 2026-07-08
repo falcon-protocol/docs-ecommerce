@@ -33,10 +33,11 @@ dependencies {
 ```
 
 ::: tip Upgrading from 1.0.0
-Versions up to 1.0.0 were served from a raw-URL Maven repo
-(`https://raw.githubusercontent.com/falcon-protocol/falcon-android-sdk/main/repo`). That repo
-remains available as a byte-identical mirror of Central, so existing builds keep working — but
-new integrations should use Maven Central alone.
+Version 1.0.0 was served from a raw-URL Maven repository
+(`https://raw.githubusercontent.com/falcon-protocol/falcon-android-sdk/main/repo`). That
+repository remains available, so existing builds keep working — but new integrations should
+use Maven Central alone, and existing ones can drop the extra `maven { url = ... }` block
+when they upgrade to 1.1.0 or later.
 :::
 
 The SDK's runtime dependencies (`androidx.browser` for Chrome Custom Tabs, and
