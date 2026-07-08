@@ -1,3 +1,7 @@
+---
+title: "Publisher API Documentation"
+---
+
 # Publisher API Documentation
 
 **Base URL**: `/api/v1/publishers`

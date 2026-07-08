@@ -1,3 +1,7 @@
+---
+title: "Custom Publisher Integration"
+---
+
 # Custom Publisher Integration
 
 ## Overview

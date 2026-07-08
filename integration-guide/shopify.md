@@ -1,3 +1,7 @@
+---
+title: "Shopify Integration docs"
+---
+
 # Shopify Integration docs
 
 ## Installing Falcon Shopify Widget
