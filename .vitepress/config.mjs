@@ -66,6 +66,10 @@ export default defineConfig({
                     link: "/integration-guide/ios/integration",
                   },
                   {
+                    text: "Events & Analytics",
+                    link: "/integration-guide/ios/events-analytics",
+                  },
+                  {
                     text: "Manual Integration (legacy)",
                     link: "/integration-guide/ios/manual",
                   },
