@@ -1,3 +1,7 @@
+---
+title: "Publishers API"
+---
+
 ## Publishers API
 
 ### Overview

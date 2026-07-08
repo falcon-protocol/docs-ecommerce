@@ -1,3 +1,7 @@
+---
+title: "Site API Documentation"
+---
+
 # Site API Documentation
 
 **Base URL**: `/api/site`

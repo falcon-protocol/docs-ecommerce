@@ -277,11 +277,21 @@ Falcon.events(layoutId: "APP_NATIVE_ESSENTIAL_0.1") { event in
 | `.placementCompleted` | The placement was engaged with and removed from the UI. |
 | `.placementFailure(Error)` | The placement failed to load. |
 
+Handlers retain whatever they capture (often a view controller) until removed
+or overwritten — call `Falcon.removeEventsHandler(layoutId:)` when you no
+longer need the subscription:
+
+```swift
+Falcon.removeEventsHandler(layoutId: "APP_NATIVE_ESSENTIAL_0.1")
+```
+
 ## SwiftUI
 
 `FalconEmbeddedSwiftUIView` is a SwiftUI-native wrapper around
 `FalconEmbeddedView`. It sizes itself automatically using the same
-height-constraint mechanism.
+height-constraint mechanism. Execution starts on the next main-queue turn after
+the view is mounted, so callbacks never fire during a SwiftUI view update and
+can safely mutate `@State`.
 
 ```swift
 import SwiftUI
@@ -318,11 +328,21 @@ struct OrderStatusView: View {
 }
 ```
 
+::: info
+The initializer also accepts a `config:` parameter for API parity; it is
+currently inert — the active configuration always comes from
+`Falcon.initSdk(apiKey:config:)`.
+:::
+
 ## Configuration
 
-Pass a `FalconConfig` to `Falcon.initSdk(apiKey:config:)` to supply a placement
-mapping. Your account manager will provide the mapping values specific to your
-integration.
+Pass a `FalconConfig` to `Falcon.initSdk(apiKey:config:)` to override defaults.
+Your account manager will provide the values specific to your integration.
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `baseURL` | `URL` | `https://pr.falconlabs.us` | Base URL of the Falcon web frontend. Keep the default unless your account manager tells you otherwise. |
+| `placementMapping` | `[String: String]` | `[:]` | Maps the `layout_id` / `view` values in your attributes dictionary to Falcon placement identifiers. |
 
 ```swift
 let config = FalconConfig(
@@ -343,9 +363,9 @@ value as fallback.
 ## Privacy
 
 FalconSDK 1.1.0 and later ships an Apple privacy manifest
-(`PrivacyInfo.xcprivacy`) inside the package. Xcode discovers it automatically
-and includes it in your app's privacy report when you archive — no extra setup
-is required.
+(`PrivacyInfo.xcprivacy`) inside the Swift package. Xcode discovers it
+automatically and includes it in your app's privacy report when you archive —
+no extra setup is required.
 
 **What the manifest declares:**
 
@@ -353,6 +373,7 @@ is required.
 |---|---|
 | Tracking (`NSPrivacyTracking`) | `false`. FalconSDK does not link user data from your app with data from other companies' apps or websites, and does not share data with data brokers. |
 | Collected data | Email address, name, and purchase history — **only if your app passes them** as attributes to `Falcon.execute`. Each is declared as linked to the user's identity, **not** used for tracking, with the purpose "third-party advertising" (displaying promotional offers). |
+| Diagnostic data | Other diagnostic data (not linked to the user's identity, not used for tracking, purpose "app functionality") — covers the SDK's PII-free error beacons, see [Diagnostics](#diagnostics). |
 | Required-reason APIs | None. The SDK does not use UserDefaults, file timestamps, system uptime, disk space, or keyboard APIs. |
 
 **App Store submission.** In your app's privacy nutrition label, declare email,
@@ -362,9 +383,9 @@ required for FalconSDK.
 
 ## SDK Version
 
-From 1.1.0 the SDK exposes its version as a public constant. Include it in
-support requests and diagnostic logs.
+The SDK exposes its version as a public constant. Include it in support
+requests and diagnostic logs.
 
 ```swift
-print("FalconSDK \(Falcon.version)")  // e.g. "1.1.0"
+print("FalconSDK \(Falcon.version)")  // e.g. "1.3.1"
 ```

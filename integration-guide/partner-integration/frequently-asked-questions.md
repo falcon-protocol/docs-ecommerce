@@ -1,3 +1,7 @@
+---
+title: "Frequently Asked Questions"
+---
+
 ## Frequently Asked Questions
 
 ### Q: What’s the difference between public and private keys?

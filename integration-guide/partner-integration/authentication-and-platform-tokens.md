@@ -1,3 +1,7 @@
+---
+title: "Authentication and Platform Tokens"
+---
+
 ## Authentication & Platform Tokens
 
 ### Platform Token Overview

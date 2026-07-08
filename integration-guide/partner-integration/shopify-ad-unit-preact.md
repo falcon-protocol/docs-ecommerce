@@ -1,3 +1,7 @@
+---
+title: "Shopify Ad Unit (Preact)"
+---
+
 # Shopify Ad Unit (Preact)
 
 ## Overview

@@ -1,3 +1,7 @@
+---
+title: "Shopify Ad Unit (React)"
+---
+
 # Shopify Ad Unit (React)
 
 ## Overview
