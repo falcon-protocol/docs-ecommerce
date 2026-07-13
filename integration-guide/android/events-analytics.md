@@ -1,3 +1,7 @@
+---
+title: "Forwarding Events to Analytics"
+---
+
 # Forwarding Events to Analytics
 
 Map the Falcon Android SDK's callbacks and events to your product-analytics

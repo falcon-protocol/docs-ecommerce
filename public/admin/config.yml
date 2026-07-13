@@ -80,25 +80,139 @@ collections:
       - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
       - { label: Body, name: body, widget: markdown, modes: [raw] }
 
-  # ─── Integration Guide (nested; preserves subdirectory structure) ────────────
+  # ─── Integration Guide ───────────────────────────────────────────────────────
   # Raw Markdown editing: these pages use ::: containers, raw HTML, JSX and
   # <!--@include--> snippets. modes: [raw] preserves all of it verbatim on save.
-  # _shared/ snippets are included via <!--@include--> and are left out of nav,
-  # but remain editable here as raw Markdown.
+  # Sveltia does NOT support recursive/nested folder collections, so each folder
+  # needs its own collection. This one lists the ~14 pages directly in
+  # integration-guide/; every subfolder has its own collection below (Partner
+  # Integration, Custom Publisher Integration, Mobile, iOS, Shopify, and Partner
+  # Integration: Advanced). The reusable _shared/ snippets also have their own.
   - name: integration-guide
     label: Integration Guide
     label_singular: Integration guide page
     folder: integration-guide
     create: true
-    nested:
-      depth: 4
-      summary: '{{title}}'
-    path: '{{slug}}'
     extension: md
     format: frontmatter
     fields:
       - { label: Title, name: title, widget: string, required: false }
       - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Partner Integration (integration-guide/partner-integration/) ────────────
+  - name: partner-integration
+    label: Partner Integration
+    label_singular: Partner Integration page
+    folder: integration-guide/partner-integration
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Custom Publisher Integration (integration-guide/publisher-integration/) ──
+  - name: publisher-integration
+    label: Custom Publisher Integration
+    label_singular: Publisher Integration page
+    folder: integration-guide/publisher-integration
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Mobile (integration-guide/mobile/) ─────────────────────────────────────
+  - name: mobile
+    label: Mobile
+    label_singular: Mobile page
+    folder: integration-guide/mobile
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── iOS (integration-guide/ios/) ───────────────────────────────────────────
+  - name: ios
+    label: iOS
+    label_singular: iOS page
+    folder: integration-guide/ios
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Android (integration-guide/android/) ───────────────────────────────────
+  - name: android
+    label: Android
+    label_singular: Android page
+    folder: integration-guide/android
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Shopify (integration-guide/shopify/) ───────────────────────────────────
+  - name: shopify
+    label: Shopify
+    label_singular: Shopify page
+    folder: integration-guide/shopify
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Partner Integration: Advanced (integration-guide/partner-integration/advanced/) ─
+  - name: partner-integration-advanced
+    label: "Partner Integration: Advanced"
+    label_singular: Advanced partner page
+    folder: integration-guide/partner-integration/advanced
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Shared Snippets (reusable content embedded via @include) ────────────────
+  # Files in integration-guide/_shared/ are pulled into multiple pages with
+  # <!--@include-->; editing a snippet updates every page that embeds it. They
+  # must NOT carry frontmatter — VitePress @include injects file content raw, so
+  # any frontmatter would leak onto the page. So: body-only, labeled by filename,
+  # raw Markdown. create/delete disabled (devs manage which snippets exist).
+  - name: shared-snippets
+    label: Shared Snippets
+    label_singular: Shared snippet
+    folder: integration-guide/_shared
+    create: false
+    delete: false
+    summary: '{{filename}}'
+    extension: md
+    fields:
       - { label: Body, name: body, widget: markdown, modes: [raw] }
 
   # ─── Terms & Legal ───────────────────────────────────────────────────────────
@@ -118,3 +232,55 @@ collections:
       - { label: Layout, name: layout, widget: string, required: false, default: blank-page, hint: "Use 'blank-page' for standalone terms pages." }
       - { label: Title, name: title, widget: string, required: false }
       - { label: Body, name: body, widget: markdown }
+
+  # ─── Navigation (left sidebar) ───────────────────────────────────────────────
+  # Edits sidebar.json (repo root), which config.mjs loads as themeConfig.sidebar.
+  # Four levels (Section → Page → Sub-page → Sub-sub-page) matches the site's nav
+  # depth. To put a page in the sidebar, add an item with its Label and Link (e.g.
+  # the URL path /terms/disney) at the right level and drag to position it.
+  - name: navigation
+    label: Navigation
+    editor: { preview: false }
+    files:
+      - name: sidebar
+        label: Left Sidebar
+        file: sidebar.json
+        fields:
+          - name: items
+            label: Sections
+            label_singular: Section
+            widget: list
+            summary: '{{fields.text}}'
+            fields:
+              - { label: Label, name: text, widget: string }
+              - { label: Link, name: link, widget: string, required: false, hint: "Optional. A URL path like /getting-started/overview. Leave blank for a heading-only group." }
+              - { label: Collapsed by default, name: collapsed, widget: boolean, required: false, default: false }
+              - name: items
+                label: Pages
+                label_singular: Page
+                widget: list
+                required: false
+                summary: '{{fields.text}}'
+                fields:
+                  - { label: Label, name: text, widget: string }
+                  - { label: Link, name: link, widget: string, required: false }
+                  - { label: Collapsed by default, name: collapsed, widget: boolean, required: false, default: false }
+                  - name: items
+                    label: Sub-pages
+                    label_singular: Sub-page
+                    widget: list
+                    required: false
+                    summary: '{{fields.text}}'
+                    fields:
+                      - { label: Label, name: text, widget: string }
+                      - { label: Link, name: link, widget: string, required: false }
+                      - { label: Collapsed by default, name: collapsed, widget: boolean, required: false, default: false }
+                      - name: items
+                        label: Sub-sub-pages
+                        label_singular: Sub-sub-page
+                        widget: list
+                        required: false
+                        summary: '{{fields.text}}'
+                        fields:
+                          - { label: Label, name: text, widget: string }
+                          - { label: Link, name: link, widget: string }

@@ -1,3 +1,7 @@
+---
+title: "Forwarding Events to Analytics"
+---
+
 # Forwarding Events to Analytics
 
 Map FalconSDK's callbacks and events to your product-analytics tool (Mixpanel,

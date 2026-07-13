@@ -1,3 +1,7 @@
+---
+title: "Android Integration"
+---
+
 # Android Integration
 
 This page covers the native **Falcon Android SDK** (recommended). For the
