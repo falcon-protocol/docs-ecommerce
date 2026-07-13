@@ -1,3 +1,7 @@
+---
+title: "iOS Integration"
+---
+
 # iOS Integration
 
 This page covers the native **FalconSDK** Swift package (recommended). For the

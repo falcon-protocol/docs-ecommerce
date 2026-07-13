@@ -1,3 +1,7 @@
+---
+title: "Manual Integration (legacy)"
+---
+
 # Manual Integration (legacy)
 
 Manual framework embedding applied to the legacy Falcon iOS SDK, which was
