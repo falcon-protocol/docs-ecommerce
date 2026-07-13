@@ -124,7 +124,14 @@
           ]
         },
         {
+          "text": "Webview Placement",
+          "link": "/integration-guide/partner-rewards-integration-hosted-webview-placement",
+          "collapsed": false,
+          "items": []
+        },
+        {
           "text": "Advanced",
+          "link": "",
           "collapsed": true,
           "items": [
             {
