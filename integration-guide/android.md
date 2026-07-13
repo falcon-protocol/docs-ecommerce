@@ -28,7 +28,7 @@ dependencyResolutionManagement {
 
 // app/build.gradle.kts
 dependencies {
-    implementation("us.falconlabs:falcon:1.1.0")
+    implementation("us.falconlabs:falcon:1.2.0")
 }
 ```
 
@@ -187,7 +187,8 @@ Falcon.execute(
 ## Callbacks
 
 All callbacks are dispatched on the **main thread** and are safe to use for UI
-updates.
+updates. To forward callbacks and events to your analytics tool, see
+[Events & Analytics](/integration-guide/android/events-analytics).
 
 | Callback | Description |
 |---|---|
@@ -331,6 +332,12 @@ fallback.
 
 ## Notes
 
+- **WebView storage isolation (1.2.0+):** on modern WebViews (WebView 119 and
+  later — the overwhelming majority of devices), placements run in a dedicated
+  browser profile with their own cookie jar and storage, fully isolated from
+  your app's own WebViews in both directions, and wiped between placement
+  sessions. On older WebViews the SDK falls back to the previous behavior
+  (shared cookie jar with third-party cookies disabled).
 - **Link handling:** user taps on placement links open in Chrome Custom Tabs;
   other URL schemes are dispatched as deep links. Clicks are honored only
   within a short window after a genuine user touch on the ad view.

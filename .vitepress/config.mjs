@@ -78,6 +78,16 @@ export default defineConfig({
               {
                 text: "Android Native SDK",
                 link: "/integration-guide/android",
+                items: [
+                  {
+                    text: "Integration",
+                    link: "/integration-guide/android",
+                  },
+                  {
+                    text: "Events & Analytics",
+                    link: "/integration-guide/android/events-analytics",
+                  },
+                ],
               },
             ],
           },
