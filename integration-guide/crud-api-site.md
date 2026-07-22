@@ -69,10 +69,10 @@ Retrieves paginated list of sites for the authenticated publisher.
       "description": "Site description",
       "orderVolume": 1000,
       "averageOrder": 49.99,
-      "ageDemographics": "AGE_25_34",
-      "genderDemographics": "MIXED",
+      "ageDemographics": "age_25_to_34",
+      "genderDemographics": "mixed",
       "domain": "example.com",
-      "status": "Active",
+      "status": "active",
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-01T00:00:00.000Z",
       "publisher": {
@@ -123,10 +123,10 @@ Creates a new site for the authenticated publisher.
   "description": "Site description",
   "orderVolume": 1000,
   "averageOrder": 49.99,
-  "ageDemographics": "AGE_25_34",
-  "genderDemographics": "MIXED",
+  "ageDemographics": "age_25_to_34",
+  "genderDemographics": "mixed",
   "domain": "example.com",
-  "status": "Active",
+  "status": "active",
   "createEpomZone": true,
   "categoryName": "Category Name"
 }
@@ -141,7 +141,7 @@ Creates a new site for the authenticated publisher.
 - `ageDemographics`: Optional, must be valid AgeDemo enum value
 - `genderDemographics`: Optional, must be valid GenderDemo enum value
 - `domain`: Optional, trimmed
-- `status`: Optional, must be valid AccountStatus enum (defaults to "Pending")
+- `status`: Optional, must be valid AccountStatus enum (defaults to "pending")
 - `createEpomZone`: Optional, boolean (defaults to true)
 - `categoryName`: Optional, must exactly match existing category name (case-sensitive)
 
@@ -156,10 +156,10 @@ Creates a new site for the authenticated publisher.
     "description": "Site description",
     "orderVolume": 1000,
     "averageOrder": 49.99,
-    "ageDemographics": "AGE_25_34",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_25_to_34",
+    "genderDemographics": "mixed",
     "domain": "example.com",
-    "status": "Pending",
+    "status": "pending",
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z",
     "category": {
@@ -202,10 +202,10 @@ Retrieves a specific site by ID. Users can only access sites that belong to thei
     "description": "Site description",
     "orderVolume": 1000,
     "averageOrder": 49.99,
-    "ageDemographics": "AGE_25_34",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_25_to_34",
+    "genderDemographics": "mixed",
     "domain": "example.com",
-    "status": "Active",
+    "status": "active",
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z",
     "publisher": {
@@ -253,10 +253,10 @@ Updates site information. Users can only update sites that belong to their publi
   "description": "Updated description",
   "orderVolume": 1500,
   "averageOrder": 59.99,
-  "ageDemographics": "AGE_35_44",
-  "genderDemographics": "MALE",
+  "ageDemographics": "age_35_to_44",
+  "genderDemographics": "male",
   "domain": "newdomain.com",
-  "status": "Active",
+  "status": "active",
   "categoryName": "New Category Name"
 }
 ```
@@ -285,10 +285,10 @@ Updates site information. Users can only update sites that belong to their publi
     "description": "Updated description",
     "orderVolume": 1500,
     "averageOrder": 59.99,
-    "ageDemographics": "AGE_35_44",
-    "genderDemographics": "MALE",
+    "ageDemographics": "age_35_to_44",
+    "genderDemographics": "male",
     "domain": "newdomain.com",
-    "status": "Active",
+    "status": "active",
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T01:00:00.000Z",
     "category": {
@@ -366,25 +366,27 @@ type SiteResponsePublic = {
 
 #### AgeDemo
 
-- `AGE_18_24`
-- `AGE_25_34`
-- `AGE_35_44`
-- `AGE_45_54`
-- `AGE_55_64`
-- `AGE_65_PLUS`
+- `under_18`
+- `age_18_to_24`
+- `age_25_to_34`
+- `age_35_to_44`
+- `age_45_to_54`
+- `age_55_to_64`
+- `over_65`
+- `mixed`
 
 #### GenderDemo
 
-- `MALE`
-- `FEMALE`
-- `MIXED`
+- `male`
+- `female`
+- `mixed`
+- `other`
 
 #### AccountStatus
 
-- `Pending`
-- `Active`
-- `Inactive`
-- `Suspended`
+- `pending`
+- `active`
+- `inactive`
 
 ## Error Handling
 
@@ -489,10 +491,10 @@ curl -X GET "http://localhost:4000/api/site?skip=0&take=10" \
       "description": "Primary online storefront",
       "orderVolume": 1500,
       "averageOrder": 89.99,
-      "ageDemographics": "AGE_25_34",
-      "genderDemographics": "MIXED",
+      "ageDemographics": "age_25_to_34",
+      "genderDemographics": "mixed",
       "domain": "store.acme-ecommerce.com",
-      "status": "Active",
+      "status": "active",
       "createdAt": "2024-01-15T11:00:00.000Z",
       "updatedAt": "2024-01-15T11:00:00.000Z"
     }
@@ -527,10 +529,10 @@ curl -X GET "http://localhost:4000/api/site?include=relations&take=5" \
       "description": "Primary online storefront",
       "orderVolume": 1500,
       "averageOrder": 89.99,
-      "ageDemographics": "AGE_25_34",
-      "genderDemographics": "MIXED",
+      "ageDemographics": "age_25_to_34",
+      "genderDemographics": "mixed",
       "domain": "store.acme-ecommerce.com",
-      "status": "Active",
+      "status": "active",
       "createdAt": "2024-01-15T11:00:00.000Z",
       "updatedAt": "2024-01-15T11:00:00.000Z",
       "publisher": {
@@ -582,10 +584,10 @@ curl -X GET "http://localhost:4000/api/site?stats=true&take=5" \
       "description": "Primary online storefront",
       "orderVolume": 1500,
       "averageOrder": 89.99,
-      "ageDemographics": "AGE_25_34",
-      "genderDemographics": "MIXED",
+      "ageDemographics": "age_25_to_34",
+      "genderDemographics": "mixed",
       "domain": "store.acme-ecommerce.com",
-      "status": "Active",
+      "status": "active",
       "createdAt": "2024-01-15T11:00:00.000Z",
       "updatedAt": "2024-01-15T11:00:00.000Z",
       "stats": {
@@ -618,10 +620,10 @@ curl -X POST http://localhost:4000/api/site \
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.50,
-    "ageDemographics": "AGE_18_24",
-    "genderDemographics": "FEMALE",
+    "ageDemographics": "age_18_to_24",
+    "genderDemographics": "female",
     "domain": "mobile.acme-ecommerce.com",
-    "status": "Active",
+    "status": "active",
     "createEpomZone": true,
     "categoryName": "Fashion & Apparel"
   }'
@@ -638,10 +640,10 @@ curl -X POST http://localhost:4000/api/site \
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.5,
-    "ageDemographics": "AGE_18_24",
-    "genderDemographics": "FEMALE",
+    "ageDemographics": "age_18_to_24",
+    "genderDemographics": "female",
     "domain": "mobile.acme-ecommerce.com",
-    "status": "Active",
+    "status": "active",
     "createdAt": "2024-01-16T09:15:00.000Z",
     "updatedAt": "2024-01-16T09:15:00.000Z",
     "category": {
@@ -676,7 +678,7 @@ curl -X POST http://localhost:4000/api/site \
   "data": {
     "id": "cm7g8h9i0j1k2l3m4n5o6p7q",
     "name": "Quick Setup Store",
-    "status": "Pending",
+    "status": "pending",
     "createdAt": "2024-01-16T10:45:00.000Z",
     "updatedAt": "2024-01-16T10:45:00.000Z"
   },
@@ -704,10 +706,10 @@ curl -X GET "http://localhost:4000/api/site/cm2a3b4c5d6e7f8g9h0i1j2k?include=rel
     "description": "Primary online storefront",
     "orderVolume": 1500,
     "averageOrder": 89.99,
-    "ageDemographics": "AGE_25_34",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_25_to_34",
+    "genderDemographics": "mixed",
     "domain": "store.acme-ecommerce.com",
-    "status": "Active",
+    "status": "active",
     "createdAt": "2024-01-15T11:00:00.000Z",
     "updatedAt": "2024-01-15T11:00:00.000Z",
     "publisher": {
@@ -749,10 +751,10 @@ curl -X PUT http://localhost:4000/api/site/cm2a3b4c5d6e7f8g9h0i1j2k \
     "description": "Enhanced shopping experience with premium features",
     "orderVolume": 2500,
     "averageOrder": 125.00,
-    "ageDemographics": "AGE_35_44",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_35_to_44",
+    "genderDemographics": "mixed",
     "domain": "premium.acme-ecommerce.com",
-    "status": "Active",
+    "status": "active",
     "categoryName": "Premium Electronics"
   }'
 ```
@@ -768,10 +770,10 @@ curl -X PUT http://localhost:4000/api/site/cm2a3b4c5d6e7f8g9h0i1j2k \
     "description": "Enhanced shopping experience with premium features",
     "orderVolume": 2500,
     "averageOrder": 125.0,
-    "ageDemographics": "AGE_35_44",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_35_to_44",
+    "genderDemographics": "mixed",
     "domain": "premium.acme-ecommerce.com",
-    "status": "Active",
+    "status": "active",
     "createdAt": "2024-01-15T11:00:00.000Z",
     "updatedAt": "2024-01-16T14:20:00.000Z",
     "category": {
@@ -795,7 +797,7 @@ curl -X PUT http://localhost:4000/api/site/cm2a3b4c5d6e7f8g9h0i1j2k \
   -H "Authorization: Bearer falcon_sk_xyz789abc123def456ghi789jkl012mno345" \
   -d '{
     "orderVolume": 3000,
-    "status": "Active"
+    "status": "active"
   }'
 ```
 
@@ -810,10 +812,10 @@ curl -X PUT http://localhost:4000/api/site/cm2a3b4c5d6e7f8g9h0i1j2k \
     "description": "Enhanced shopping experience with premium features",
     "orderVolume": 3000,
     "averageOrder": 125.0,
-    "ageDemographics": "AGE_35_44",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_35_to_44",
+    "genderDemographics": "mixed",
     "domain": "premium.acme-ecommerce.com",
-    "status": "Active",
+    "status": "active",
     "createdAt": "2024-01-15T11:00:00.000Z",
     "updatedAt": "2024-01-16T16:45:00.000Z"
   },
@@ -884,7 +886,7 @@ curl -X POST http://localhost:4000/api/site \
   "success": false,
   "error": "Validation failed",
   "details": [
-    "ageDemographics: Invalid enum value. Expected AGE_18_24 | AGE_25_34 | AGE_35_44 | AGE_45_54 | AGE_55_64 | AGE_65_PLUS",
+    "ageDemographics: Invalid enum value. Expected 'under_18' | 'age_18_to_24' | 'age_25_to_34' | 'age_35_to_44' | 'age_45_to_54' | 'age_55_to_64' | 'over_65' | 'mixed', received 'INVALID_AGE'",
     "orderVolume: orderVolume must be a non-negative integer if provided"
   ]
 }
