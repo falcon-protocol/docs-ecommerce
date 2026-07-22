@@ -33,6 +33,10 @@
             {
               "text": "Unified",
               "link": "/integration-guide/unified"
+            },
+            {
+              "text": "Google Ad Manager",
+              "link": "/integration-guide/gam"
             }
           ]
         },
