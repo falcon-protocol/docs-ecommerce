@@ -40,8 +40,8 @@ POST /api/site
   "description": "Dedicated mobile shopping experience",
   "orderVolume": 800,
   "averageOrder": 65.5,
-  "ageDemographics": "AGE_25_34",
-  "genderDemographics": "MIXED",
+  "ageDemographics": "age_25_to_34",
+  "genderDemographics": "mixed",
   "domain": "mobile.acme-ecommerce.com",
   "status": "active",
   "createEpomZone": true,
@@ -56,9 +56,9 @@ POST /api/site
 - `orderVolume`: Optional, non-negative integer (monthly order volume)
 - `averageOrder`: Optional, non-negative number (average order value in USD)
 - `ageDemographics`: Optional, must be valid AgeDemo enum value
-  - Valid values: `AGE_18_24`, `AGE_25_34`, `AGE_35_44`, `AGE_45_54`, `AGE_55_64`, `AGE_65_PLUS`
+  - Valid values: `under_18`, `age_18_to_24`, `age_25_to_34`, `age_35_to_44`, `age_45_to_54`, `age_55_to_64`, `over_65`, `mixed`
 - `genderDemographics`: Optional, must be valid GenderDemo enum value
-  - Valid values: `MALE`, `FEMALE`, `MIXED`
+  - Valid values: `male`, `female`, `mixed`, `other`
 - `domain`: Optional, trimmed (use actual domain, avoid myshopify.com when possible)
 - `status`: Optional, must be "active" or "inactive" (defaults to "pending")
 - `createEpomZone`: Optional, boolean (defaults to true)
@@ -387,8 +387,8 @@ curl -X POST https://pr-api.falconlabs.us/api/site \
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.50,
-    "ageDemographics": "AGE_25_34",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_25_to_34",
+    "genderDemographics": "mixed",
     "domain": "mobile.acme-ecommerce.com",
     "status": "active",
     "createEpomZone": true,
@@ -407,8 +407,8 @@ curl -X POST https://pr-api.falconlabs.us/api/site \
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.5,
-    "ageDemographics": "AGE_25_34",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_25_to_34",
+    "genderDemographics": "mixed",
     "domain": "mobile.acme-ecommerce.com",
     "status": "active",
     "adsEnabled": true,
@@ -438,8 +438,8 @@ curl -X POST https://pr-api.falconlabs.us/api/site \
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.5,
-    "ageDemographics": "AGE_25_34",
-    "genderDemographics": "MIXED",
+    "ageDemographics": "age_25_to_34",
+    "genderDemographics": "mixed",
     "domain": "mobile.acme-ecommerce.com",
     "status": "active",
     "adsEnabled": true,
@@ -535,8 +535,8 @@ curl -X GET https://pr-api.falconlabs.us/api/site/clx3c4d5e6f7g8h9i0j1k2l3m \
     "domain": "fashionboutique.com",
     "orderVolume": 500,
     "averageOrder": 75.5,
-    "ageDemographics": "AGE_25_34",
-    "genderDemographics": "FEMALE",
+    "ageDemographics": "age_25_to_34",
+    "genderDemographics": "female",
     "status": "active",
     "adsEnabled": true,
     "createdAt": "2024-01-15T10:35:00.000Z",
