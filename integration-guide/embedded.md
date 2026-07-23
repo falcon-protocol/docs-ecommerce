@@ -38,6 +38,8 @@ Add a container element where the promotional content will render:
 - **Desktop:** 580px × 260px (minimum)
 - **Mobile:** 479px × 400px (minimum)
 
+> **Note:** These dimensions are a starting size to reserve space before the offer loads, not a size the offer will stretch to fill. The offer's height automatically adjusts to match its own content. See [Container Sizing](#1-container-sizing) in Best Practices to avoid empty space below the offer.
+
 ### Step 4: Initialize with Single API Call
 
 Use `FalconAds.init()` method to initialize and display perks in one call:
@@ -308,7 +310,7 @@ FalconAds.init({
 
 ### 1. Container Sizing
 
-Provide explicit dimensions for optimal display:
+The SDK automatically adjusts the offer's height to match its own content. It does not stretch to fill whatever height you give the container. Treat the dimensions below as a **minimum starting size** to reserve space before the offer loads, not a fixed size the offer will grow or shrink to fill. If the container is taller than the offer needs, the extra space stays empty underneath it.
 
 ```css
 /* Desktop */
@@ -331,6 +333,17 @@ Provide explicit dimensions for optimal display:
 
 - Desktop: 580px × 260px
 - Mobile: 479px × 400px
+
+**To avoid empty space below the offer:** use `min-height` instead of a fixed `height` so the container can shrink to whatever size the offer actually renders at:
+
+```css
+#falcon-ads-container {
+  width: 580px;
+  min-height: 260px;
+}
+```
+
+Width behaves differently from height: the offer fills 100% of the container's width, so a fixed width is safe to use.
 
 ### 2. Container Must Exist Before Initialization
 
@@ -486,6 +499,14 @@ Each placement should have its own unique container:
   });
 </script>
 ```
+
+#### Empty space below the offer
+
+**Problem:** The container has blank space underneath the rendered offer.
+
+**Cause:** The offer's height is sized to its own content, not to the container. If the container has a fixed `height` set higher than what the offer needs (for example, higher than the recommended minimum), the leftover space is that gap.
+
+**Solution:** Use `min-height` instead of a fixed `height` on the container so it can shrink to match the offer's rendered size. See [Container Sizing](#1-container-sizing).
 
 #### No offers display (no error)
 

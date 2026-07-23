@@ -36,6 +36,8 @@ A container is required regardless of which mode Falcon selects — it's the ren
 
 Recommended minimum dimensions: **580×260px** desktop, **479×400px** mobile.
 
+> **Note:** When Falcon assigns embedded mode, the offer's height automatically adjusts to match its own content rather than stretching to fill the container. See [Container Sizing](./embedded#1-container-sizing) in the Embedded guide for how to avoid empty space below the offer.
+
 ### Step 3: Initialize
 
 ```javascript
