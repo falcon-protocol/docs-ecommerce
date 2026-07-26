@@ -118,6 +118,7 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
       "images": []
     }
   ],
+  "template": 21,
   "adDisplayDelay": 0,
   "isTestMode": true,
   "siteStatus": "active",
@@ -168,6 +169,7 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
   - `clickUrl`: URL to redirect to when customer clicks the offer — see [Click API](./click-api) for how to fire this event
   - `beaconUrl`: URL to call when offer is displayed — see [Impression API](./impression-api) for how to fire this event
   - `closeUrl`: URL to call when customer closes the ad
+- `template`: Numeric ID of the template assigned to this placement (e.g. `21`, `15`). Used to select which template component to render.
 - `isTestMode`: Whether the placement is in test mode
 - `templateData`: Configuration data for customizing the ad display
   - `templateConfig`: Display configuration parameters (see Adjustable Template section)
