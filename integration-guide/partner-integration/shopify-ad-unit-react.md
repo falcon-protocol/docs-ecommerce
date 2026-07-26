@@ -8,6 +8,8 @@ title: "Shopify Ad Unit (React)"
 
 This guide walks you through integrating the Falcon configurable ad template into your Shopify app. The setup is straightforward and requires minimal ongoing maintenance — everything is powered by git submodules, so updates are pulled in with a single command.
 
+> **Where the data comes from:** Everything the template needs (`templateData`, `activeOffer`, `offers`, `template`/`templateId`) comes from a single call to the [OData API](./odata-api) (`GET /api/odata`), the same endpoint and public key you use elsewhere in your integration. There is no separate "proxy" endpoint to request — when this guide refers to data being "provided by Falcon," it means the OData response. You write the code that calls it (see the `useFalconApi` example in [Usage Example](#5-usage-example)).
+
 ## 1. Repository Access
 
 Template files are distributed via a private GitHub repository. Access is managed through SSH deploy keys — no individual GitHub accounts need to be added.
@@ -180,7 +182,7 @@ If you have questions about where to obtain any of these values, reach out to th
 
 ### `index.tsx` — Template21 (Configurable Template)
 
-The primary configurable ad template. Its layout, element parameters, and positioning are all controlled remotely through our proxy — changes take effect without pulling updates from GitHub.
+The primary configurable ad template. Its layout, element parameters, and positioning are all controlled remotely through the [OData API](./odata-api) response — changes take effect without pulling updates from GitHub.
 
 #### Props (index.tsx)
 
@@ -202,7 +204,7 @@ interface TemplateProps {
 
 **Where data comes from:**
 
-- `showIcon`, `templateData`, `activeOffer`, `offers` — provided by the Falcon proxy API (we will supply the endpoint).
+- `showIcon`, `templateData`, `activeOffer`, `offers` — provided by the [OData API](./odata-api) response (`GET /api/odata`). Call it with the same public key you use for `FeatureManagementProvider`.
 - `extensionTarget`, `firstName`, `email` — obtained from Shopify APIs on your side.
 - `activeOfferIndex`, `reachedEndOfOffers`, `clickOffer`, `handleNoThanks` — handled by your application logic.
 
@@ -233,17 +235,17 @@ A simplified fallback template with a predefined layout. It accepts the same pro
 
 ### `renderer.tsx` — Renderer
 
-Handles template routing — automatically selects Template21 or Template15 based on the `templateId` from the Falcon proxy API. You don't need to implement any switching logic yourself.
+Handles template routing — automatically selects Template21 or Template15 based on `templateId`. You don't need to implement any switching logic yourself.
 
 The Renderer accepts the same props as the templates, plus one additional prop:
 
 ```typescript
 interface RendererProps extends TemplateProps {
-  templateId: number; // Template ID from Falcon API
+  templateId: number; // Template ID
 }
 ```
 
-`templateId` is provided by the Falcon proxy API alongside `templateData` and `activeOffer`.
+`templateId` comes from the `template` field in the [OData API](./odata-api) response, alongside `templateData` and `activeOffer`.
 
 | `templateId` | Template              |
 | ------------ | --------------------- |
@@ -264,6 +266,8 @@ Use it in two ways:
 
 ## 5. Usage Example
 
+> **Note:** `useShopifyApi`, `useFalconApi`, and `useFalconFlow` below are **not** exported by the submodule. They're placeholders for code you write yourself: `useShopifyApi` wraps Shopify's checkout/customer-account hooks, `useFalconApi` calls the [OData API](./odata-api) and returns its response fields (including `template` as `templateId`), and `useFalconFlow` implements your carousel/click-through logic (see [Inspired Offer Behavior](#6-inspired-offer-behavior)).
+
 ```tsx
 import { FeatureManagementProvider } from '<your-preferred-path>/react/provider';
 import { Renderer } from '<your-preferred-path>/react/renderer';
@@ -276,6 +280,8 @@ function App() {
   const [sessionId] = useState(generateUUID());
   const { hashedCustomerShopifyId, hashedPhone, hashedEmail, firstName } =
     useShopifyApi();
+  // useFalconApi is your own hook — call GET /api/odata (see the OData API guide)
+  // and return its fields. Map the response's `template` field to `templateId`.
   const { templateId, showIcon, templateData, activeOffer } = useFalconApi();
 
   const { reachedEndOfOffers, handleClick, handleDecline } = useFalconFlow();
