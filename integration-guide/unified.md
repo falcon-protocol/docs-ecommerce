@@ -26,6 +26,8 @@ On each `init()` call the SDK:
 <script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/unified-sdk.js"></script>
 ```
 
+> **Staging:** Use `https://d6y5cd3imay52.cloudfront.net/sdk/staging/unified-sdk.js` and your staging API key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across all three Web SDKs.
+
 ### Step 2: Add a Container Element
 
 A container is required regardless of which mode Falcon selects — it's the render target for embedded mode and must exist in the DOM before `init()` is called.
@@ -49,6 +51,26 @@ FalconUnifiedAds.init({
 ```
 
 That's it. The SDK loads and displays offers in whichever format Falcon assigns to this user.
+
+### With Order Attributes
+
+Pass order and customer data via `attributes` for revenue attribution and offer targeting — see the [Embedded guide's attribute reference](./embedded#attribute-reference) for the full field list:
+
+```javascript
+FalconUnifiedAds.init({
+  apiKey: "YOUR_API_KEY",
+  containerId: "falcon-ads-container",
+  placementId: "YOUR_PLACEMENT_ID",
+  attributes: {
+    orderId: "ORD-123456",
+    hashedEmail: "SHA256_HEX_OF_EMAIL_LOWERCASE",
+    category: "Electronics",
+    subcategory: "Headphones",
+    amount: "99.99",
+    currency: "USD",
+  },
+});
+```
 
 ## API Reference
 

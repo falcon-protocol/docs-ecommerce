@@ -18,7 +18,7 @@ Add this to your **order confirmation page** (or any page where you want to show
 
 ```html
 <head>
-  <script src="<https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js>"></script>
+  <script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/falcon-sdk.js"></script>
   <script>
     (async function () {
       try {
@@ -28,9 +28,9 @@ Add this to your **order confirmation page** (or any page where you want to show
         // 2. Create a placement instance with user/order data
         const perks = FalconSDK.createPerksInstance("YOUR_PLACEMENT_ID", {
           attributes: {
-            email: "user@example.com",
-            firstname: "John",
             orderId: "ORDER-123",
+            hashedEmail: "SHA256_HEX_OF_EMAIL_LOWERCASE",
+            firstname: "John",
             amount: "99.99",
           },
         });
@@ -51,6 +51,10 @@ Add this to your **order confirmation page** (or any page where you want to show
 That's it. The modal will appear with available offers.
 
 > **Get your credentials:** Contact your Falcon Labs account manager to obtain your SDK key and placement ID.
+
+> **Staging:** Point the script tag at `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-sdk.js` and use your staging SDK key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across all three Web SDKs.
+>
+> **Legacy link:** Existing integrations using `https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js` don't need to migrate, that link is kept up to date in parallel, it just isn't served through CloudFront and has no staging equivalent. New integrations should use the CloudFront URL above.
 
 ## Framework Examples
 
@@ -90,14 +94,14 @@ Show the modal immediately when the component mounts (e.g. order confirmation pa
 
 ```tsx
 // Load the SDK script once in your index.html <head>:
-// <script src="<https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js>"></script>
+// <script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/falcon-sdk.js"></script>
 
 import { useEffect, useRef } from "react";
 
 export function FalconPerksAutoShow({
   sdkKey,
   placementId,
-  userEmail,
+  userHashedEmail,
   userName,
   orderId,
   amount,
@@ -111,9 +115,9 @@ export function FalconPerksAutoShow({
 
         const perks = FalconSDK.createPerksInstance(placementId, {
           attributes: {
-            email: userEmail,
-            firstname: userName,
             orderId,
+            hashedEmail: userHashedEmail,
+            firstname: userName,
             amount,
           },
         });
@@ -134,7 +138,7 @@ export function FalconPerksAutoShow({
     return () => {
       instanceRef.current?.destroy();
     };
-  }, [sdkKey, placementId, userEmail, userName, orderId, amount]);
+  }, [sdkKey, placementId, userHashedEmail, userName, orderId, amount]);
 
   return null;
 }
@@ -150,7 +154,7 @@ import { useEffect, useRef, useCallback } from "react";
 export function FalconPerksButton({
   sdkKey,
   placementId,
-  userEmail,
+  userHashedEmail,
   userName,
   orderId,
   amount,
@@ -164,9 +168,9 @@ export function FalconPerksButton({
 
         instanceRef.current = FalconSDK.createPerksInstance(placementId, {
           attributes: {
-            email: userEmail,
-            firstname: userName,
             orderId,
+            hashedEmail: userHashedEmail,
+            firstname: userName,
             amount,
           },
         });
@@ -180,7 +184,7 @@ export function FalconPerksButton({
     return () => {
       instanceRef.current?.destroy();
     };
-  }, [sdkKey, placementId, userEmail, userName, orderId, amount]);
+  }, [sdkKey, placementId, userHashedEmail, userName, orderId, amount]);
 
   const handleShowPerks = useCallback(async () => {
     if (!instanceRef.current) return;
@@ -207,7 +211,7 @@ The React examples above work in Next.js. The only difference is loading the SDK
 import Script from "next/script";
 
 <Script
-  src="<https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js>"
+  src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/falcon-sdk.js"
   strategy="afterInteractive"
 />;
 ```
@@ -216,23 +220,34 @@ Make sure to add `"use client"` to components that use the SDK.
 
 ## Custom Attributes
 
-Pass user and order data for personalized offer targeting. The more attributes you provide, the better the targeting.
+<!--@include: ./_shared/attributes-reference.md-->
 
 ```tsx
 interface CustomAttributes {
-  // Customer email address.
-  // Used for offer personalization and deduplication.
+  // Unique order or transaction identifier.
+  // Links the offer impression to a specific purchase.
+  orderId?: string;
+
+  // Customer email, hashed (SHA-256, lowercase) on your end.
+  // Pass this or `email`, not both.
+  hashedEmail?: string;
+
+  // Customer email address, plain text.
+  // The SDK hashes it in the browser before sending. Pass this or
+  // `hashedEmail`, not both.
   email?: string;
+
+  // Order or product category.
+  category?: string;
+
+  // Order or product subcategory.
+  subcategory?: string;
 
   // Customer first name.
   firstname?: string;
 
   // Customer last name.
   lastname?: string;
-
-  // Unique order or transaction identifier.
-  // Links the offer impression to a specific purchase.
-  orderId?: string;
 
   // Total transaction amount as a string (e.g. "99.99").
   // Used for offer eligibility rules based on order value.
@@ -264,7 +279,12 @@ interface CustomAttributes {
   // Used for card-based offer targeting.
   ccbin?: string;
 
-  // Customer mobile phone number.
+  // Customer phone, hashed (SHA-256, lowercase) on your end.
+  // Pass this or `mobile`, not both.
+  hashedPhone?: string;
+
+  // Customer mobile phone number, plain text.
+  // Hashed in the browser the same way as `email`.
   mobile?: string;
 
   // Billing address line 1.
@@ -376,6 +396,6 @@ The SDK throws on invalid operations. Common errors you may encounter:
 
 **Script doesn't load:**
 
-- Check for ad blockers or CSP rules blocking `falconlabs.s3.us-east-2.amazonaws.com`
+- Check for ad blockers or CSP rules blocking `d6y5cd3imay52.cloudfront.net` (or `falconlabs.s3.us-east-2.amazonaws.com` if you're still on the legacy link)
 
 **Need help?** Contact your Falcon Labs account manager.

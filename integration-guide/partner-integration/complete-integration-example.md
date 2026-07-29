@@ -6,6 +6,8 @@ title: "Complete Integration Example"
 
 This is a complete walkthrough of the **custom integration path** — creating the entity hierarchy as a partner, then rendering offers yourself by calling OData directly and wiring up the click and impression URLs returned in the response. If you have full control over the surface and don't need to customize rendering, prefer the [Embedded Web SDK](/integration-guide/embedded) — it handles fetching, rendering, impression tracking, and click handling for you. This guide is for cases where you're rendering offers in your own UI.
 
+> Run this against staging first (`https://staging-pr-api.falconlabs.us`) — see [Staging Environment](./staging-environment). The `BASE_URL` below is production; swap it for staging while testing.
+
 ### 1. Create the entity hierarchy
 
 ```bash
@@ -72,7 +74,7 @@ echo "Placement ID:$PLACEMENT_ID"
 ```bash
 echo ""
 echo "Step 4: Fetching offers..."
-curl -s -X GET "${BASE_URL}/api/odata?placementId=${PLACEMENT_ID}&sessionId=test_session_123&count=4&at.email=customer@example.com&at.orderid=ORDER-12345&at.clientIp=203.0.113.42&at.userAgent=Mozilla%2F5.0" \
+curl -s -X GET "${BASE_URL}/api/odata?placementId=${PLACEMENT_ID}&sessionId=test_session_123&count=4&at.hashedEmail=SHA256_HEX_OF_EMAIL_LOWERCASE&at.orderid=ORDER-12345&at.category=Apparel&at.subcategory=Shoes&at.clientIp=203.0.113.42&at.userAgent=Mozilla%2F5.0" \
   -H "Authorization: Bearer${PUBLIC_KEY}" | jq '.'
 
 echo ""
