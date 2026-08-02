@@ -58,7 +58,7 @@ Pass customer and order data with the `at.` prefix for better targeting and anal
 - `at.address` (string): Customer address (max 500 chars)
 - `at.zipcode` (string): ZIP/postal code (max 20 chars)
 
-> Email Hashing: For privacy compliance, hash the email using SHA-256 (trim → lowercase → hash) before sending. Use the dedicated `at.hashedEmail` parameter, or pass the hash directly in `at.email` (legacy, still supported — the API detects a valid SHA-256 hex string automatically). Don't send both `at.hashedEmail` and a plaintext `at.email` for the same request.
+> Email Hashing: Send plain-text `at.email` when you can — it gives the best matching and targeting. If privacy or compliance requirements mean you can't send plaintext email, hash it yourself using SHA-256 (trim → lowercase → hash) and send it via the dedicated `at.hashedEmail` parameter, or pass the hash directly in `at.email` (legacy, still supported — the API detects a valid SHA-256 hex string automatically). Don't send both `at.hashedEmail` and a plaintext `at.email` for the same request.
 >
 > Example: `email@example.com` → SHA-256 → `a1b2c3d4e5f6...` (64-character hex string)
 
