@@ -25,6 +25,8 @@ Add the Falcon embedded SDK script to your HTML page:
 </head>
 ```
 
+> **Staging:** Use `https://d6y5cd3imay52.cloudfront.net/sdk/staging/embedded-sdk.js` and your staging API key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across all three Web SDKs.
+
 ### Step 3: Create HTML Container
 
 Add a container element where the promotional content will render:
@@ -199,8 +201,14 @@ interface FalconAdsConfig {
 interface FalconAdsAttributes {
   /** Unique order identifier (no special characters: #, @, ., spaces) */
   orderId?: string;
-  /** Customer email address */
+  /** Customer email, hashed (SHA-256, lowercase) on your end. Pass this or `email`, not both */
+  hashedEmail?: string;
+  /** Customer email address, plain text. The SDK hashes it in the browser before sending. Pass this or `hashedEmail`, not both */
   email?: string;
+  /** Order or product category */
+  category?: string;
+  /** Order or product subcategory */
+  subcategory?: string;
   /** Order total as a string (e.g. "99.99") */
   amount?: string;
   /** Customer first name */
@@ -221,7 +229,9 @@ interface FalconAdsAttributes {
   paymenttype?: string;
   /** First 6 digits of credit card (BIN) */
   ccbin?: string;
-  /** Customer mobile phone number */
+  /** Customer phone, hashed (SHA-256, lowercase) on your end. Pass this or `mobile`, not both */
+  hashedPhone?: string;
+  /** Customer mobile phone number, plain text. Hashed in the browser the same way as `email` */
   mobile?: string;
   /** Billing address line 1 */
   billingaddress1?: string;
@@ -247,7 +257,9 @@ FalconAds.init({
   placementId: "YOUR_PLACEMENT_ID",
   attributes: {
     orderId: "ORD-123456",
-    email: "customer@example.com",
+    hashedEmail: "SHA256_HEX_OF_EMAIL_LOWERCASE",
+    category: "Electronics",
+    subcategory: "Headphones",
     amount: "99.99",
     currency: "USD",
     firstname: "John",
@@ -261,19 +273,7 @@ FalconAds.init({
 
 ### Attribute Reference
 
-| Attribute        | Priority    | Description             | Format                                          |
-| ---------------- | ----------- | ----------------------- | ----------------------------------------------- |
-| `orderId`        | Required    | Unique order identifier | String, no special characters (#, @, ., spaces) |
-| `email`          | Required    | Customer email          | Valid email string                              |
-| `amount`         | Recommended | Order total             | Numeric string (e.g. `"99.99"`)                 |
-| `firstname`      | Recommended | Customer first name     | String                                          |
-| `lastname`       | Recommended | Customer last name      | String                                          |
-| `currency`       | Optional    | Currency code           | ISO 4217 (e.g. `"USD"`, `"EUR"`)                |
-| `country`        | Optional    | Customer country        | ISO 3166-1 alpha-2 (e.g. `"US"`, `"GB"`)        |
-| `language`       | Optional    | Customer language       | ISO 639-1 (e.g. `"en"`, `"fr"`)                 |
-| `billingzipcode` | Optional    | Billing zip/postal code | String                                          |
-
-> **Note:** All attribute values must be strings. The `attributes` field is optional — the SDK works without it, but passing attributes enables better offer targeting and analytics.
+<!--@include: ./_shared/attributes-reference.md-->
 
 ## Error Handling
 

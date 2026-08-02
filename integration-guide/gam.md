@@ -43,6 +43,8 @@ In GAM, go to **Delivery → Creatives → New creative → Custom** and paste t
       amount: "%%PATTERN:amount%%",
       currency: "%%PATTERN:currency%%",
       language: "%%PATTERN:language%%",
+      category: "%%PATTERN:category%%",
+      subcategory: "%%PATTERN:subcategory%%",
     },
   });
 </script>
@@ -50,6 +52,8 @@ In GAM, go to **Delivery → Creatives → New creative → Custom** and paste t
 
 Missing key-values are safe: if a macro is not set on the ad request, the SDK drops the
 unexpanded `%%…%%` value instead of sending it.
+
+> **Staging:** Use `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-gam-sdk.js` in a staging creative, with your staging API key. See [Staging Environment](/integration-guide/partner-integration/staging-environment) for the full URL reference across all Web SDKs.
 
 ### Step 3: Uncheck "Serve into a SafeFrame"
 
