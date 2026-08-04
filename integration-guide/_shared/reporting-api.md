@@ -72,7 +72,6 @@ The response includes the following metrics:
 - `clicks`: Number of clicks on offers
 - `conversions`: Number of conversions
 - `revenue`: Revenue generated
-- `profit`: Profit amount
 - `ctr`: Click-through rate (clicks / requests)
 
 > Note: requests and transactions are event counts, not currency values. requests tracks all impressions, while transactions tracks only those with postback/conversion data.
