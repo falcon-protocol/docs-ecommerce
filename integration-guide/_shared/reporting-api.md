@@ -71,8 +71,7 @@ The response includes the following metrics:
 - `transactions`: Number of requests that resulted in postback/conversion tracking (subset of requests with conversion data)
 - `clicks`: Number of clicks on offers
 - `conversions`: Number of conversions
-- `revenue`: Revenue generated (requires `revenueAccess` permission)
-- `gross`: Gross revenue (requires `grossAccess` permission)
+- `revenue`: Revenue generated
 - `profit`: Profit amount
 - `ctr`: Click-through rate (clicks / requests)
 
