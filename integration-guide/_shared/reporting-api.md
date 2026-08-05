@@ -63,19 +63,25 @@ GET /api/report
 - `MONTH`: Monthly breakdown
 - `NONE` (default): No time breakdown
 
-### Report Metrics
+### Response Format
 
-The response includes the following metrics:
+The endpoint returns a **bare JSON array** of report rows. There is no `data` wrapper and no `summary` object — totals and averages are not computed by the API. Each element of the array is a single row.
 
-- `requests`: Total number of ad impression requests (how many times the ad unit was loaded/shown)
-- `transactions`: Number of requests that resulted in postback/conversion tracking (subset of requests with conversion data)
-- `clicks`: Number of clicks on offers
-- `conversions`: Number of conversions
-- `revenue`: Revenue generated
-- `profit`: Profit amount
-- `ctr`: Click-through rate (clicks / requests)
+The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) are present on every row. The remaining fields appear only under the conditions noted below.
 
-> Note: requests and transactions are event counts, not currency values. requests tracks all impressions, while transactions tracks only those with postback/conversion data.
+| Field | Type | Present when | Notes |
+| --- | --- | --- | --- |
+| `date` | string | Always | Format depends on `breakdownBy` — see below |
+| `clicks` | number | Always | Number of clicks on offers |
+| `transactions` | number | Always | Event count of requests that resulted in postback/conversion tracking |
+| `revenue` | number | Always | Revenue generated. This is the only revenue field returned |
+| `site` | string | Always | Site name |
+| `siteId` | string | Always | |
+| `placement` | string | On `PLACEMENT` reports | Placement name |
+| `placementId` | string | On `PLACEMENT` reports | |
+| `country` | string \| null | When grouped by `COUNTRY` | ISO country code, or `null` when unknown |
+
+> **`date` format:** when `breakdownBy` is `NONE` (the default), `date` is the report's start date in `YYYY-MM-DD` form (e.g. `"2024-01-01"`). For any time breakdown (`DAY`, `WEEK`, `MONTH`), `date` is formatted as `DD/MM/YYYY` (e.g. `"15/01/2024"`).
 
 ### Example Requests
 
@@ -102,38 +108,37 @@ curl -X GET "https://pr-api.falconlabs.us/api/report?dateStart=20240101&dateEnd=
 
 ### Success Response (200 OK)
 
+The response is a bare array of row objects:
+
 ```json
-{
-  "data": [
-    {
-      "date": "2024-01-15",
-      "transactions": 1250,
-      "clicks": 85,
-      "conversions": 12,
-      "revenue": 450.5,
-      "ctr": 6.8,
-      "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
-      "placement": "Thank You Page Placement",
-      "country": "US"
-    },
-    {
-      "date": "2024-01-16",
-      "transactions": 1420,
-      "clicks": 96,
-      "conversions": 15,
-      "revenue": 562.75,
-      "ctr": 6.76,
-      "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
-      "placement": "Thank You Page Placement",
-      "country": "US"
-    }
-  ],
-  "summary": {
-    "totalTransactions": 2670,
-    "totalClicks": 181,
-    "totalConversions": 27,
-    "totalRevenue": 1013.25,
-    "averageCtr": 6.78
+[
+  {
+    "date": "15/01/2024",
+    "clicks": 85,
+    "transactions": 1250,
+    "revenue": 450.5,
+    "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
+    "placement": "Thank You Page Placement",
+    "siteId": "clx0s1t2e3i4d5x6y7z8",
+    "site": "example.com",
+    "country": "US"
+  },
+  {
+    "date": "16/01/2024",
+    "clicks": 96,
+    "transactions": 1420,
+    "revenue": 562.75,
+    "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
+    "placement": "Thank You Page Placement",
+    "siteId": "clx0s1t2e3i4d5x6y7z8",
+    "site": "example.com",
+    "country": "US"
   }
-}
+]
 ```
+
+---
+
+#### Click-through rate (CTR)
+
+CTR reporting is not enabled for all accounts. If your account has CTR access, each row will also include a `ctr` field (`number`) — the row's click-through rate, derived from clicks over ad impressions. If your account does not have CTR access, the field is simply omitted from the response.
