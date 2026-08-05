@@ -40,6 +40,7 @@ Authorization: Bearer PUBLIC_KEY
 ### Optional Parameters
 
 - `count` (number, default: 4): Number of offers to return
+- `at.correlationId` (string): Mediation correlation ID. Required in practice when the API is integrated through Falcon Mediation.
 
 ### Customer Data Parameters
 
