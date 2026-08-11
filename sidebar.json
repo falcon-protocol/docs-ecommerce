@@ -145,6 +145,10 @@
             {
               "text": "Embedded SDK Callbacks",
               "link": "/integration-guide/embedded-sdk-callbacks"
+            },
+            {
+              "text": "Falcon-Sponsored Offers",
+              "link": "/integration-guide/falcon-sponsored-offers"
             }
           ]
         },
