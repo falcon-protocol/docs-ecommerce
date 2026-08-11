@@ -43,6 +43,37 @@ This mirrors Falcon's own ad-unit implementation. (If your placement instead ren
 
 **Placement:** the tease bar lives in the offer's **footer**, at the bottom — below the offer body and the redeem / "No thanks" (decline) actions, grouped with the terms / privacy-policy links. Render `teaseMessage` **verbatim**; Falcon's templates pair it with a small gift icon.
 
+### On click, jump straight to the sponsored offer
+
+The tease bar promises a free gift, so a click has to deliver it — otherwise the tease doesn't make sense. Implement this in your click handler: when `hasInspired` is `true` and the customer **claims an offer that showed the tease bar** (any offer before the last), don't advance to the next offer in sequence — **skip the intermediate offers and jump directly to the sponsored offer** (`offers.length - 1`) so they can claim the gift.
+
+Only the redeem / claim action jumps. "No thanks" (decline) still advances sequentially to the next offer as usual, and once the customer is already on the sponsored offer there's nowhere left to jump.
+
+```js
+function onClickOffer() {
+  // ... your normal click tracking (fire clickUrl) ...
+
+  const lastIndex = offers.length - 1;
+
+  // Already on the sponsored (last) offer — end of the flow.
+  if (currentIndex >= lastIndex) {
+    onEndOfOffers();
+    return;
+  }
+
+  // Teased offer was claimed → jump straight to the gift.
+  if (templateData.hasInspired) {
+    setCurrentIndex(lastIndex);
+    return;
+  }
+
+  // Default: advance one offer.
+  setCurrentIndex(currentIndex + 1);
+}
+```
+
+This mirrors Falcon's own ad-unit flow. Without it, a customer who claims a teased offer would never reach the gift you promised.
+
 ### Render the sponsored offer — like any other offer
 
 Nothing special here. The sponsored offer follows the standard offer contract, so render it from its own `title`, `description`, and `ctaText` just as you render every other offer. Two small things to be aware of:
@@ -85,5 +116,6 @@ Every offer, sponsored or not, ships with the same pre-built tracking URLs. Fire
 1. Call [`GET /api/odata`](/integration-guide/publisher-integration/odata-api) — unchanged.
 2. Read `templateData.hasInspired`. If `false`/absent, you're done — render offers as today.
 3. If `true`, render `templateData.teaseMessage` as a tease bar on **every offer except the last**, and hide it on the sponsored (last) offer.
-4. Expect **one more offer** than you requested — drive off `offers.length`.
-5. Render the sponsored offer like any other offer, and fire its `beaconUrl` / `clickUrl` / `closeUrl` as usual.
+4. When a customer **claims a teased offer**, jump straight to the sponsored offer (`offers.length - 1`) instead of advancing one step.
+5. Expect **one more offer** than you requested — drive off `offers.length`.
+6. Render the sponsored offer like any other offer, and fire its `beaconUrl` / `clickUrl` / `closeUrl` as usual.
