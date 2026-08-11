@@ -83,7 +83,7 @@ The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) 
 
 > **`date` format:** when `breakdownBy` is `NONE` (the default), `date` is the report's start date in `YYYY-MM-DD` form (e.g. `"2024-01-01"`). For any time breakdown (`DAY`, `WEEK`, `MONTH`), `date` is formatted as `DD/MM/YYYY` (e.g. `"15/01/2024"`).
 
-> **`revenue` and your payout:** `revenue` is already net of Falcon's revenue share for your account — it is not gross ad revenue, and no further take rate is deducted from it before payout. It also reflects floor-price protection and, once a month closes, that month's reconciliation against actual advertiser-reported revenue. Because of that reconciliation step, `revenue` for the current (not-yet-closed) month is Falcon's best estimate and may be revised slightly when the month is reconciled; `revenue` for a closed, reconciled month is the final figure your payout for that month is based on.
+> **`revenue` and your payout:** `revenue` is already net of Falcon's revenue share for your account — it is not gross ad revenue, and no further take rate is deducted from it before payout. Once a month closes, that month's `revenue` is reconciled against actual advertiser-reported revenue. Because of that reconciliation step, `revenue` for the current (not-yet-closed) month is Falcon's best estimate and may be revised slightly when the month is reconciled; `revenue` for a closed, reconciled month is the final figure your payout for that month is based on.
 
 ### Example Requests
 
