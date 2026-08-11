@@ -2,11 +2,11 @@
 
 ### Overview
 
-A **Falcon-sponsored offer** is an extra, Falcon-funded offer that we can append to an ad response to lift overall offer performance. When one applies, it arrives as an additional offer on top of the offers you requested — you don't request it and you don't pay for it.
+This supports adding an extra, Falcon-sponsored offer that we can append to an ad response to lift the overall offer performance of every offer in the unit. When one applies, it arrives as an additional offer on top of the normal offer count requested or returned.
 
 Supporting it is **additive**. If you already render offers from [`GET /api/odata`](/integration-guide/publisher-integration/odata-api), the sponsored offer itself renders like any other offer. The one piece of real integration work is the **tease bar**: when a sponsored offer is present, you display a teaser on every preceding offer so the customer knows the free gift is coming.
 
-> This guide is for **publishers and partners that render OData offers directly via the API**. If you use a Falcon SDK or one of the pre-built ad units — [Shopify Ad Unit (React)](/integration-guide/partner-integration/shopify-ad-unit-react) or [(Preact)](/integration-guide/partner-integration/shopify-ad-unit-preact) — this is already handled for you and there's nothing to do here.
+> This guide is for **publishers and partners that render OData offers directly via the API**. If you use a Falcon SDK or one of the pre-built ad units — [Shopify Ad Unit (Preact)](/integration-guide/partner-integration/shopify-ad-unit-preact) or the [Android](/integration-guide/android) / [iOS](/integration-guide/ios/integration) SDK — this is already handled for you and there's nothing to do here.
 
 ### Detect that a sponsored offer is present
 
