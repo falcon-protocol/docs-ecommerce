@@ -69,6 +69,7 @@ Pass customer and order data with the `at.` prefix for better targeting and anal
 - `at.category` (string): Order or product category
 - `at.subcategory` (string): Order or product subcategory
 - `at.amount` or `at.ordervalue` (number): Order amount (0-1,000,000)
+- `at.shippingAmount` (number): Total shipping amount for the order (0-1,000,000)
 - `at.currency` (string): Currency code (e.g., “USD”, “EUR”, “GBP”)
 - `at.billingaddress1` (string): Billing address (max 500 chars)
 - `at.billingzipcode` (string): Billing ZIP code (max 20 chars)
