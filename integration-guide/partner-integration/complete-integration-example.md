@@ -130,6 +130,6 @@ function renderOffer(offer, container) {
 }
 ```
 
-> Important: Skipping the impression beacon means Falcon never records that the offer was viewed, which breaks attribution and reporting. Skipping the click URL means clicks aren't recorded and the customer won't be redirected to the advertiser. Both are required for a custom integration to be considered complete.
+> Important: Skipping the impression beacon means Falcon never records that the offer was viewed. Since 15 August 2026 that also means the resulting order is not counted as a transaction in your reports. See [How transactions are counted](/integration-guide/partner-integration/reporting-api#how-transactions-are-counted). Skipping the click URL means clicks aren't recorded and the customer won't be redirected to the advertiser. Both are required for a custom integration to be considered complete.
 
 For the full event semantics — including the JSON variants and required parameters — see the [Impression API](./impression-api) and [Click API](./click-api) docs.
