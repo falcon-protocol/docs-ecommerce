@@ -78,6 +78,7 @@ https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&ses
 | `at.mobile` | Phone number |
 | `at.billingaddress1` | Billing address line 1 |
 | `at.billingaddress2` | Billing address line 2 |
+| `at.theme` | Colour scheme of your screen: `dark` renders the dark palette, anything else the default light one |
 | `at.age` | Customer age |
 | `at.gender` | Customer gender |
 | `at.cartItems` | Cart items (JSON string) |

@@ -1,4 +1,4 @@
-Pass user and order data via `attributes` for revenue attribution, offer targeting, and personalization. All values are strings.
+Pass user and order data via `attributes` for revenue attribution, offer targeting, personalization, and rendering hints. All values are strings.
 
 | Attribute | Priority | Description | Format |
 | --- | --- | --- | --- |
@@ -24,6 +24,7 @@ Pass user and order data via `attributes` for revenue attribution, offer targeti
 | `paymenttype` | Optional | Payment method (e.g. `"credit_card"`, `"paypal"`) | String |
 | `ccbin` | Optional | First 6 digits of the credit card number (BIN) | String |
 | `confirmationref` | Optional | Merchant/seller name, or your own internal confirmation reference if separate from `orderId`. Displayed in the offer headline on some templates | String |
+| `theme` | Optional | Colour scheme of the page the widget sits on. Pass `"dark"` when your page uses a dark background so the widget renders its dark palette. Any other value, or omitting it, renders the default light widget | `"dark"` or `"light"` |
 
 \* Pass either `hashedEmail` or `email`, not both. If both are present, `hashedEmail` takes priority. Without one of them (or `orderId`), the SDK still loads and displays offers, but there's nothing to match the impression back to the order, so attribution won't work — this isn't enforced as a hard error, so it's easy to miss during testing.
 

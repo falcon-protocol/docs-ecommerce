@@ -243,6 +243,9 @@ interface CustomAttributes {
   // Order or product subcategory.
   subcategory?: string;
 
+  // Colour scheme of your page. "dark" renders the widget's dark palette.
+  theme?: "dark" | "light";
+
   // Customer first name.
   firstname?: string;
 
