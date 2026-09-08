@@ -209,6 +209,8 @@ interface FalconAdsAttributes {
   category?: string;
   /** Order or product subcategory */
   subcategory?: string;
+  /** Colour scheme of your page. "dark" renders the widget's dark palette */
+  theme?: "dark" | "light";
   /** Order total as a string (e.g. "99.99") */
   amount?: string;
   /** Customer first name */
