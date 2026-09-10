@@ -87,19 +87,17 @@ USD, EUR, GBP, CAD, AUD, JPY, CNY, NZD, CHF, SEK, NOK, DKK, PLN, CZK, HUF, RON, 
 
 ### Sending Requests Over POST
 
-**`POST` is the recommended way to call `/api/odata`.** The endpoint accepts both `GET` and `POST`, and a `POST` request is behaviorally identical to the equivalent `GET` — same offers, same targeting, same persisted data, same response. The only difference is *where* the parameters travel: with `POST` you send them in a JSON request body instead of the URL query string, which keeps PII and line-item data out of URLs and access logs. Use `GET` only for simple browser-side calls where none of that is a concern (see [Using GET](#using-get) below).
+**`POST` is the recommended way to call `/api/odata`.** `POST` and `GET` accept the same parameters and return the same offers — the only difference is *where* the parameters travel. With `POST` you send them in a JSON request body instead of the URL query string, which keeps PII and line-item data out of URLs and access logs. Use `GET` only for simple browser-side calls where none of that is a concern (see [Using GET](#using-get) below).
 
 ```
 POST https://pr-api.falconlabs.us/api/odata
 ```
 
-**How the body maps to parameters**
+**Structuring the body**
 
-The JSON body is flattened into the same dotted parameters you'd use on a `GET`, then the identical handler runs:
-
-- **Nested objects** are flattened to dotted keys: `{ "at": { "email": "x" } }` becomes `at.email=x`.
-- **Flat dotted keys** pass through unchanged: `{ "at.email": "x" }` works too. Use whichever form you prefer.
-- **Body wins over the query string.** If the same key appears in both the URL and the body, the body value is used. This lets you keep routing params like `placementId` in the URL while carrying PII in the body.
+- Keep `placementId` and `sessionId` in the URL query string; send everything else in the JSON body.
+- Put customer and order attributes under an `at` object — `{ "at": { "email": "x" } }`. Dotted keys work too if you prefer them — `{ "at.email": "x" }`.
+- If the same parameter appears in both the query string and the body, the body value takes precedence.
 
 **Rules and traps to watch for**
 
@@ -127,7 +125,7 @@ await fetch(
     body: JSON.stringify({
       count: "2", // send scalars as strings
       at: {
-        email: "customer@example.com", // nested -> at.email
+        email: "customer@example.com",
         orderid: "ORDER-12345", // quote identifiers — never a raw JSON number
         amount: "125.50",
         currency: "USD",
@@ -137,8 +135,7 @@ await fetch(
           { sku: "SKU-2", qty: 2, price: "12.50" },
         ]),
       },
-      // equivalently, using flat dotted keys:
-      // "at.email": "customer@example.com",
+      // or, using dotted keys: "at.email": "customer@example.com"
     }),
   }
 );
