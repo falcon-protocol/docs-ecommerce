@@ -82,14 +82,12 @@ curl -s -X POST "${BASE_URL}/api/odata?placementId=${PLACEMENT_ID}&sessionId=tes
   -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
   -d '{
         "count": "4",
-        "at": {
-          "hashedEmail": "SHA256_HEX_OF_EMAIL_LOWERCASE",
-          "orderid": "ORDER-12345",
-          "category": "Apparel",
-          "subcategory": "Shoes",
-          "clientIp": "203.0.113.42",
-          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
+        "at.hashedEmail": "SHA256_HEX_OF_EMAIL_LOWERCASE",
+        "at.orderid": "ORDER-12345",
+        "at.category": "Apparel",
+        "at.subcategory": "Shoes",
+        "at.clientIp": "203.0.113.42",
+        "at.userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
       }' | jq '.'
 
 echo ""

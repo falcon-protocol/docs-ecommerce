@@ -32,13 +32,11 @@ curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i
   -H "Content-Type: application/json" \
   -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
   -d '{
-        "at": {
-          "email": "customer@example.com",
-          "orderid": "ORDER-12345",
-          "pubSub1": "campaign-42",
-          "pubSub2": "source-fb",
-          "pubSub3": "segment-vip"
-        }
+        "at.email": "customer@example.com",
+        "at.orderid": "ORDER-12345",
+        "at.pubSub1": "campaign-42",
+        "at.pubSub2": "source-fb",
+        "at.pubSub3": "segment-vip"
       }'
 ```
 

@@ -96,7 +96,7 @@ POST https://pr-api.falconlabs.us/api/odata
 **Structuring the body**
 
 - Keep `placementId` and `sessionId` in the URL query string; send everything else in the JSON body.
-- Put customer and order attributes under an `at` object — `{ "at": { "email": "x" } }`. Dotted keys work too if you prefer them — `{ "at.email": "x" }`.
+- Use dotted keys that match the query-parameter names exactly — `{ "at.email": "x", "at.orderid": "y" }`. (A nested `at` object — `{ "at": { "email": "x" } }` — is also accepted if you prefer it.)
 - If the same parameter appears in both the query string and the body, the body value takes precedence.
 
 **Rules and traps to watch for**
@@ -124,18 +124,15 @@ await fetch(
     },
     body: JSON.stringify({
       count: "2", // send scalars as strings
-      at: {
-        email: "customer@example.com",
-        orderid: "ORDER-12345", // quote identifiers — never a raw JSON number
-        amount: "125.50",
-        currency: "USD",
-        userAgent: "Mozilla/5.0 (...)", // real client UA when proxying server-side
-        lineItems: JSON.stringify([
-          { sku: "SKU-1", qty: 1, price: "49.99" },
-          { sku: "SKU-2", qty: 2, price: "12.50" },
-        ]),
-      },
-      // or, using dotted keys: "at.email": "customer@example.com"
+      "at.email": "customer@example.com",
+      "at.orderid": "ORDER-12345", // quote identifiers — never a raw JSON number
+      "at.amount": "125.50",
+      "at.currency": "USD",
+      "at.userAgent": "Mozilla/5.0 (...)", // real client UA when proxying server-side
+      "at.lineItems": JSON.stringify([
+        { sku: "SKU-1", qty: 1, price: "49.99" },
+        { sku: "SKU-2", qty: 2, price: "12.50" },
+      ]),
     }),
   }
 );
@@ -150,13 +147,11 @@ curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i
   -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
   -d '{
         "count": "2",
-        "at": {
-          "email": "customer@example.com",
-          "orderid": "ORDER-12345",
-          "amount": "125.50",
-          "currency": "USD",
-          "lineItems": "[{\"sku\":\"SKU-1\",\"qty\":1,\"price\":\"49.99\"}]"
-        }
+        "at.email": "customer@example.com",
+        "at.orderid": "ORDER-12345",
+        "at.amount": "125.50",
+        "at.currency": "USD",
+        "at.lineItems": "[{\"sku\":\"SKU-1\",\"qty\":1,\"price\":\"49.99\"}]"
       }'
 ```
 
