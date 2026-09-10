@@ -243,8 +243,8 @@ interface FalconAdsAttributes {
   age?: string;
   /** Customer gender */
   gender?: string;
-  /** Cart items as a JSON string */
-  cartItems?: string;
+  /** Cart line items as a JSON string */
+  lineItems?: string;
 }
 ```
 

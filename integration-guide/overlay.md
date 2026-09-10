@@ -302,9 +302,9 @@ interface CustomAttributes {
   // Customer gender.
   gender?: string;
 
-  // Cart items as a JSON string.
+  // Cart line items as a JSON string.
   // Used for product-based offer targeting.
-  cartItems?: string;
+  lineItems?: string;
 }
 ```
 

@@ -71,11 +71,26 @@ echo "Placement ID:$PLACEMENT_ID"
 
 ### 2. Fetch offers via OData
 
+`POST` is the recommended way to call OData — PII and order data travel in the JSON body instead of the URL. Because this call is server-side, it sets a browser-style `User-Agent` (via `at.userAgent`); without one, bot detection returns a silent `204`. See [Sending Requests Over POST](./odata-api#sending-requests-over-post).
+
 ```bash
 echo ""
 echo "Step 4: Fetching offers..."
-curl -s -X GET "${BASE_URL}/api/odata?placementId=${PLACEMENT_ID}&sessionId=test_session_123&count=4&at.hashedEmail=SHA256_HEX_OF_EMAIL_LOWERCASE&at.orderid=ORDER-12345&at.category=Apparel&at.subcategory=Shoes&at.clientIp=203.0.113.42&at.userAgent=Mozilla%2F5.0" \
-  -H "Authorization: Bearer${PUBLIC_KEY}" | jq '.'
+curl -s -X POST "${BASE_URL}/api/odata?placementId=${PLACEMENT_ID}&sessionId=test_session_123" \
+  -H "Authorization: Bearer ${PUBLIC_KEY}" \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+  -d '{
+        "count": "4",
+        "at": {
+          "hashedEmail": "SHA256_HEX_OF_EMAIL_LOWERCASE",
+          "orderid": "ORDER-12345",
+          "category": "Apparel",
+          "subcategory": "Shoes",
+          "clientIp": "203.0.113.42",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }' | jq '.'
 
 echo ""
 echo "Integration complete!"

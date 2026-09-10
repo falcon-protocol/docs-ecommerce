@@ -20,7 +20,7 @@ Pass user and order data via `attributes` for revenue attribution, offer targeti
 | `billingzipcode` | Optional | Billing ZIP or postal code | String |
 | `billingaddress1` | Optional | Billing address line 1 | String |
 | `billingaddress2` | Optional | Billing address line 2 | String |
-| `cartItems` | Optional | Cart contents | JSON string |
+| `lineItems` | Optional | Cart line items | JSON string |
 | `paymenttype` | Optional | Payment method (e.g. `"credit_card"`, `"paypal"`) | String |
 | `ccbin` | Optional | First 6 digits of the credit card number (BIN) | String |
 | `confirmationref` | Optional | Merchant/seller name, or your own internal confirmation reference if separate from `orderId`. Displayed in the offer headline on some templates | String |

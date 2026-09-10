@@ -4,7 +4,7 @@
 
 This supports adding an extra, Falcon-sponsored offer that we can append to an ad response to lift the overall offer performance of every offer in the unit. When one applies, it arrives as an additional offer on top of the normal offer count requested or returned.
 
-Supporting it is **additive**. If you already render offers from [`GET /api/odata`](/integration-guide/publisher-integration/odata-api), the sponsored offer itself renders like any other offer. The one piece of real integration work is the **tease bar**: when a sponsored offer is present, you display a teaser on every preceding offer so the customer knows the free gift is coming.
+Supporting it is **additive**. If you already render offers from [`POST /api/odata`](/integration-guide/publisher-integration/odata-api), the sponsored offer itself renders like any other offer. The one piece of real integration work is the **tease bar**: when a sponsored offer is present, you display a teaser on every preceding offer so the customer knows the free gift is coming.
 
 > This guide is for **publishers and partners that render OData offers directly via the API**. If you use a Falcon SDK or one of the pre-built ad units — [Shopify Ad Unit (Preact)](/integration-guide/partner-integration/shopify-ad-unit-preact) or the [Android](/integration-guide/android) / [iOS](/integration-guide/ios/integration) SDK — this is already handled for you and there's nothing to do here.
 
@@ -113,7 +113,7 @@ Every offer, sponsored or not, ships with the same pre-built tracking URLs. Fire
 
 ### Summary
 
-1. Call [`GET /api/odata`](/integration-guide/publisher-integration/odata-api) — unchanged.
+1. Call [`POST /api/odata`](/integration-guide/publisher-integration/odata-api) — unchanged.
 2. Read `templateData.hasInspired`. If `false`/absent, you're done — render offers as today.
 3. If `true`, render `templateData.teaseMessage` as a tease bar on **every offer except the last**, and hide it on the sponsored (last) offer.
 4. When a customer **claims a teased offer**, jump straight to the sponsored offer (`offers.length - 1`) instead of advancing one step.

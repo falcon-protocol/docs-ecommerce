@@ -7,8 +7,10 @@ The OData API allows you to fetch promotional offers to display to customers. Th
 ### Endpoint
 
 ```
-GET https://pr-api.falconlabs.us/api/odata
+POST https://pr-api.falconlabs.us/api/odata
 ```
+
+**`POST` is the recommended method.** Send parameters in a JSON body so PII (`at.email`, `at.orderid`, hashed identifiers) and line-item data (`at.lineItems`) stay out of URLs, browser history, proxies, and access logs. The endpoint also accepts `GET` with the same parameters as query-string values — behaviorally identical — for simple browser-side calls; see [Sending Requests Over POST](#sending-requests-over-post) for the mapping rules and the GET fallback.
 
 > **Staging:** Use `https://staging-pr-api.falconlabs.us/api/odata` with your staging public key while testing. See [Staging Environment](/integration-guide/partner-integration/staging-environment) for the full environment reference.
 
@@ -76,10 +78,94 @@ Pass customer and order data with the `at.` prefix for better targeting and anal
 - `at.paymenttype` or `at.payment_type` (string): Payment method
 - Valid values: `creditCard`, `debitCard`, `paypal`, `applePay`, `googlePay`, `bankTransfer`, `crypto`, `other`
 
+**Cart / Line Items:**
+
+- `at.lineItems` (JSON string): The order's cart contents — a JSON-encoded array of line items (e.g. SKU, quantity, price, product metadata) used for product-based offer targeting and analytics. Because this is array data that can bloat or leak through the URL query string, prefer sending it in a JSON body over [POST](#sending-requests-over-post).
+
 **Supported Currencies:**
 USD, EUR, GBP, CAD, AUD, JPY, CNY, NZD, CHF, SEK, NOK, DKK, PLN, CZK, HUF, RON, BGN, HRK, RUB, TRY, BRL, MXN, ARS, CLP, COP, PEN, UYU, INR, IDR, MYR, PHP, SGD, THB, VND, KRW, HKD, TWD, SAR, AED, ILS, EGP, ZAR, NGN, KES, GHS
 
-### Example Request
+### Sending Requests Over POST
+
+**`POST` is the recommended way to call `/api/odata`.** The endpoint accepts both `GET` and `POST`, and a `POST` request is behaviorally identical to the equivalent `GET` — same offers, same targeting, same persisted data, same response. The only difference is *where* the parameters travel: with `POST` you send them in a JSON request body instead of the URL query string, which keeps PII and line-item data out of URLs and access logs. Use `GET` only for simple browser-side calls where none of that is a concern (see [Using GET](#using-get) below).
+
+```
+POST https://pr-api.falconlabs.us/api/odata
+```
+
+**How the body maps to parameters**
+
+The JSON body is flattened into the same dotted parameters you'd use on a `GET`, then the identical handler runs:
+
+- **Nested objects** are flattened to dotted keys: `{ "at": { "email": "x" } }` becomes `at.email=x`.
+- **Flat dotted keys** pass through unchanged: `{ "at.email": "x" }` works too. Use whichever form you prefer.
+- **Body wins over the query string.** If the same key appears in both the URL and the body, the body value is used. This lets you keep routing params like `placementId` in the URL while carrying PII in the body.
+
+**Rules and traps to watch for**
+
+- **Send every value as a string** — including numbers and booleans. A raw JSON number used for an identifier (e.g. `"orderid": 12345678901234567890`) is silently rounded by `JSON.parse` *before the server ever sees it*, corrupting the value. Wrap identifiers, amounts, and counts in quotes. Booleans are coerced to the strings `"true"` / `"false"`.
+- **Keep `placementId` (and `sessionId`) in the query string.** Only PII and line items need to move into the body. Routing/identity params are fine in the URL and keep requests easy to trace.
+- **Set `Content-Type: application/json`.** This is the documented contract. (The body is parsed even without it as a safety net, but always send the header.) Malformed JSON returns **400**.
+- **32 kb body cap.** A body larger than 32 kb returns **413 Payload Too Large** (not 500).
+- **Bot detection returns a silent `204 No Content`.** The endpoint runs bot detection on every request and returns an empty **204** — no error, no body — for bot-like `User-Agent`s. `isbot` flags plain HTTP-client user agents, so **a bare `curl` or a server-side HTTP client gets 204'd with no error.** Server-side integrators **must** either set a browser-style `User-Agent` header or pass the real client UA via `at.userAgent` in the body. See the proxying note under Required Parameters.
+- **Auth is unchanged** — same `Authorization: Bearer PUBLIC_KEY`. Invalid/missing token → **401**.
+
+**Example: `POST` with PII and line items in the body (JavaScript)**
+
+```javascript
+await fetch(
+  "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0j1k2l3m4n&sessionId=session_abc123",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${publicKey}`,
+      "Content-Type": "application/json",
+      // Server-side callers only: set a browser-style UA (or pass at.userAgent below),
+      // otherwise bot detection returns a silent 204.
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    },
+    body: JSON.stringify({
+      count: "2", // send scalars as strings
+      at: {
+        email: "customer@example.com", // nested -> at.email
+        orderid: "ORDER-12345", // quote identifiers — never a raw JSON number
+        amount: "125.50",
+        currency: "USD",
+        userAgent: "Mozilla/5.0 (...)", // real client UA when proxying server-side
+        lineItems: JSON.stringify([
+          { sku: "SKU-1", qty: 1, price: "49.99" },
+          { sku: "SKU-2", qty: 2, price: "12.50" },
+        ]),
+      },
+      // equivalently, using flat dotted keys:
+      // "at.email": "customer@example.com",
+    }),
+  }
+);
+```
+
+**Example: `POST` with `curl`** (note the browser-style `User-Agent` — without it the request is 204'd):
+
+```bash
+curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0j1k2l3m4n&sessionId=session_abc123" \
+  -H "Authorization: Bearer pub_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+  -d '{
+        "count": "2",
+        "at": {
+          "email": "customer@example.com",
+          "orderid": "ORDER-12345",
+          "amount": "125.50",
+          "currency": "USD",
+          "lineItems": "[{\"sku\":\"SKU-1\",\"qty\":1,\"price\":\"49.99\"}]"
+        }
+      }'
+```
+
+#### Using GET
+
+`GET` is supported for simple browser-side calls and is behaviorally identical to `POST` — but every parameter, including PII and line items, travels in the URL query string, where it can end up in browser history, proxy logs, and access logs. Prefer `POST` for anything server-side or anything carrying customer data.
 
 ```bash
 curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0j1k2l3m4n&sessionId=session_abc123&count=4&at.email=customer@example.com&at.firstname=John&at.lastname=Doe&at.orderid=ORDER-12345&at.category=Apparel&at.subcategory=Shoes&at.amount=125.50&at.currency=USD&at.country=US" \
@@ -198,6 +284,10 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
   }
 }
 ```
+
+> **204 No Content (bot detection):** When the request's `User-Agent` (header on `GET`, or `at.userAgent` on `POST`) looks like a bot or a plain HTTP client, the endpoint returns an empty **204** with no error body. This is expected behavior, not a failure — but it means a bare `curl` or server-side HTTP client with a default UA receives no offers and no error. Set a browser-style `User-Agent` or pass `at.userAgent` (see [Sending Requests Over POST](#sending-requests-over-post)).
+
+> **413 Payload Too Large (POST only):** A `POST` body larger than the 32 kb cap is rejected with **413**.
 
 **401 Unauthorized - Invalid Public Key**
 

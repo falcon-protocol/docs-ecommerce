@@ -4,7 +4,7 @@ title: "Advanced: Custom Attributes"
 
 # Advanced: Custom Attributes
 
-`at.pubSub1`, `at.pubSub2`, and `at.pubSub3` are optional, free-form pass-through attributes you can append to the [OData ad-serving request](/integration-guide/publisher-integration/odata-api) (`GET /api/odata`) to capture your own dimensions — the kinds of things you may want to break your traffic down by, or that give Falcon additional signal to help understand and optimize it over time. Typical uses are an audience segment or persona, an affiliate ID, a traffic source, or a campaign ID. You decide what each slot means.
+`at.pubSub1`, `at.pubSub2`, and `at.pubSub3` are optional, free-form pass-through attributes you can append to the [OData ad-serving request](/integration-guide/publisher-integration/odata-api) (`POST /api/odata`) to capture your own dimensions — the kinds of things you may want to break your traffic down by, or that give Falcon additional signal to help understand and optimize it over time. Typical uses are an audience segment or persona, an affiliate ID, a traffic source, or a campaign ID. You decide what each slot means.
 
 They are **pass-through only.** Falcon does not use them for offer targeting, ranking, or any real-time decisioning on the request, and does not treat them as PII.
 
@@ -27,11 +27,22 @@ They are **pass-through only.** Falcon does not use them for offer targeting, ra
 ## Example Request
 
 ```bash
-curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0j1k2l3m4n&sessionId=session_abc123&at.email=customer@example.com&at.orderid=ORDER-12345&at.pubSub1=campaign-42&at.pubSub2=source-fb&at.pubSub3=segment-vip" \
-  -H "Authorization: Bearer pub_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0j1k2l3m4n&sessionId=session_abc123" \
+  -H "Authorization: Bearer pub_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+  -d '{
+        "at": {
+          "email": "customer@example.com",
+          "orderid": "ORDER-12345",
+          "pubSub1": "campaign-42",
+          "pubSub2": "source-fb",
+          "pubSub3": "segment-vip"
+        }
+      }'
 ```
 
-Values are opaque strings you choose. URL-encode them like any query parameter (for example, a space becomes `%20`).
+Values are opaque strings you choose. (On the [`GET` fallback](/integration-guide/publisher-integration/odata-api#using-get) they're query parameters — URL-encode them like any other, e.g. a space becomes `%20`.)
 
 ## Availability
 

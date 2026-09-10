@@ -81,7 +81,7 @@ https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&ses
 | `at.theme` | Colour scheme of your screen: `dark` renders the dark palette, anything else the default light one |
 | `at.age` | Customer age |
 | `at.gender` | Customer gender |
-| `at.cartItems` | Cart items (JSON string) |
+| `at.lineItems` | Cart line items (JSON string) |
 | `at.clientIp` | Client IP address (overrides auto-detected IP) |
 | `at.userAgent` | Client user agent string (overrides auto-detected UA) |
 
