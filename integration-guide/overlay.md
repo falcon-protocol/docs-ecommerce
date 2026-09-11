@@ -52,7 +52,7 @@ That's it. The modal will appear with available offers.
 
 > **Get your credentials:** Contact your Falcon Labs account manager to obtain your SDK key and placement ID.
 >
-> **Staging:** Point the script tag at `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-sdk.js` and use your staging SDK key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across all three Web SDKs.
+> **Staging:** Point the script tag at `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-sdk.js` and use your staging SDK key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across the Web SDKs.
 >
 > **Legacy link:** Existing integrations using `https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js` don't need to migrate, that link is kept up to date in parallel, it just isn't served through CloudFront and has no staging equivalent. New integrations should use the CloudFront URL above.
 

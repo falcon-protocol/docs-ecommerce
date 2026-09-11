@@ -20,12 +20,13 @@ Contact the Falcon integration team to receive your staging credentials before b
 
 ### Web SDK Script URLs
 
-If you're using one of the Web SDKs ([Overlay](/integration-guide/overlay), [Embedded](/integration-guide/embedded), [Unified](/integration-guide/unified), [Google Ad Manager](/integration-guide/gam)) rather than calling OData directly, load the staging build while testing:
+If you're using one of the Web SDKs ([Overlay](/integration-guide/overlay), [Embedded](/integration-guide/embedded), [General](/integration-guide/general), [Unified](/integration-guide/unified), [Google Ad Manager](/integration-guide/gam)) rather than calling OData directly, load the staging build while testing:
 
 | SDK | Production | Staging |
 | --- | --- | --- |
 | Overlay | `https://d6y5cd3imay52.cloudfront.net/sdk/v1/falcon-sdk.js` | `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-sdk.js` |
 | Embedded | `https://d6y5cd3imay52.cloudfront.net/sdk/v1/embedded-sdk.js` | `https://d6y5cd3imay52.cloudfront.net/sdk/staging/embedded-sdk.js` |
+| General | `https://d6y5cd3imay52.cloudfront.net/sdk/v1/falcon-general-sdk.js` | `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-general-sdk.js` |
 | Unified | `https://d6y5cd3imay52.cloudfront.net/sdk/v1/unified-sdk.js` | `https://d6y5cd3imay52.cloudfront.net/sdk/staging/unified-sdk.js` |
 | Google Ad Manager | `https://d6y5cd3imay52.cloudfront.net/sdk/v1/falcon-gam-sdk.js` | `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-gam-sdk.js` |
 

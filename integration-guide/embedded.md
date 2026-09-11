@@ -25,7 +25,7 @@ Add the Falcon embedded SDK script to your HTML page:
 </head>
 ```
 
-> **Staging:** Use `https://d6y5cd3imay52.cloudfront.net/sdk/staging/embedded-sdk.js` and your staging API key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across all three Web SDKs.
+> **Staging:** Use `https://d6y5cd3imay52.cloudfront.net/sdk/staging/embedded-sdk.js` and your staging API key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across the Web SDKs.
 
 ### Step 3: Create HTML Container
 
@@ -40,7 +40,7 @@ Add a container element where the promotional content will render:
 - **Desktop:** 580px × 260px (minimum)
 - **Mobile:** 479px × 400px (minimum)
 
-> **Note:** These dimensions are a starting size to reserve space before the offer loads, not a size the offer will stretch to fill. The offer's height automatically adjusts to match its own content. See [Container Sizing](#1-container-sizing) in Best Practices to avoid empty space below the offer.
+> **Note:** These dimensions are a starting size to reserve space before the offer loads, not a size the offer will stretch to fill. The offer's height automatically adjusts to match its own content. See [Container Sizing](#container-sizing) in Best Practices to avoid empty space below the offer.
 
 ### Step 4: Initialize with Single API Call
 
@@ -319,7 +319,7 @@ FalconAds.init({
 
 ## Best Practices
 
-### 1. Container Sizing
+### Container Sizing
 
 The SDK automatically adjusts the offer's height to match its own content. It does not stretch to fill whatever height you give the container. Treat the dimensions below as a **minimum starting size** to reserve space before the offer loads, not a fixed size the offer will grow or shrink to fill. If the container is taller than the offer needs, the extra space stays empty underneath it.
 
@@ -356,7 +356,7 @@ The SDK automatically adjusts the offer's height to match its own content. It do
 
 Width behaves differently from height: the offer fills 100% of the container's width, so a fixed width is safe to use.
 
-### 2. Container Must Exist Before Initialization
+### Container Must Exist Before Initialization
 
 Ensure the container element is in the DOM before calling `FalconAds.init()`:
 
@@ -381,7 +381,7 @@ Ensure the container element is in the DOM before calling `FalconAds.init()`:
 <div id="falcon-ads-container"></div>
 ```
 
-### 3. Place Script Near Closing `</body>` Tag
+### Place Script Near Closing `</body>` Tag
 
 For best performance, place the SDK script and initialization at the bottom of your page:
 
@@ -400,7 +400,7 @@ For best performance, place the SDK script and initialization at the bottom of y
 </body>
 ```
 
-### 4. Use Unique Container IDs
+### Use Unique Container IDs
 
 Each placement should have its own unique container:
 
@@ -517,7 +517,7 @@ Each placement should have its own unique container:
 
 **Cause:** The offer's height is sized to its own content, not to the container. If the container has a fixed `height` set higher than what the offer needs (for example, higher than the recommended minimum), the leftover space is that gap.
 
-**Solution:** Use `min-height` instead of a fixed `height` on the container so it can shrink to match the offer's rendered size. See [Container Sizing](#1-container-sizing).
+**Solution:** Use `min-height` instead of a fixed `height` on the container so it can shrink to match the offer's rendered size. See [Container Sizing](#container-sizing).
 
 #### No offers display (no error)
 

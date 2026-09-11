@@ -10,6 +10,8 @@ The Falcon Unified SDK automatically selects the right ad format — **overlay**
 
 Use this when you want Falcon to dynamically switch or A/B test formats without requiring code changes on your end. If you need a fixed format, use the [Overlay](./overlay) or [Embedded](./embedded) guides instead.
 
+> New integrations should use the [General SDK](./general) instead. It does the same job with one fewer network round trip on the critical path, and this guide stays for integrations already running on Unified.
+
 ## How It Works
 
 On each `init()` call the SDK:
@@ -26,7 +28,7 @@ On each `init()` call the SDK:
 <script src="https://d6y5cd3imay52.cloudfront.net/sdk/v1/unified-sdk.js"></script>
 ```
 
-> **Staging:** Use `https://d6y5cd3imay52.cloudfront.net/sdk/staging/unified-sdk.js` and your staging API key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across all three Web SDKs.
+> **Staging:** Use `https://d6y5cd3imay52.cloudfront.net/sdk/staging/unified-sdk.js` and your staging API key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across the Web SDKs.
 
 ### Step 2: Add a Container Element
 
@@ -38,7 +40,7 @@ A container is required regardless of which mode Falcon selects — it's the ren
 
 Recommended minimum dimensions: **580×260px** desktop, **479×400px** mobile.
 
-> **Note:** When Falcon assigns embedded mode, the offer's height automatically adjusts to match its own content rather than stretching to fill the container. See [Container Sizing](./embedded#1-container-sizing) in the Embedded guide for how to avoid empty space below the offer.
+> **Note:** When Falcon assigns embedded mode, the offer's height automatically adjusts to match its own content rather than stretching to fill the container. See [Container Sizing](./embedded#container-sizing) in the Embedded guide for how to avoid empty space below the offer.
 
 ### Step 3: Initialize
 
