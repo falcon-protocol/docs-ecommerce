@@ -31,12 +31,20 @@
               "link": "/integration-guide/embedded"
             },
             {
+              "text": "General",
+              "link": "/integration-guide/general"
+            },
+            {
               "text": "Unified",
               "link": "/integration-guide/unified"
             },
             {
               "text": "Google Ad Manager",
               "link": "/integration-guide/gam"
+            },
+            {
+              "text": "Google Tag Manager",
+              "link": "/integration-guide/gtm"
             }
           ]
         },
