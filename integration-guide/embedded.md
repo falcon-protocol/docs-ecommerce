@@ -183,6 +183,15 @@ FalconAds.init({
 Types for the SDK (add once, e.g. in `falcon-ads.d.ts`):
 
 ```typescript
+// Any JSON value. Objects and arrays are serialized by the SDK before sending.
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 declare const FalconAds: {
   init(config: FalconAdsConfig): Promise<void>;
 };
@@ -243,8 +252,8 @@ interface FalconAdsAttributes {
   age?: string;
   /** Customer gender */
   gender?: string;
-  /** Cart items as a JSON string */
-  cartItems?: string;
+  /** Cart or order line items as JSON, an array or object in your own shape */
+  lineItems?: JsonValue;
 }
 ```
 

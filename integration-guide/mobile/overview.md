@@ -15,12 +15,12 @@ Falcon Perks can be displayed in native iOS and Android apps using a **WebView**
 
 ## WebView URL
 
-```
+```text
 https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&sessionId=SESSION_ID
 ```
 
 | Parameter | Required | Description |
-|-----------|----------|-------------|
+| --- | --- | --- |
 | `placement` | Yes | Your placement ID |
 | `apiKey` | Yes | Your Falcon API key |
 | `sessionId` | Yes | A unique session identifier (e.g., UUID). Generate a new one per session. |
@@ -47,7 +47,7 @@ All messages follow this structure:
 ### Events
 
 | Event | Description | Data |
-|-------|-------------|------|
+| --- | --- | --- |
 | `click` | User clicked a perk offer | `{ "index": 0, "clickUrl": "https://..." }` |
 | `close` | User closed the perks view | `{ "index": 0, "closeType": "..." }` |
 
@@ -57,12 +57,12 @@ When you receive a `click` event, open the `clickUrl` in the system browser or a
 
 You can pass user and order attributes to improve offer targeting and personalization. Attributes are passed as `at.*` query parameters on the WebView URL:
 
-```
+```text
 https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&sessionId=SESSION_ID&at.email=user@example.com&at.firstname=John&at.country=US&at.orderId=ORD-123&at.amount=99.99
 ```
 
 | Parameter | Description |
-|-----------|-------------|
+| --- | --- |
 | `at.email` | Customer email |
 | `at.firstname` | First name |
 | `at.lastname` | Last name |
@@ -81,7 +81,7 @@ https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&ses
 | `at.theme` | Colour scheme of your screen: `dark` renders the dark palette, anything else the default light one |
 | `at.age` | Customer age |
 | `at.gender` | Customer gender |
-| `at.cartItems` | Cart items (JSON string) |
+| `at.lineItems` | Cart or order line items as a JSON string (URL-encoded) |
 | `at.clientIp` | Client IP address (overrides auto-detected IP) |
 | `at.userAgent` | Client user agent string (overrides auto-detected UA) |
 
@@ -106,7 +106,7 @@ Understanding the full lifecycle of events helps you integrate correctly:
 ## Requirements
 
 | Platform | Minimum Version |
-|----------|----------------|
+| --- | --- |
 | iOS | 15.0+ |
 | Android | API 24 (Android 7.0)+ |
 

@@ -6,7 +6,7 @@ The OData API allows you to fetch promotional offers to display to customers. Th
 
 ### Endpoint
 
-```
+```text
 GET https://pr-api.falconlabs.us/api/odata
 ```
 
@@ -16,7 +16,7 @@ GET https://pr-api.falconlabs.us/api/odata
 
 Use the publisher’s **Public Key**:
 
-```
+```text
 Authorization: Bearer PUBLIC_KEY
 ```
 
@@ -34,7 +34,7 @@ Authorization: Bearer PUBLIC_KEY
 - `at.userAgent` (string): Client user agent string (max 500 chars) — used for device detection
 
 > Note: `placementId` and `sessionId` are the only parameters the API enforces — a request missing them is rejected. Everything else (`at.orderid`, `at.email`/`at.hashedEmail`, and the rest of the customer/order data parameters below) is not blocked if missing or malformed, the request still succeeds and serves offers. But without at least `at.orderid` and `at.email`/`at.hashedEmail`, there's nothing to match the impression back to a specific order or customer, so revenue attribution won't work even though the request itself "succeeds." Treat them as required in practice.
-
+>
 > Proxying through a server: If you call OData from a backend or proxy rather than directly from the end user's browser, the request's source IP and User-Agent header will be your server's, not the customer's. In that case you must read the original client IP from the `X-Forwarded-For` header (typically the first IP in the list) and the original `User-Agent` header from the inbound request, and forward them explicitly via `at.clientIp` and `at.userAgent`. Otherwise every request will appear to come from your server, breaking geo and device targeting for all users.
 
 ### Optional Parameters
@@ -74,6 +74,7 @@ Pass customer and order data with the `at.` prefix for better targeting and anal
 - `at.billingaddress1` (string): Billing address (max 500 chars)
 - `at.billingzipcode` (string): Billing ZIP code (max 20 chars)
 - `at.paymenttype` or `at.payment_type` (string): Payment method
+- `at.lineItems` (JSON string): The shopper's cart or order line items, a JSON array with one entry per line item in your own shape (for example `sku`, `title`, `quantity`, `price`). Serialise it and URL-encode it on `GET`; on `POST` it goes in the body as-is. Used for product-aware offer targeting and ranking
 - Valid values: `creditCard`, `debitCard`, `paypal`, `applePay`, `googlePay`, `bankTransfer`, `crypto`, `other`
 
 **Supported Currencies:**
@@ -184,7 +185,7 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
 
 ### Error Responses
 
-**400 Bad Request - Missing Parameters**
+#### 400 Bad Request - Missing Parameters
 
 ```json
 {
@@ -199,7 +200,7 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
 }
 ```
 
-**401 Unauthorized - Invalid Public Key**
+#### 401 Unauthorized - Invalid Public Key
 
 ```json
 {
@@ -211,7 +212,7 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
 }
 ```
 
-**404 Not Found - Invalid Placement**
+#### 404 Not Found - Invalid Placement
 
 ```json
 {
@@ -226,7 +227,7 @@ curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0
 }
 ```
 
-**500 Internal Server Error**
+#### 500 Internal Server Error
 
 ```json
 {
