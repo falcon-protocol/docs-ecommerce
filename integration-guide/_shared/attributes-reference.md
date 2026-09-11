@@ -1,4 +1,4 @@
-Pass user and order data via `attributes` for revenue attribution, offer targeting, personalization, and rendering hints. All values are strings.
+Pass user and order data via `attributes` for revenue attribution, offer targeting, personalization, and rendering hints. All values are strings, except `lineItems`, which is JSON.
 
 | Attribute | Priority | Description | Format |
 | --- | --- | --- | --- |
@@ -20,7 +20,7 @@ Pass user and order data via `attributes` for revenue attribution, offer targeti
 | `billingzipcode` | Optional | Billing ZIP or postal code | String |
 | `billingaddress1` | Optional | Billing address line 1 | String |
 | `billingaddress2` | Optional | Billing address line 2 | String |
-| `cartItems` | Optional | Cart contents | JSON string |
+| `lineItems` | Optional | Contents of the shopper's cart or order, one entry per line item, in your own shape (for example `sku`, `title`, `quantity`, `price`). Used for product-aware offer targeting and ranking | JSON array or object. Pass the value itself, the SDK serialises it; a pre-serialised JSON string is accepted too |
 | `paymenttype` | Optional | Payment method (e.g. `"credit_card"`, `"paypal"`) | String |
 | `ccbin` | Optional | First 6 digits of the credit card number (BIN) | String |
 | `confirmationref` | Optional | Merchant/seller name, or your own internal confirmation reference if separate from `orderId`. Displayed in the offer headline on some templates | String |
