@@ -293,7 +293,9 @@ when (json.optString("name")) {
 With `hostClose=scheme` there is no message at all — one `if` in the navigation handler you already have:
 
 ```kotlin
-if (request.url.toString() == "falcon://close") {
+// Match on scheme and host, not the whole string: URL parsing is free to
+// hand back "falcon://close/" for the same link.
+if (request.url.scheme == "falcon" && request.url.host == "close") {
     runOnUiThread { finish() }
     return true
 }
@@ -308,7 +310,7 @@ if (request.url.toString() == "falcon://close") {
 | Field | Description |
 | --- | --- |
 | `index` | Which offer was on screen. |
-| `closeType` | `1` the X, `2` the last offer declined, `5` a unit timer running out. Close the webview on any of them; the field is there if you want to report them apart. |
+| `closeType` | `1` the X, `2` the last offer declined. Close the webview on either. The field is there if you want to report them apart, and it leaves room for a reason we add later, so treat an unfamiliar value as a close too. |
 
 ### Asking for something else
 
