@@ -32,14 +32,14 @@ The `/api/odata` response is `{ offers: [...], templateData: {...}, template, ..
 
 ```json
 "templateData": {
-  "hasInspired": true,
+  "hasRewardedPerk": true,
   "teaseMessage": "A free $10 donation gift to the cause of your choice is included when you claim this offer"
 }
 ```
 
-- `hasInspired === true` means a perk is present. It is always the **last** element of `offers`, `offers[offers.length - 1]`.
+- `hasRewardedPerk === true` means a perk is present. It is always the **last** element of `offers`, `offers[offers.length - 1]`.
 - `teaseMessage` is the exact copy for the tease bar. Render it **verbatim**, don't write your own.
-- `hasInspired` absent or `false` means nothing extra to do, render offers exactly as you do today.
+- `hasRewardedPerk` absent or `false` means nothing extra to do, render offers exactly as you do today.
 
 > **It adds one offer beyond the count you requested.** The perk is appended on top of your requested offers, so if you request the default of `4` you'll get `5`; request `10`, you'll get `11`. Always size your UI and loops off the actual `offers.length`, **not** the `count` you asked for.
 
@@ -50,9 +50,9 @@ This is the part that's different from a normal integration. When a perk is pres
 Offers are typically presented one at a time in a carousel, and you already track which offer is active. **Tease-bar visibility is just derived state off that index.** There's no separate API call, nothing to re-fetch, and no per-offer request. Recompute one boolean whenever the active offer changes:
 
 ```js
-const hasRewardedPerk = !!templateData.hasInspired && !!templateData.teaseMessage;
-const isLastOffer     = currentIndex === offers.length - 1;
-const showTeaseBar    = hasRewardedPerk && !isLastOffer;
+const perkPresent  = !!templateData.hasRewardedPerk && !!templateData.teaseMessage;
+const isLastOffer  = currentIndex === offers.length - 1;
+const showTeaseBar = perkPresent && !isLastOffer;
 
 // when showTeaseBar, render templateData.teaseMessage in the footer
 ```
@@ -80,7 +80,7 @@ function onClickOffer() {
   }
 
   // Teased offer was claimed → jump straight to the reward.
-  if (templateData.hasInspired) {
+  if (templateData.hasRewardedPerk) {
     setCurrentIndex(lastIndex);
     return;
   }
