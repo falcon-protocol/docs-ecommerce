@@ -38,7 +38,7 @@ https://staging-pr.falconlabs.us/partners-rewards?placementId=YOUR_PLACEMENT_ID&
 
 - Renders full-screen. Give it a full-height webview.
 - Tapping an offer opens the advertiser and the unit moves to the next one, looping after the last. Where the advertiser opens is the next section.
-- The unit cannot dismiss itself: the webview is yours, so only your app can close it. Users swipe. An X that asks your app to close it is [available on request](#in-unit-close-control-on-request).
+- The unit cannot dismiss itself: the webview is yours, so only your app can close it. Out of the box users swipe, and the offers loop rather than run out. If your app can act on a close, you can turn on [an X](#in-unit-close-control) that asks it to.
 - If `placementId` or `publicApiKey` is missing, the page reads "These offers are not available right now." That looks the same as having no offers, so check the URL first.
 
 ## Opening offers in a native browser (recommended)
@@ -236,11 +236,37 @@ func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigatio
 }
 ```
 
-## In-unit close control (on request)
+## In-unit close control
 
-This is the other close: the whole placement, not the advertiser's page. We can show an X, but the unit cannot act on it — the webview is yours, so the tap has to come back to you.
+This is the other close: the whole placement, not the advertiser's page. We can show an X and tell you when the user is done with the offers, but the unit cannot dismiss itself — the webview is yours, so all it can do is ask.
 
-Ask us and we will render it and send a `close` event. It arrives in the handler you already have, so you switch on the event name instead of guarding for `click`. On iOS, inside `userContentController` from step 2:
+Off by default, because an X nobody acts on is worse than no X at all. Turn it on by telling us how your app wants to hear about it.
+
+### 1. Pick how we tell you
+
+Add `hostClose` to the URL you load:
+
+| Value | What we do |
+| --- | --- |
+| `hostClose=bridge` | Send a `close` event over the same bridge as `click`. |
+| `hostClose=scheme` | Navigate to `falcon://close`, for you to catch where you already intercept non-http(s) URLs. |
+| `hostClose=both` | Both, message first. |
+
+```text
+https://pr.falconlabs.us/partners-rewards?placementId=YOUR_PLACEMENT_ID&publicApiKey=YOUR_PUBLIC_API_KEY&sessionId=SESSION_ID&hostClose=bridge
+```
+
+Independent of `nativeClick`: opening a URL natively and dismissing your own webview are different pieces of code, and you can have either without the other. Dropping the parameter switches this back off at any time, without waiting for a release from us.
+
+::: warning Pick `scheme` only if you already intercept non-http(s) navigations
+It is the same handler as the app-install section above. An Android WebView that does not intercept it will load `falcon://close` as a page and paint an `ERR_UNKNOWN_URL_SCHEME` error over the unit.
+:::
+
+### 2. Handle it
+
+With the flag on, an X appears on the unit. Tapping it asks your app to close. The offers still loop after the last one, so the X is the only thing that ends the unit unless you ask us for the rest, which is the last section here.
+
+On iOS, inside `userContentController` from step 2:
 
 ```swift
 guard message.name == "iosNativeListener",
@@ -264,7 +290,33 @@ when (json.optString("name")) {
 }
 ```
 
-If you already intercept non-http(s) navigations, we can send the close as `falcon://close` instead: one `if` in that handler, no bridge at all.
+With `hostClose=scheme` there is no message at all — one `if` in the navigation handler you already have:
+
+```kotlin
+// Match on scheme and host, not the whole string: URL parsing is free to
+// hand back "falcon://close/" for the same link.
+if (request.url.scheme == "falcon" && request.url.host == "close") {
+    runOnUiThread { finish() }
+    return true
+}
+```
+
+### The message we send
+
+```json
+{ "type": "event", "name": "close", "data": { "index": 3, "closeType": 2 } }
+```
+
+| Field | Description |
+| --- | --- |
+| `index` | Which offer was on screen. |
+| `closeType` | Why it closed. `1` is the X, which is the only one you get by default. `2` is the last offer being declined, if you turn that on below. Close the webview on either, and treat an unfamiliar value as a close too, since it leaves room for a reason we add later. |
+
+### Closing on the last offer too
+
+By default the offers keep looping and only the X ends the unit. We can also have the last "No thanks" close it, so the user is not handed the first offer again after turning all of them down.
+
+That one is set per placement on our side, so ask your account manager rather than changing anything yourself. Worth doing once you have confirmed the X works in your build, since it is the same `close` event either way and only the `closeType` differs.
 
 ## Optional attributes
 

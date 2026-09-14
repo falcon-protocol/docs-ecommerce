@@ -51,8 +51,8 @@ Add this to your **order confirmation page** (or any page where you want to show
 That's it. The modal will appear with available offers.
 
 > **Get your credentials:** Contact your Falcon Labs account manager to obtain your SDK key and placement ID.
-
-> **Staging:** Point the script tag at `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-sdk.js` and use your staging SDK key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across all three Web SDKs.
+>
+> **Staging:** Point the script tag at `https://d6y5cd3imay52.cloudfront.net/sdk/staging/falcon-sdk.js` and use your staging SDK key while testing. See [Staging Environment](./partner-integration/staging-environment) for the full URL reference across the Web SDKs.
 >
 > **Legacy link:** Existing integrations using `https://falconlabs.s3.us-east-2.amazonaws.com/sdk/falcon-sdk.js` don't need to migrate, that link is kept up to date in parallel, it just isn't served through CloudFront and has no staging equivalent. New integrations should use the CloudFront URL above.
 
@@ -223,6 +223,15 @@ Make sure to add `"use client"` to components that use the SDK.
 <!--@include: ./_shared/attributes-reference.md-->
 
 ```tsx
+// Any JSON value. Objects and arrays are serialised by the SDK before sending.
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 interface CustomAttributes {
   // Unique order or transaction identifier.
   // Links the offer impression to a specific purchase.
@@ -302,9 +311,9 @@ interface CustomAttributes {
   // Customer gender.
   gender?: string;
 
-  // Cart line items as a JSON string.
+  // Cart or order line items as JSON, an array or object in your own shape.
   // Used for product-based offer targeting.
-  lineItems?: string;
+  lineItems?: JsonValue;
 }
 ```
 

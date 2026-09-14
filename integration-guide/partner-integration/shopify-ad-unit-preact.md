@@ -6,7 +6,7 @@ title: "Shopify Ad Unit (Preact)"
 
 ## Overview
 
-This guide walks you through integrating the Falcon ad template into your Shopify app using Preact and Shopify's web components (API version 2025-10+). The setup is straightforward and requires minimal ongoing maintenance — everything is powered by git submodules, so updates are pulled in with a single command.
+This guide walks you through integrating the Falcon ad template into your Shopify app using Preact and Shopify's web components (API version 2026-04). The setup is straightforward and requires minimal ongoing maintenance — everything is powered by git submodules, so updates are pulled in with a single command.
 
 ## 1. Repository Access
 
@@ -24,14 +24,15 @@ Template files are distributed via a private GitHub repository. Access is manage
 
 ## 2. Prerequisites
 
-- `preact`
-- `@shopify/ui-extensions`
+- `preact` and `@preact/signals`
+- `@shopify/ui-extensions` 2026.4
+- `js-sha256` (used by the Integration Guide code)
 
 ## 3. Installation
 
 First, create two helper scripts in your project root and add them to `package.json`.
 
-> **Important:** In both scripts and in `package.json`, replace `<your-preferred-path>` with the actual path where you want the templates (e.g., `src/falcon-templates`).
+> **Important:** In both scripts, replace `<your-preferred-path>` with the actual path where you want the templates (e.g., `src/falcon-templates`).
 
 **`falcon-init.sh`:**
 
@@ -108,11 +109,20 @@ npm run falcon:init
 
 The `preact/` folder contains:
 
-| File           | Description                 |
-| -------------- | --------------------------- |
-| `provider.tsx` | Feature management provider |
-| `index.tsx`    | Ad template                 |
-| `skeleton.tsx` | Loading skeleton            |
+| File              | Description                               |
+| ----------------- | ----------------------------------------- |
+| `provider.tsx`    | Feature management provider               |
+| `fallback.tsx`    | Template15 — fallback template            |
+| `brandcollab.tsx` | Template17 — brand collaboration template |
+| `renderer.tsx`    | Template router (selects 17 or 15)        |
+| `skeleton.tsx`    | Loading skeleton                          |
+| `attributes.tsx`  | Shopper-attributes context (internal)     |
+| `configs.tsx`     | Shared constants + translations (int.)    |
+| `utils.tsx`       | Shared utils/hooks/ui (internal)          |
+
+`attributes.tsx`, `configs.tsx` and `utils.tsx` are internal plumbing: the other files import them relatively — you never import them yourself, just keep them in the folder when updating (always sync the whole folder, never individual files).
+
+The folder also ships two guides: this page (installing the templates and their props) and the [Integration Guide](./shopify-ad-unit-integration-guide) (everything your extension does around them: shopper data, session id, the offers request, tracking).
 
 ---
 
@@ -126,15 +136,14 @@ A Preact context provider that must wrap the template. It handles feature delive
 interface FeatureManagementProviderProps {
   // Required
   publicKey: string; // Falcon API public key
-  apiEndpoint: string; // API endpoint URL (default: https://pr-api.falconlabs.us/api/features/evaluate)
+  apiEndpoint: string; // `{BASE_URL}/api/features/evaluate`, see the Integration Guide
   userContext: FeatureManagementUserContext; // User targeting context (see below)
   extensionTarget: string; // Shopify extension target (see below)
   storage: Storage; // Shopify storage object from useStorage()
-  children: ComponentChildren; // Child components
+  children: JSX.Element; // Child components
 
   // Optional
   loadingElement?: JSX.Element; // Component shown during loading
-  preventEvaluateRequest?: boolean; // Skip API call (default: false)
   disableClientImpressions?: boolean; // Disable automatic impression beacon firing (default: false)
 }
 ```
@@ -147,7 +156,7 @@ interface FeatureManagementUserContext {
   placementId: string; // The placement ID for this extension
 
   // Optional — User identification
-  sessionId?: string; // One-time generated session ID (uuid, format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx, 36 characters)
+  sessionId?: string; // The same session id you send to the offers API (see Integration Guide §2)
   hashedCustomerShopifyId?: string; // Hashed* Shopify customer ID (trimmed, e.g. "1" from "gid://shopify/Customer/1")
   hashedPhone?: string; // Hashed* phone number
   hashedEmail?: string; // Hashed* email address
@@ -155,6 +164,7 @@ interface FeatureManagementUserContext {
   // Optional — Targeting attributes
   templateId?: number; // from Falcon API
   timezone?: string; // User timezone
+  language?: string; // Shopper language, lowercase, e.g. 'de' or 'de-de' — REQUIRED for localized template labels
   amount?: number; // Order amount
   orderId?: string; // Order ID
   paymentType?: string; // Payment type
@@ -175,54 +185,108 @@ If you have questions about where to obtain any of these values, reach out to th
 
 ---
 
-### `index.tsx` — Template
+### Template props
 
-The ad template built with Preact and Shopify web components (`s-box`, `s-text`, `s-button`, etc.).
+Every template takes the same props. The Renderer passes them through, so this
+is the only prop list you need to satisfy.
 
-#### Props (index.tsx)
+#### Props
 
 ```typescript
 interface TemplateProps {
-  showIcon: boolean; // Show icon flag, from Falcon API
   templateData: TemplateData; // Template configuration, from Falcon API
   activeOffer: Offer; // Current active offer, from Falcon API
   offers: Offer[]; // Full array of offers, from Falcon API
   activeOfferIndex: number; // Index of the current offer in the offers array
-  reachedEndOfOffers: boolean; // Whether all offers have been shown
+  reachedEndOfOffers: boolean; // Your carousel ran out; the Renderer ends the unit itself (see §6)
   clickOffer: () => void; // Handler for offer click (primary CTA)
   handleNoThanks: () => void; // Handler for declining an offer
   extensionTarget: ExtensionTarget; // Shopify extension target
   firstName?: string; // Customer first name, from Shopify API
   email?: string; // Customer email, from Shopify API
+  language?: string; // Shopper language, lowercase, e.g. 'de' or 'de-de', from Shopify API
 }
 ```
 
 **Where data comes from:**
 
-- `showIcon`, `templateData`, `activeOffer`, `offers` — provided by the Falcon proxy API (we will supply the endpoint).
-- `extensionTarget`, `firstName`, `email` — obtained from Shopify APIs on your side.
+- `templateData`, `activeOffer`, `offers` — from the Falcon offers API response.
+- `extensionTarget`, `firstName`, `email`, `language` — obtained from Shopify APIs on your side.
 - `activeOfferIndex`, `reachedEndOfOffers`, `clickOffer`, `handleNoThanks` — handled by your application logic.
+
+The [Integration Guide](./shopify-ad-unit-integration-guide) shows how to obtain every one of these: reading shopper data from Shopify, creating the session id, making the offers request, and turning the response into the props above.
 
 **Prop details:**
 
 - **`activeOffer`** — The current offer object to display.
-- **`templateData`** — Configuration object including template styling and content settings.
+- **`templateData`** — Configuration object from the Falcon API. Pass it straight through; new fields (e.g. `privacyLabelOverride`, which replaces the footer's "Privacy Policy" link text when present) take effect automatically, so do not whitelist or strip its fields.
 - **`extensionTarget`** — Identifies the extension point:
   - `"purchase.thank-you.block.render"` — Thank you page
   - `"customer-account.order-status.block.render"` — Order status page
 - **`offers`** — The full array of offers from the Falcon API response. Used internally by the template for the Inspired tease bar feature.
 - **`activeOfferIndex`** — The index of the currently displayed offer within the `offers` array.
-- **`clickOffer`** — Called when the primary CTA button is clicked. See [Inspired offer behavior](#6-inspired-offer-behavior) below.
-- **`handleNoThanks`** — Called when the decline button is clicked.
+- **`clickOffer`** — Called when the primary CTA button is clicked. See [Offer Navigation](#_6-offer-navigation) for advancement, and [Inspired Offer Behavior](#_7-inspired-offer-behavior) for the Inspired special case.
+- **`handleNoThanks`** — Called when the decline button is clicked. See [Offer Navigation](#_6-offer-navigation).
 - **`firstName`** — Used for personalization (e.g., _"John, thank you for your purchase"_).
 - **`email`** — Customer email address, displayed in the template when email feature is enabled.
-- **`reachedEndOfOffers`** — Set to `true` to hide the component when no more offers are available.
+- **`language`** — The shopper language, lowercase (e.g. `'de'` or `'de-de'`). Static template labels are resolved from `userContext.language` on the provider; pass the same value here and as `at.language` to the offers API so the banner copy and the labels match. Unknown or missing languages render the English defaults. Offer-provided copy (`ctaText`, `declineButtonText`) is never modified.
+- **`reachedEndOfOffers`** — Your end-of-offers flag: `true` once the shopper declined the last offer. Keep rendering `<Renderer>` with it set; the SDK ends the unit itself — inside the countdown experiment it shows a redeem card that brings the offers back (through `onRestartOffers`), outside it renders nothing (see [§6. Offer Navigation](#_6-offer-navigation)).
 
 If you have questions about any of these props, reach out to the Falcon Labs technical team.
 
 ---
 
-### `skeleton.tsx` — TemplateSimpleSkeleton
+### `fallback.tsx` — Template15 (Fallback Template)
+
+A simplified template with a predefined layout, and the template the Renderer falls back to. Accepts the props listed above. The Renderer handles switching between templates automatically.
+
+---
+
+### `brandcollab.tsx` — Template17 (Brand Collaboration Template)
+
+A brand collaboration template with a landscape banner image on top of the offer content. Accepts the props listed above, plus one additional prop used to resolve the banner image:
+
+```typescript
+interface Template17Props extends TemplateProps {
+  siteImages?: ImageInstance[]; // Site-level images, from the offers API response
+}
+```
+
+The banner image resolves through a cascade: offer-level image (`activeOffer.images`) → site-level image (`siteImages`) → generic Falcon fallback banner. If the proxy API response includes `siteImages`, forward it — otherwise the template still renders with the fallback source.
+
+Template17 additionally gates itself on the `shopify_brand_collab_template_gate` server gate, evaluated by the bundled `provider.tsx` (a device filter — the banner is sized for mobile). When the gate is off for the session (or gate evaluation fails), the Renderer falls back to Template15 even for `templateId: 17`.
+
+---
+
+### `renderer.tsx` — Renderer
+
+Handles template routing — automatically selects Template17 or Template15 based on the `templateId` from the Falcon proxy API. You don't need to implement any switching logic yourself. Templates that define a render gate (currently Template17, see above) fall back to Template15 when their gate doesn't pass.
+
+The Renderer accepts the same props as the templates, plus:
+
+```typescript
+interface RendererProps extends TemplateProps {
+  templateId: number; // `template` from the offers API response
+  siteImages?: ImageInstance[]; // `siteImages` from the offers API response (Template17 banner)
+  withOverlayTrigger?: boolean; // `withOverlayTrigger` from the offers API response
+  onOverlayDismissed?: () => void; // Called when the shopper closes the offer overlay; set your end-of-offers flag
+  onRestartOffers?: () => void; // Called when the shopper taps the redeem card; put your carousel back on the first offer
+}
+```
+
+Some placements open the remaining offers in an overlay when the shopper declines. The Renderer handles the overlay itself when `withOverlayTrigger` is `true`. When the shopper closes it, `onOverlayDismissed` fires: set `reachedEndOfOffers` to `true` and keep rendering `<Renderer>` — it ends the unit the same way it does when your carousel runs out (see [§6. Offer Navigation](#_6-offer-navigation)).
+
+Inside the countdown experiment the unit does not simply disappear at the end: a redeem card takes its place, and a tap on it calls `onRestartOffers`. Set `activeOfferIndex` back to `0` and `reachedEndOfOffers` to `false` there; the Renderer shows the offers again.
+
+| `templateId` | Template                                            |
+| ------------ | --------------------------------------------------- |
+| `17`         | Template17 (Template15 when its render gate is off) |
+| `15`         | Template15                                          |
+| any other    | Template15 (fallback)                               |
+
+---
+
+### `skeleton.tsx` — TemplateDefaultLoader
 
 A loading skeleton component. No props required. Shows a card with a spinner while the provider loads.
 
@@ -233,72 +297,89 @@ Use it in two ways:
 
 ## 5. Usage Example
 
-```tsx
-import '@shopify/ui-extensions/preact';
-import { render } from 'preact';
-import { useState } from 'preact/hooks';
-import { useStorage } from '@shopify/ui-extensions/checkout/preact';
+The [Integration Guide](./shopify-ad-unit-integration-guide) walks through a complete extension, in the order you build it: reading shopper data from Shopify, the session id, hashed identifiers, the offers request, and a reference component that wires the response into `FeatureManagementProvider` and `<Renderer>`. Start there; the sections below cover the carousel rules and tracking that component relies on.
 
-import { FeatureManagementProvider } from '<your-preferred-path>/preact/provider';
-import { Template15 } from '<your-preferred-path>/preact/index';
-import { TemplateSimpleSkeleton } from '<your-preferred-path>/preact/skeleton';
+## 6. Offer Navigation
 
-export default function extension() {
-  render(<App />, document.body);
-}
+> **Important:** Advancing offers is your responsibility — the SDK renders the current offer but never changes the index for you. Getting this wrong is the most common cause of a stuck carousel or a missing final-offer impression.
 
-function App() {
-  const publicKey = 'your-public-key';
-  const apiEndpoint = 'https://pr-api.falconlabs.us/api/features/evaluate';
+The SDK renders **one offer at a time**. Your application owns the `activeOfferIndex` state and the two handlers that change it — `clickOffer` (primary CTA) and `handleNoThanks` (decline). The SDK reads `activeOffer` / `activeOfferIndex` and renders the current offer; it never mutates the index itself.
 
-  const [sessionId] = useState(generateUUID());
-  const { hashedCustomerShopifyId, hashedPhone, hashedEmail, firstName } =
-    useShopifyApi();
-  const { templateId, showIcon, templateData, activeOffer } = useFalconApi();
+**Why this matters:** impression beacons fire automatically each time `activeOffer` changes (see [Impression Tracking](#_8-impression-tracking)). An offer is therefore only counted once your code advances the index to it. If your advance logic stops one short of the end, the final offer is never displayed **and never impressed**.
 
-  const { reachedEndOfOffers, handleClick, handleDecline } = useFalconFlow();
+### State you own
 
-  const storage = useStorage();
+Keep the index and the end-of-offers flag in a single object so one functional update stays correct even if you later memoize the handlers (no stale-closure reads):
 
-  const userContext = {
-    placementId: 'extension-placement-id',
-    sessionId: sessionId,
-    hashedCustomerShopifyId: hashedCustomerShopifyId,
-    hashedPhone: hashedPhone,
-    hashedEmail: hashedEmail,
-    templateId: templateId,
-  };
+```typescript
+const [nav, setNav] = useState({
+  activeOfferIndex: 0,
+  reachedEndOfOffers: false,
+});
 
-  const extensionTarget = 'purchase.thank-you.block.render';
+const activeOffer = offers[nav.activeOfferIndex];
 
-  return (
-    <FeatureManagementProvider
-      publicKey={publicKey}
-      apiEndpoint={apiEndpoint}
-      userContext={userContext}
-      loadingElement={<TemplateSimpleSkeleton />}
-      storage={storage}
-      extensionTarget={extensionTarget}
-    >
-      <Template15
-        showIcon={showIcon}
-        templateData={templateData}
-        activeOffer={activeOffer}
-        offers={offers}
-        activeOfferIndex={activeOfferIndex}
-        reachedEndOfOffers={reachedEndOfOffers}
-        clickOffer={handleClick}
-        handleNoThanks={handleDecline}
-        extensionTarget={extensionTarget}
-        firstName={firstName}
-        email={email}
-      />
-    </FeatureManagementProvider>
+// `activeOffer` is a non-optional prop that the templates dereference, so never
+// render <Renderer> without one. Do NOT guard on `reachedEndOfOffers` here:
+// the index stays on the last offer, and the Renderer ends the unit itself.
+if (!offers.length || !activeOffer) return null;
+```
+
+In addition to the props documented in [§4. File Overview](#_4-file-overview), pass `activeOffer`, `activeOfferIndex={nav.activeOfferIndex}` and `reachedEndOfOffers={nav.reachedEndOfOffers}` to `<Renderer>`, along with the handlers below.
+
+### Decline — `handleNoThanks`
+
+Advance **sequentially, by exactly one**. On the last offer, end the carousel — do not wrap back to the start:
+
+```typescript
+function handleNoThanks() {
+  setNav((prev) =>
+    prev.activeOfferIndex >= offers.length - 1
+      ? { ...prev, reachedEndOfOffers: true } // last offer declined → end
+      : { ...prev, activeOfferIndex: prev.activeOfferIndex + 1 },
   );
 }
 ```
 
-## 6. Inspired Offer Behavior
+### CTA — `clickOffer`
+
+Same sequential advance, with one exception: when the response contains an Inspired offer, the CTA jumps straight to it (see [Inspired Offer Behavior](#_7-inspired-offer-behavior)):
+
+```typescript
+function clickOffer() {
+  setNav((prev) => {
+    const lastIndex = offers.length - 1;
+    if (prev.activeOfferIndex >= lastIndex) {
+      return { ...prev, reachedEndOfOffers: true }; // already on the last offer → end
+    }
+    if (templateData.hasInspired) {
+      return { ...prev, activeOfferIndex: lastIndex }; // jump to the Inspired offer
+    }
+    return { ...prev, activeOfferIndex: prev.activeOfferIndex + 1 };
+  });
+}
+```
+
+### Restart — `onRestartOffers`
+
+Inside the countdown experiment the Renderer replaces a finished unit with a redeem card. A tap on it calls `onRestartOffers`; put the carousel back on the first offer:
+
+```typescript
+function restartOffers() {
+  setNav({ activeOfferIndex: 0, reachedEndOfOffers: false });
+}
+```
+
+Pass it as `onRestartOffers={restartOffers}`. Wire `onOverlayDismissed` to the same end-of-offers state (`reachedEndOfOffers: true`), so the overlay closing ends the unit the same way declining the last offer does.
+
+### Rules
+
+- **Always guard the last offer.** Advancing past `offers.length - 1` leaves `activeOffer` `undefined`; because it is a non-optional prop that the templates dereference, that **throws inside the template** and drops the final offer's impression.
+- **`handleNoThanks` never jumps.** Only `clickOffer` may jump (the Inspired case); declining always moves forward exactly one step.
+- **Keep rendering `<Renderer>` at the end — the SDK ends the unit for you.** Pass `reachedEndOfOffers={true}` and leave `activeOffer` on the last offer; the Renderer renders nothing, or the redeem card inside the countdown experiment. Dropping `<Renderer>` yourself skips that card. Render nothing only when `activeOffer` is missing, as the guard above does.
+- **Don't `await` anything before the state update.** Impressions and clicks are tracked by the SDK; if you do your own work on click or decline, do not block `setNav` on it, or the carousel flickers.
+
+## 7. Inspired Offer Behavior
 
 Some Falcon API responses include an "Inspired" offer — a special final offer in the carousel. When this feature is active, the API response will contain:
 
@@ -307,30 +388,7 @@ Some Falcon API responses include an "Inspired" offer — a special final offer 
 
 The template handles the **tease bar rendering** automatically — it shows the bar when `teaseMessage` exists, hides it on non-block targets, and hides it when the user reaches the last (Inspired) offer.
 
-However, the **offer navigation logic** is your responsibility. Your `clickOffer` handler must implement the "jump to last offer" behavior:
-
-```typescript
-function clickOffer() {
-  // ... your existing click tracking logic ...
-
-  const lastIndex = offers.length - 1;
-
-  // If already on the last offer, mark end of offers
-  if (activeOfferIndex >= lastIndex) {
-    setReachedEndOfOffers(true);
-    return;
-  }
-
-  // If hasInspired, jump directly to the last (Inspired) offer
-  if (templateData.hasInspired) {
-    setActiveOfferIndex(lastIndex);
-    return;
-  }
-
-  // Default: advance to next offer
-  setActiveOfferIndex(activeOfferIndex + 1);
-}
-```
+However, the **offer navigation logic** is your responsibility: the `clickOffer` handler in [Offer Navigation](#_6-offer-navigation) already implements the jump to the last offer when `templateData.hasInspired` is `true`.
 
 **Key points:**
 
@@ -338,9 +396,9 @@ function clickOffer() {
 - The tease bar and offer index update should happen in the same state update to avoid visual flicker
 - `handleNoThanks` should always advance to the next offer sequentially (no jumping)
 
-## 7. Impression Tracking
+## 8. Impression Tracking
 
-The SDK fires impression beacons automatically — no action required on your side. Each time the active offer changes, the template sends a request to `activeOffer.beaconUrl` to register that the offer was seen.
+The SDK fires impression beacons automatically — no action required on your side. Each time the active offer changes, the Renderer sends a request to `activeOffer.beaconUrl` to register that the offer was seen, whichever template renders it.
 
 ### Server-side impressions (opt-out)
 
@@ -370,12 +428,11 @@ Example server-side beacon call:
 
 ```http
 GET {activeOffer.beaconUrl}&at.clientIp=1.2.3.4&at.userAgent=Mozilla%2F5.0...
-Authorization: Bearer {publicKey}
 ```
 
 > **Important:** Use exactly `at.clientIp` and `at.userAgent` as the parameter names. Other names (e.g. `userIp`, `userAgent`) are not recognized and will be silently ignored.
 
-## 8. Updating Templates
+## 9. Updating Templates
 
 Run the sync script (set up in step 3):
 
@@ -385,7 +442,9 @@ npm run falcon:sync
 
 This pulls the latest templates from the Falcon repository using your deploy key.
 
-## 9. CI/CD Setup
+> **Tip:** Add `falcon:sync` to your pre-commit hook (e.g., via Husky) to keep templates up to date automatically.
+
+## 10. CI/CD Setup
 
 Your CI/CD environment (CodeBuild, GitHub Actions, etc.) does not have access to the private template repository by default. When your pipeline clones your repo, it won't be able to fetch the submodule — you need to configure the same deploy key on the server.
 

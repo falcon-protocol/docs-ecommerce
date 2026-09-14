@@ -31,12 +31,20 @@
               "link": "/integration-guide/embedded"
             },
             {
+              "text": "General",
+              "link": "/integration-guide/general"
+            },
+            {
               "text": "Unified",
               "link": "/integration-guide/unified"
             },
             {
               "text": "Google Ad Manager",
               "link": "/integration-guide/gam"
+            },
+            {
+              "text": "Google Tag Manager",
+              "link": "/integration-guide/gtm"
             }
           ]
         },
@@ -206,12 +214,12 @@
               "link": "/integration-guide/partner-integration/reporting-api"
             },
             {
-              "text": "Shopify Ad Unit (React)",
-              "link": "/integration-guide/partner-integration/shopify-ad-unit-react"
-            },
-            {
               "text": "Shopify Ad Unit (Preact)",
               "link": "/integration-guide/partner-integration/shopify-ad-unit-preact"
+            },
+            {
+              "text": "Shopify Ad Unit — Integration Guide",
+              "link": "/integration-guide/partner-integration/shopify-ad-unit-integration-guide"
             },
             {
               "text": "Complete Custom Integration Example",
