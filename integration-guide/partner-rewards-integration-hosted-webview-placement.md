@@ -38,7 +38,7 @@ https://staging-pr.falconlabs.us/partners-rewards?placementId=YOUR_PLACEMENT_ID&
 
 - Renders full-screen. Give it a full-height webview.
 - Tapping an offer opens the advertiser and the unit moves to the next one, looping after the last. Where the advertiser opens is the next section.
-- The unit cannot dismiss itself: the webview is yours, so only your app can close it. Out of the box users swipe, and the offers loop rather than run out. If your app can act on a close, you can turn on [an X and a close signal](#in-unit-close-control) instead.
+- The unit cannot dismiss itself: the webview is yours, so only your app can close it. Out of the box users swipe, and the offers loop rather than run out. If your app can act on a close, you can turn on [an X](#in-unit-close-control) that asks it to.
 - If `placementId` or `publicApiKey` is missing, the page reads "These offers are not available right now." That looks the same as having no offers, so check the URL first.
 
 ## Opening offers in a native browser (recommended)
@@ -240,7 +240,7 @@ func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigatio
 
 This is the other close: the whole placement, not the advertiser's page. We can show an X and tell you when the user is done with the offers, but the unit cannot dismiss itself — the webview is yours, so all it can do is ask.
 
-Off by default, because a close nobody acts on is worse than no close at all: the X would do nothing and the last decline would leave the user on an offer they had just turned down. Turn it on by telling us how your app wants to hear about it.
+Off by default, because an X nobody acts on is worse than no X at all. Turn it on by telling us how your app wants to hear about it.
 
 ### 1. Pick how we tell you
 
@@ -264,7 +264,7 @@ It is the same handler as the app-install section above. An Android WebView that
 
 ### 2. Handle it
 
-With the flag on, an X appears on the unit, and declining the last offer asks your app to close instead of looping back to the first. Both arrive the same way, so there is one thing to handle.
+With the flag on, an X appears on the unit. Tapping it asks your app to close. The offers still loop after the last one, so the X is the only thing that ends the unit unless you ask us for the rest, which is the last section here.
 
 On iOS, inside `userContentController` from step 2:
 
@@ -310,11 +310,13 @@ if (request.url.scheme == "falcon" && request.url.host == "close") {
 | Field | Description |
 | --- | --- |
 | `index` | Which offer was on screen. |
-| `closeType` | `1` the X, `2` the last offer declined. Close the webview on either. The field is there if you want to report them apart, and it leaves room for a reason we add later, so treat an unfamiliar value as a close too. |
+| `closeType` | Why it closed. `1` is the X, which is the only one you get by default. `2` is the last offer being declined, if you turn that on below. Close the webview on either, and treat an unfamiliar value as a close too, since it leaves room for a reason we add later. |
 
-### Asking for something else
+### Closing on the last offer too
 
-The X and the last-offer close are one switch by default, but they are configured per placement and we can split them. Tell your account manager if you want the X without the last decline closing, or the reverse — an X that works while the offers keep looping.
+By default the offers keep looping and only the X ends the unit. We can also have the last "No thanks" close it, so the user is not handed the first offer again after turning all of them down.
+
+That one is set per placement on our side, so ask your account manager rather than changing anything yourself. Worth doing once you have confirmed the X works in your build, since it is the same `close` event either way and only the `closeType` differs.
 
 ## Optional attributes
 
