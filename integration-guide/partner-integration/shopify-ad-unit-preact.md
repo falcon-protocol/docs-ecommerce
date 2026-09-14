@@ -370,7 +370,7 @@ function restartOffers() {
 }
 ```
 
-Pass it as `onRestartOffers={restartOffers}`. Wire `onOverlayDismissed` to the same end-of-offers state (`reachedEndOfOffers: true`), so the overlay closing ends the unit the same way declining the last offer does.
+Pass it as `onRestartOffers={restartOffers}`. Without it the card would have nothing to bring back, so a finished unit renders nothing instead. Wire `onOverlayDismissed` to the same end-of-offers state (`reachedEndOfOffers: true`), so the overlay closing ends the unit the same way declining the last offer does.
 
 ### Rules
 
