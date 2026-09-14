@@ -16,7 +16,7 @@ Example: the user claims a 60-day free trial, which is the first perk shown in t
 
 This supports adding an extra, Falcon-funded perk that we append to an ad response. When one applies, it arrives as an additional offer on top of the normal offer count requested or returned.
 
-Supporting it is **additive**. If you already render offers from [`GET /api/odata`](/integration-guide/publisher-integration/odata-api), the perk itself renders like any other offer. The one piece of real integration work is the **tease bar**: when a perk is present, you display a teaser on every preceding offer so the customer knows the reward is coming.
+Supporting it is **additive**. If you already render offers from [`POST /api/odata`](/integration-guide/publisher-integration/odata-api), the perk itself renders like any other offer. The one piece of real integration work is the **tease bar**: when a perk is present, you display a teaser on every preceding offer so the customer knows the reward is coming.
 
 > This guide is for **publishers and partners that render OData offers directly via the API**. If you use a Falcon SDK or one of the pre-built ad units, [Shopify Ad Unit (Preact)](/integration-guide/partner-integration/shopify-ad-unit-preact) or the [Android](/integration-guide/android) / [iOS](/integration-guide/ios/integration) SDK, this is already handled for you and there's nothing to do here.
 
@@ -131,7 +131,7 @@ Every offer, perk or not, ships with the same pre-built tracking URLs. Fire them
 
 ### Summary
 
-1. Call [`GET /api/odata`](/integration-guide/publisher-integration/odata-api), unchanged.
+1. Call [`POST /api/odata`](/integration-guide/publisher-integration/odata-api), unchanged.
 2. Read the perk flag on `templateData`. If `false` or absent, you're done, render offers as today.
 3. If `true`, render `templateData.teaseMessage` as a tease bar on **every offer except the last**, and hide it on the perk itself.
 4. When a customer **claims a teased offer**, jump straight to the perk (`offers.length - 1`) instead of advancing one step.
