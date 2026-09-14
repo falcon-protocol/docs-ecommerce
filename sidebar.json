@@ -214,12 +214,12 @@
               "link": "/integration-guide/partner-integration/reporting-api"
             },
             {
-              "text": "Shopify Ad Unit (React)",
-              "link": "/integration-guide/partner-integration/shopify-ad-unit-react"
-            },
-            {
               "text": "Shopify Ad Unit (Preact)",
               "link": "/integration-guide/partner-integration/shopify-ad-unit-preact"
+            },
+            {
+              "text": "Shopify Ad Unit — Integration Guide",
+              "link": "/integration-guide/partner-integration/shopify-ad-unit-integration-guide"
             },
             {
               "text": "Complete Custom Integration Example",
