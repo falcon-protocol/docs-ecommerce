@@ -47,7 +47,7 @@ By default, tapping an offer opens the advertiser in the webview itself: a new t
 
 You can take the click instead and open it in an in-app browser over the webview. The user gets a progress bar and a way out of it — Done on older iOS, an X on newer. It closes the advertiser's page, not the unit, so they land back on the offers and one session can produce several clicks.
 
-The click reaches you over the same bridge as our mobile integration: `iosNativeListener` on iOS, the `Android` interface on Android. Payload at the end of this section. If that bridge is already wired up, only the `click` branch and step 3 are new.
+The click reaches you over the same bridge as our mobile integration: `iosNativeListener` on iOS, the `Android` interface on Android, `Unity.call` in a gree/unity-webview. Payload at the end of this section. If that bridge is already wired up, only the `click` branch and step 3 are new.
 
 ### 1. Register the message handler
 
@@ -95,6 +95,8 @@ dependencies {
 webView.settings.javaScriptEnabled = true
 webView.addJavascriptInterface(FalconBridge(), "Android") // FalconBridge: step 2
 ```
+
+Unity — nothing to register. [gree/unity-webview](https://github.com/gree/unity-webview) exposes `window.Unity.call` to the page on its own, and we send the click through it as a string. The callback you already pass to `WebViewObject.Init` receives it; step 2 is what goes inside.
 
 ### 2. Open the URL when a click arrives
 
@@ -170,6 +172,26 @@ With ProGuard or R8, keep the interface methods, or the bridge goes silent in re
 }
 ```
 
+Unity — the callback from step 1, in C#. The message arrives as one JSON string:
+
+```csharp
+using UnityEngine;
+
+[System.Serializable] class FalconEvent { public string type; public string name; public FalconEventData data; }
+[System.Serializable] class FalconEventData { public string clickUrl; public string kind; }
+
+void OnFalconMessage(string message)
+{
+    var falconEvent = JsonUtility.FromJson<FalconEvent>(message);
+    if (falconEvent == null || falconEvent.type != "event" || falconEvent.name != "click") return;
+    if (string.IsNullOrEmpty(falconEvent.data?.clickUrl)) return;
+
+    Application.OpenURL(falconEvent.data.clickUrl);
+}
+```
+
+`Application.OpenURL` hands the URL to the system browser. That is a fine first version: the tap gets an immediate response instead of the webview sitting on the old screen while the advertiser loads, and tracking is unaffected, since the URL is opened as given. What it does not give you is the way back — the user is in another app, and returning to the offers is up to them. An in-app browser (`SFSafariViewController`, Custom Tabs) keeps them in yours, but inside Unity that means a native plugin, so treat it as a later step rather than a requirement.
+
 ### 3. Opt in with `nativeClick=1`
 
 Add the flag to the URL you load:
@@ -185,6 +207,8 @@ The flag tells us you handle the click. A registered handler alone is not enough
 ```json
 { "type": "event", "name": "click", "data": { "clickUrl": "https://...", "kind": "offer" } }
 ```
+
+iOS receives it as an object through `iosNativeListener`. Android and Unity receive it as a JSON string, through `Android.postMessage` and `Unity.call` respectively. We try them in that order and send to the first one present, so a host with more than one bridge hears about each tap once.
 
 | Field | Description |
 | --- | --- |
