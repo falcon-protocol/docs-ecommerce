@@ -111,7 +111,9 @@ export function FalconPerksAutoShow({
   useEffect(() => {
     async function initPerks() {
       try {
-        await FalconSDK.init(sdkKey);
+        // Already initialized by an earlier run of this effect. The key cannot
+        // be swapped after the first call, so ignoring this is safe.
+        await FalconSDK.init(sdkKey).catch(() => {});
 
         const perks = FalconSDK.createPerksInstance(placementId, {
           attributes: {
@@ -125,6 +127,10 @@ export function FalconPerksAutoShow({
         instanceRef.current = perks;
 
         const result = await perks.loadPerks();
+
+        // A later run may already have replaced this instance.
+        if (instanceRef.current !== perks) return;
+
         if (result.isReady) {
           perks.show({ subtitle: `Thanks, ${userName}!` });
         }
@@ -137,6 +143,7 @@ export function FalconPerksAutoShow({
 
     return () => {
       instanceRef.current?.destroy();
+      instanceRef.current = null;
     };
   }, [sdkKey, placementId, userHashedEmail, userName, orderId, amount]);
 
@@ -164,7 +171,9 @@ export function FalconPerksButton({
   useEffect(() => {
     async function initSDK() {
       try {
-        await FalconSDK.init(sdkKey);
+        // Already initialized by an earlier run of this effect. The key cannot
+        // be swapped after the first call, so ignoring this is safe.
+        await FalconSDK.init(sdkKey).catch(() => {});
 
         instanceRef.current = FalconSDK.createPerksInstance(placementId, {
           attributes: {
@@ -183,16 +192,22 @@ export function FalconPerksButton({
 
     return () => {
       instanceRef.current?.destroy();
+      instanceRef.current = null;
     };
   }, [sdkKey, placementId, userHashedEmail, userName, orderId, amount]);
 
   const handleShowPerks = useCallback(async () => {
-    if (!instanceRef.current) return;
+    const perks = instanceRef.current;
+    if (!perks) return;
 
     try {
-      const result = await instanceRef.current.loadPerks();
+      const result = await perks.loadPerks();
+
+      // Destroyed while the offers were loading.
+      if (instanceRef.current !== perks) return;
+
       if (result.isReady) {
-        instanceRef.current.show({ subtitle: `Hey, ${userName}!` });
+        perks.show({ subtitle: `Hey, ${userName}!` });
       }
     } catch (error) {
       console.error("Falcon SDK error:", error);

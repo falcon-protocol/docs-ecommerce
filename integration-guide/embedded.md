@@ -153,6 +153,8 @@ The SDK handles errors internally and logs them to console:
 - The method returns a `Promise<void>` but is fire-and-forget — all errors are handled internally, so `await` is not required
 - Multiple calls with different placements will work, but avoid duplicate placement IDs
 
+> **Need to reload the unit on the same page?** `init()` creates the ad unit internally and hands nothing back, so there is no way to tear it down and start over. If your page can be opened more than once in a single session (a single-page app route, a drawer, a tab), use [Embedded SDK Manual Control](/integration-guide/embedded-sdk-instance) instead. It exposes the instance along with `show()`, `hide()`, and `destroy()`.
+
 ## Configuration
 
 ### `FalconAdsConfig`
@@ -461,6 +463,18 @@ Each placement should have its own unique container:
 
 ### Common Issues and Solutions
 
+#### "Placement already in use" error
+
+**Problem:** `[FalconAds] Init failed: Error: Placement "YOUR_PLACEMENT_ID" already in use`
+
+The unit renders the first time, then fails when the page is opened again.
+
+**Solution:**
+
+- One placement ID can have one live ad unit at a time
+- `FalconAds.init()` creates that unit internally and gives you no way to remove it
+- Switch to [Embedded SDK Manual Control](/integration-guide/embedded-sdk-instance), which hands you the instance and a `destroy()` method to call before rendering again
+
 #### "Container not found" error
 
 **Problem:** `[FalconAds] Container not found: "falcon-ads-container"`
@@ -551,15 +565,12 @@ Before going live, verify:
 
 ## Additional Features
 
-Need more control over the integration? The SDK also supports an advanced API with:
+Need more control over the integration? Two advanced options are documented:
 
-- Custom user attributes for personalization
-- Event callbacks (ready, click, close)
-- Manual control over loading and display timing
-- Programmatic show/hide control
-- Support for dynamic content updates
+- [Embedded SDK Callbacks](/integration-guide/embedded-sdk-callbacks) — hook show, view, click, close, and ready events into your own analytics, without leaving `FalconAds.init()`
+- [Embedded SDK Manual Control](/integration-guide/embedded-sdk-instance) — hold the ad-unit instance yourself for `show()`, `hide()`, and `destroy()`, which is what a page the visitor can reopen needs
 
-**Contact your Falcon Labs account manager** to learn about advanced integration options.
+For anything not covered there, contact your Falcon Labs account manager.
 
 ## Support
 
