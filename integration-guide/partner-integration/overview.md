@@ -34,7 +34,7 @@ On any surface where you have full control over the rendered HTML, we highly rec
 
 Within the Shopify world there are restrictions on the types of components that can render in the Checkout Flow, so the standard Embedded SDK isn't usable there. For those surfaces we maintain a Preact git submodule that you can import into your codebase and leverage to do all the heavy lifting of generating the look and feel, managing the carousel, wrapping the components in click URLs, and firing impressions.
 
-- [Shopify Ad Unit (Preact)](./shopify-ad-unit-preact)
+- [Shopify Ad Unit (1.x)](./shopify-ad-unit-1)
 - [Shopify Ad Unit — Integration Guide](./shopify-ad-unit-integration-guide)
 
 #### Direct OData integration

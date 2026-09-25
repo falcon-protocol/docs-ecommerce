@@ -4,7 +4,7 @@ title: "Shopify Ad Unit — Integration Guide"
 
 # Shopify Ad Unit (Preact) — Integration Guide
 
-The [plugin guide](./shopify-ad-unit-preact) covers installing the templates and their props. This guide is the code around them.
+The [plugin guide](./shopify-ad-unit-1) covers installing the templates and their props. This guide is the code around them.
 
 From your Falcon contact, per environment: a **public key** and **one placement id per surface** (thank-you page and order-status page are separate placements).
 
@@ -99,7 +99,7 @@ Copy the key casing exactly.
 
 | Field                | Use                                                                                                                                                                                                                                 |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `offers`             | Pass the whole array to `<Renderer offers>`; render one at a time. Do not call `clickUrl` or `beaconUrl` yourself unless you opt into server-side impressions ([plugin guide §8](./shopify-ad-unit-preact#_8-impression-tracking)). |
+| `offers`             | Pass the whole array to `<Renderer offers>`; render one at a time. Do not call `clickUrl` or `beaconUrl` yourself unless you opt into server-side impressions ([plugin guide §8](./shopify-ad-unit-1#_8-impression-tracking)).      |
 | `template`           | `<Renderer templateId>` and `userContext.templateId`                                                                                                                                                                                |
 | `templateData`       | `<Renderer templateData>`, pass through untouched                                                                                                                                                                                   |
 | `siteImages`         | `<Renderer siteImages>`                                                                                                                                                                                                             |
@@ -258,8 +258,8 @@ Rules:
 - Mount `FeatureManagementProvider` only after the offers response is in, with the complete `userContext`. Do not change its values afterwards.
 - `<Renderer>` goes inside `<s-query-container>`, as a child of the provider (it throws outside it).
 - Inside the checkout editor (`useExtensionEditor()`) render even when `siteStatus` is not `active`.
-- `sessionId`, `hashedEmail`, `hashedPhone`, `hashedCustomerShopifyId`, `language`, `orderId`, `amount` and `templateId` in `userContext` must equal what the offers request sent. Other accepted keys: [plugin guide](./shopify-ad-unit-preact#featuremanagementusercontext).
-- `clickOffer` and `handleNoThanks` follow [Offer Navigation](./shopify-ad-unit-preact#_6-offer-navigation) and [Inspired Offer Behavior](./shopify-ad-unit-preact#_7-inspired-offer-behavior). When `onOverlayDismissed` fires, set `reachedEndOfOffers` to `true` and keep rendering; the Renderer ends the unit itself. `onRestartOffers` puts the carousel back on the first offer.
+- `sessionId`, `hashedEmail`, `hashedPhone`, `hashedCustomerShopifyId`, `language`, `orderId`, `amount` and `templateId` in `userContext` must equal what the offers request sent. Other accepted keys: [plugin guide](./shopify-ad-unit-1#featuremanagementusercontext).
+- `clickOffer` and `handleNoThanks` follow [Offer Navigation](./shopify-ad-unit-1#_6-offer-navigation) and [Inspired Offer Behavior](./shopify-ad-unit-1#_7-inspired-offer-behavior). When `onOverlayDismissed` fires, set `reachedEndOfOffers` to `true` and keep rendering; the Renderer ends the unit itself. `onRestartOffers` puts the carousel back on the first offer.
 
 ```tsx
 // src/ThankYouBlock.tsx
@@ -465,4 +465,4 @@ hashedCustomerShopifyId: hashIdentifier(
 4. A `GET` to `beaconUrl` for the first offer, then one more for each decline or CTA.
 5. Decline through every offer: the unit disappears after the last one.
 6. Repeat on the order-status page.
-7. Production build: production base URL, key and placement ids; CI can fetch the templates ([plugin guide §10](./shopify-ad-unit-preact#_10-ci-cd-setup)).
+7. Production build: production base URL, key and placement ids; CI can fetch the templates ([plugin guide §10](./shopify-ad-unit-1#_10-ci-cd-setup)).

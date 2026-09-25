@@ -18,7 +18,7 @@ title: "Frequently Asked Questions"
 
 ### Q: How do I customize the appearance of offers?
 
-**A**: For Shopify Checkout, use our maintained ad unit components — see [Shopify Ad Unit (Preact)](./shopify-ad-unit-preact) and its [Integration Guide](./shopify-ad-unit-integration-guide). For surfaces where you control the page, use the [Embedded Web SDK](/integration-guide/embedded). If you need full control over rendering, call [OData](./odata-api) directly and render the offer data yourself — but remember you'll then own firing impressions and wrapping CTAs in the click URL (see the [Complete Custom Integration Example](./complete-integration-example)).
+**A**: For Shopify Checkout, use our maintained ad unit components — see [Shopify Ad Unit (1.x)](./shopify-ad-unit-1) and its [Integration Guide](./shopify-ad-unit-integration-guide). For surfaces where you control the page, use the [Embedded Web SDK](/integration-guide/embedded). If you need full control over rendering, call [OData](./odata-api) directly and render the offer data yourself — but remember you'll then own firing impressions and wrapping CTAs in the click URL (see the [Complete Custom Integration Example](./complete-integration-example)).
 
 ### Q: How long are offers valid?
 

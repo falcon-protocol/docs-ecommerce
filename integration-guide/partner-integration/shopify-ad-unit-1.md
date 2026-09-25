@@ -1,8 +1,8 @@
 ---
-title: "Shopify Ad Unit (Preact)"
+title: "Shopify Ad Unit (1.x)"
 ---
 
-# Shopify Ad Unit (Preact)
+# Shopify Ad Unit (1.x)
 
 ## Overview
 

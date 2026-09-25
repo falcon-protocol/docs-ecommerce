@@ -6,19 +6,19 @@ Falcon Rewarded Perks are offers that unlock an additional reward once the user 
 
 Example: the user claims a 60-day free trial, which is the first perk shown in the unit, and that unlocks a free $10 donation gift for a cause of their choice. The donation gift is one reward type; other reward types are also available.
 
-**Why turn this on**
+### Why turn this on
 
 - Higher user engagement with the offers in the unit, since there is a reason to claim rather than skip.
 - A better experience for the user, who gets something back for engaging.
 - Stronger monetization performance across every offer in the unit, not just the perk itself.
 
-**What the integration involves**
+### What the integration involves
 
 This supports adding an extra, Falcon-funded perk that we append to an ad response. When one applies, it arrives as an additional offer on top of the normal offer count requested or returned.
 
 Supporting it is **additive**. If you already render offers from [`POST /api/odata`](/integration-guide/publisher-integration/odata-api), the perk itself renders like any other offer. The one piece of real integration work is the **tease bar**: when a perk is present, you display a teaser on every preceding offer so the customer knows the reward is coming.
 
-> This guide is for **publishers and partners that render OData offers directly via the API**. If you use a Falcon SDK or one of the pre-built ad units, [Shopify Ad Unit (Preact)](/integration-guide/partner-integration/shopify-ad-unit-preact) or the [Android](/integration-guide/android) / [iOS](/integration-guide/ios/integration) SDK, this is already handled for you and there's nothing to do here.
+> This guide is for **publishers and partners that render OData offers directly via the API**. If you use a Falcon SDK or one of the pre-built ad units, [Shopify Ad Unit (1.x)](/integration-guide/partner-integration/shopify-ad-unit-1) or the [Android](/integration-guide/android) / [iOS](/integration-guide/ios/integration) SDK, this is already handled for you and there's nothing to do here.
 
 ### What it looks like
 
