@@ -74,7 +74,7 @@ The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) 
 | `date` | string | Always | Format depends on `breakdownBy` — see below |
 | `clicks` | number | Always | Number of clicks on offers |
 | `transactions` | number | Always | Event count of requests that resulted in postback/conversion tracking |
-| `revenue` | number | Always | Revenue generated. This is the only revenue field returned |
+| `revenue` | number | Always | Your revenue after Falcon's revenue share, not gross ad revenue. This is the only revenue field returned — see note below |
 | `site` | string | Always | Site name |
 | `siteId` | string | Always | |
 | `placement` | string | On `PLACEMENT` reports | Placement name |
@@ -82,6 +82,8 @@ The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) 
 | `country` | string \| null | When grouped by `COUNTRY` | ISO country code, or `null` when unknown |
 
 > **`date` format:** when `breakdownBy` is `NONE` (the default), `date` is the report's start date in `YYYY-MM-DD` form (e.g. `"2024-01-01"`). For any time breakdown (`DAY`, `WEEK`, `MONTH`), `date` is formatted as `DD/MM/YYYY` (e.g. `"15/01/2024"`).
+
+> **`revenue` and your payout:** `revenue` is already net of Falcon's revenue share for your account — it is not gross ad revenue, and no further take rate is deducted from it before payout. Once a month closes, that month's `revenue` is reconciled against actual advertiser-reported revenue. Because of that reconciliation step, `revenue` for the current (not-yet-closed) month is Falcon's best estimate and may be revised slightly when the month is reconciled; `revenue` for a closed, reconciled month is the final figure your payout for that month is based on.
 
 ### Example Requests
 
