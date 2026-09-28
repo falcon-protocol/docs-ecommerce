@@ -79,6 +79,10 @@
               "link": "/integration-guide/mobile/android"
             },
             {
+              "text": "React Native / Expo",
+              "link": "/integration-guide/mobile/react-native"
+            },
+            {
               "text": "iOS Native SDK",
               "link": "/integration-guide/ios/integration",
               "items": [
