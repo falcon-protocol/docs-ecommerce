@@ -1,5 +1,7 @@
 Pass user and order data via `attributes` for revenue attribution, offer targeting, personalization, and rendering hints. All values are strings, except `lineItems`, which is JSON.
 
+**Keys are case-sensitive.** Spell each one exactly as the table shows. Most are lowercase, but `orderId`, `lineItems`, `hashedEmail` and `hashedPhone` are camelCase. A key with the wrong casing is ignored rather than corrected, so `orderid` or `order_id` silently sends nothing. The SDK logs a console warning naming the correct spelling when it recognises the mistake.
+
 | Attribute | Priority | Description | Format |
 | --- | --- | --- | --- |
 | `orderId` | Required | Unique order/transaction identifier. Links the offer impression back to a specific purchase for revenue attribution | String, no special characters (`#`, `@`, `.`, spaces) |
