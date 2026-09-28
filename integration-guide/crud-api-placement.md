@@ -143,6 +143,10 @@ Creates a new placement for the authenticated publisher.
 }
 ```
 
+The create response contains only `id` and `name`.
+
+> **Idempotent retries:** If a matching placement already exists, the API returns **200 OK** with `"message": "Placement already exists"` instead of **201 Created**. The `data` payload (`id`, `name`) is identical in both cases.
+
 ---
 
 ### 3. Get Placement by ID
