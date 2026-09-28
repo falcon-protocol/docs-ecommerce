@@ -92,6 +92,13 @@ GAM substitutes `%%PATTERN:orderid%%` in the creative code at serve time. The sa
 works for the optional `amount`, `currency`, `language`, `category`, and `subcategory`
 key-values.
 
+::: warning The two `orderid`s are not the same
+The GAM key-value name is lowercase because GAM ignores casing. The `attributes` key inside
+`FalconGamAds.init` does not: it must be `orderId`, camelCase. `orderid`, `OrderId` and
+`order_id` are ignored, and the SDK logs a console warning naming the correct spelling. Every
+other key this bundle accepts is already lowercase.
+:::
+
 Key-value constraints (GAM limits): values up to 40 characters, keys are case-insensitive, and
 these characters are not allowed: `" ' = ! + # * ~ ; ^ ( ) < > [ ] , &`. Falcon order IDs fit
 these limits.
