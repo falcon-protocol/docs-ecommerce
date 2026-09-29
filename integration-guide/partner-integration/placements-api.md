@@ -111,25 +111,20 @@ curl -X POST https://pr-api.falconlabs.us/api/placements \
 
 ### Success Response (201 Created)
 
+The create response contains only `id` and `name`. To read the full placement (site, type, mode, timestamps), call `GET /api/placements/:id` afterwards.
+
 ```json
 {
   "success": true,
   "data": {
     "id": "cm0j1k2l3m4n5o6p7q8r9s0t",
-    "name": "Thank You Page Placement",
-    "site": {
-      "id": "cm2a3b4c5d6e7f8g9h0i1j2k",
-      "name": "My Store"
-    },
-    "type": "THANK_YOU_PAGE",
-    "pageTarget": "BLOCK",
-    "isLiveMode": false,
-    "createdAt": "2024-01-15T10:40:00.000Z",
-    "updatedAt": "2024-01-15T10:40:00.000Z"
+    "name": "Thank You Page Placement"
   },
   "message": "Placement created successfully"
 }
 ```
+
+> **Idempotent retries:** If a matching placement already exists, the API responds with **200 OK** and `"message": "Placement already exists"` instead of **201 Created**. The `data` payload (`id`, `name`) is the same in both cases.
 
 **Key Response Fields:**
 
@@ -241,8 +236,7 @@ curl -X GET https://pr-api.falconlabs.us/api/placements/clx4d5e6f7g8h9i0j1k2l3m4
     "isLiveMode": false,
     "createdAt": "2024-01-15T10:40:00.000Z",
     "updatedAt": "2024-01-15T10:40:00.000Z"
-  },
-  "message": "Placement created successfully"
+  }
 }
 ```
 

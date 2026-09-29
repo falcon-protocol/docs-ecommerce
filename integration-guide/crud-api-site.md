@@ -89,6 +89,7 @@ Retrieves paginated list of sites for the authenticated publisher.
         }
       ],
       "category": {
+        // Only if include=relations
         "id": "cat_id",
         "name": "Category Name",
         "path": "Category > Subcategory",
@@ -147,27 +148,23 @@ Creates a new site for the authenticated publisher.
 
 **Response** (201):
 
+The create response contains only the site's own fields. Relations (`category`, `publisher`, `placements`) are **not** included on create — retrieve them afterwards via `GET` with `?include=relations`. The optional fields (`description`, `orderVolume`, `averageOrder`, `ageDemographics`, `genderDemographics`, `domain`) appear only if they were provided in the request.
+
 ```json
 {
   "success": true,
   "data": {
     "id": "clxx...",
     "name": "Site Name",
+    "status": "pending",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
     "description": "Site description",
     "orderVolume": 1000,
     "averageOrder": 49.99,
     "ageDemographics": "age_25_to_34",
     "genderDemographics": "mixed",
-    "domain": "example.com",
-    "status": "pending",
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-01-01T00:00:00.000Z",
-    "category": {
-      "id": "cat_id",
-      "name": "Category Name",
-      "path": "Category > Subcategory",
-      "taxonomyId": "taxonomy_id"
-    }
+    "domain": "example.com"
   },
   "message": "Site created successfully"
 }
@@ -222,6 +219,7 @@ Retrieves a specific site by ID. Users can only access sites that belong to thei
       }
     ],
     "category": {
+      // Only if include=relations
       "id": "cat_id",
       "name": "Category Name",
       "path": "Category > Subcategory",
@@ -637,25 +635,21 @@ curl -X POST http://localhost:4000/api/site \
   "data": {
     "id": "cm5e6f7g8h9i0j1k2l3m4n5o",
     "name": "Mobile E-commerce Store",
+    "status": "active",
+    "createdAt": "2024-01-16T09:15:00.000Z",
+    "updatedAt": "2024-01-16T09:15:00.000Z",
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.5,
     "ageDemographics": "age_18_to_24",
     "genderDemographics": "female",
-    "domain": "mobile.acme-ecommerce.com",
-    "status": "active",
-    "createdAt": "2024-01-16T09:15:00.000Z",
-    "updatedAt": "2024-01-16T09:15:00.000Z",
-    "category": {
-      "id": "cm6f7g8h9i0j1k2l3m4n5o6p",
-      "name": "Fashion & Apparel",
-      "path": "Shopping > Fashion & Apparel",
-      "taxonomyId": "falcon_tax_fashion_001"
-    }
+    "domain": "mobile.acme-ecommerce.com"
   },
   "message": "Site created successfully"
 }
 ```
+
+> **Note:** The `categoryName` you send in the request is used to associate the site with a category, but the category object itself is **not** echoed back on create — fetch it with `GET /api/site/{id}?include=relations`.
 
 ---
 
@@ -685,6 +679,8 @@ curl -X POST http://localhost:4000/api/site \
   "message": "Site created successfully"
 }
 ```
+
+Because no optional fields were sent, only the core fields are returned.
 
 ---
 

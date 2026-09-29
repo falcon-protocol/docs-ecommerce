@@ -398,28 +398,23 @@ curl -X POST https://pr-api.falconlabs.us/api/site \
 
 ### Success Response (201 Created)
 
+The create response returns only the site's own fields. Optional fields (`description`, `orderVolume`, `averageOrder`, `ageDemographics`, `genderDemographics`, `domain`) are echoed back only if they were sent in the request. The `category` object and `adsEnabled` field are **not** returned on create — `category` is available via `GET /api/site/{id}?include=relations`, and `adsEnabled` is returned only by the lifecycle endpoints (`PATCH /api/site/:id/ads` and `PATCH /api/site/:id/status`).
+
 ```json
 {
   "success": true,
   "data": {
     "id": "cm5e6f7g8h9i0j1k2l3m4n5o",
     "name": "Mobile E-commerce Store",
+    "status": "active",
+    "createdAt": "2024-01-16T09:15:00.000Z",
+    "updatedAt": "2024-01-16T09:15:00.000Z",
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.5,
     "ageDemographics": "age_25_to_34",
     "genderDemographics": "mixed",
-    "domain": "mobile.acme-ecommerce.com",
-    "status": "active",
-    "adsEnabled": true,
-    "createdAt": "2024-01-16T09:15:00.000Z",
-    "updatedAt": "2024-01-16T09:15:00.000Z",
-    "category": {
-      "id": "cm6f7g8h9i0j1k2l3m4n5o6p",
-      "name": "Apparel and Fashion > Clothing and Apparel",
-      "path": "Apparel and Fashion > Clothing and Apparel",
-      "taxonomyId": "falcon_tax_fashion_001"
-    }
+    "domain": "mobile.acme-ecommerce.com"
   },
   "message": "Site created successfully"
 }
@@ -435,22 +430,15 @@ curl -X POST https://pr-api.falconlabs.us/api/site \
   "data": {
     "id": "cm5e6f7g8h9i0j1k2l3m4n5o",
     "name": "Mobile E-commerce Store",
+    "status": "active",
+    "createdAt": "2024-01-15T09:15:00.000Z",
+    "updatedAt": "2024-01-15T09:15:00.000Z",
     "description": "Dedicated mobile shopping experience",
     "orderVolume": 800,
     "averageOrder": 65.5,
     "ageDemographics": "age_25_to_34",
     "genderDemographics": "mixed",
-    "domain": "mobile.acme-ecommerce.com",
-    "status": "active",
-    "adsEnabled": true,
-    "createdAt": "2024-01-15T09:15:00.000Z",
-    "updatedAt": "2024-01-15T09:15:00.000Z",
-    "category": {
-      "id": "cm6f7g8h9i0j1k2l3m4n5o6p",
-      "name": "Apparel and Fashion > Clothing and Apparel",
-      "path": "Apparel and Fashion > Clothing and Apparel",
-      "taxonomyId": "falcon_tax_fashion_001"
-    }
+    "domain": "mobile.acme-ecommerce.com"
   },
   "message": "Site created successfully"
 }
@@ -538,10 +526,10 @@ curl -X GET https://pr-api.falconlabs.us/api/site/clx3c4d5e6f7g8h9i0j1k2l3m \
     "ageDemographics": "age_25_to_34",
     "genderDemographics": "female",
     "status": "active",
-    "adsEnabled": true,
     "createdAt": "2024-01-15T10:35:00.000Z",
     "updatedAt": "2024-01-15T10:35:00.000Z",
     "category": {
+      // Only returned with ?include=relations
       "id": "cm6f7g8h9i0j1k2l3m4n5o6p",
       "name": "Apparel and Fashion > Clothing and Apparel",
       "path": "Apparel and Fashion > Clothing and Apparel",
@@ -550,6 +538,8 @@ curl -X GET https://pr-api.falconlabs.us/api/site/clx3c4d5e6f7g8h9i0j1k2l3m \
   }
 }
 ```
+
+> **Note:** `adsEnabled` is not part of the standard site object. It is returned only by the lifecycle endpoints (`PATCH /api/site/:id/ads` and `PATCH /api/site/:id/status`). The `category` relation is included only when you pass `?include=relations`.
 
 ### Error Responses
 
