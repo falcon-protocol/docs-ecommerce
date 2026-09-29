@@ -70,7 +70,7 @@ By default `init()` fetches and renders in one step, so the container has to be 
 
 1. **Fetch.** Call [`/api/odata`](./partner-integration/odata-api) with `isPreview=true` and a `sessionId` you generate. No SDK and no container are needed. If `offers` is non-empty, an offer is available.
 2. **Decide.** Show it or not. If you don't, do nothing else.
-3. **Render.** Mount your container, then call `init()` with the **same `placementId` and `sessionId`** plus `hasPreview: true`. The SDK replays the offer from step 1 without running a new auction, and renders it in your container.
+3. **Render.** Mount your container, then call `init()` with the **same `placementId` and `sessionId`** plus `hasPreview: true`. The SDK replays the exact offer from step 1 instead of selecting a new one, so it comes back fast, and renders it in your container.
 
 ```javascript
 // 1. Fetch (from the browser, so the shopper's IP and user agent are sent automatically)
@@ -110,12 +110,12 @@ FalconGeneralSDK.init({
 - **One-time setup.** Ask the Falcon team to enable server-side preview replay for your publisher. Without it, the render step comes back empty.
 - **Fetching without rendering is free.** A fetched offer that is never rendered records no order and no impression, so it does not affect your reporting.
 - **Replay window.** The fetched offer is held server-side for a window configured for your publisher. Render within it. After it expires, the render step requests a fresh offer instead, which may differ from the one you fetched or be empty, so handle `onReady(false)`.
-- **Render speed.** The render step skips the auction, so it is fast, but it still loads the ad frame. Add the SDK `<script>` when the page loads rather than when you open your modal, and reveal the ad area on `onReady(true)`.
+- **Render speed.** The render step reuses the offer you already fetched, so it is fast, but it still loads the ad frame. Add the SDK `<script>` when the page loads rather than when you open your modal, and reveal the ad area on `onReady(true)`.
 - **Rendering inside your own UI.** If the offer must render inside your container (for example in a modal) rather than as an overlay, tell the Falcon team so your placement is configured as embedded.
 - **Calling from your server instead.** Send the shopper's IP and user agent as `at.clientIp` and `at.userAgent` in the body. Otherwise the request looks like it comes from your server and bot detection returns `204 No Content`.
 - **`isPreview` is enough.** You don't need `isCheckout` or `count`.
 
-See [Gift with Purchase](./partner-integration/advanced/gift-with-purchase) for the full `sessionId` rules.
+- **`sessionId` rules.** Required on both calls (a missing one returns `400`). Use any opaque string under 128 characters that doesn't contain `'` `"` `;` `\` `` ` `` or `--`.
 
 ## Migrating from the Unified SDK
 
