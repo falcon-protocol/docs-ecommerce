@@ -17,13 +17,14 @@ GET  https://pr-api.falconlabs.us/api/odata?placementId=...&sessionId=...&at.ema
 
 ### Authentication
 
-Use the publisher’s **Public Key**, in either header:
+Send the publisher’s **Public Key** in the `X-Falcon-Public-Key` header:
 
 ```text
-Authorization: Bearer PUBLIC_KEY
 X-Falcon-Public-Key: PUBLIC_KEY
 ```
 
+> The legacy `Authorization: Bearer PUBLIC_KEY` header is still accepted (and takes precedence when both are sent), but it is being phased out — prefer `X-Falcon-Public-Key` for new integrations.
+>
 > Note: This is the only endpoint that uses the public key. All other endpoints use the private key.
 
 ### Query Parameters
@@ -107,7 +108,7 @@ USD, EUR, GBP, CAD, AUD, JPY, CNY, NZD, CHF, SEK, NOK, DKK, PLN, CZK, HUF, RON, 
 - **Set `Content-Type: application/json`.** This is the documented contract. (The body is parsed even without it as a safety net, but always send the header.) Malformed JSON returns **400**.
 - **32 kb body cap.** A body larger than 32 kb returns **413 Payload Too Large** (not 500).
 - **Bot detection returns a silent `204 No Content`.** The endpoint runs bot detection on every request and returns an empty **204** — no error, no body — for bot-like `User-Agent`s. `isbot` flags plain HTTP-client user agents, so **a bare `curl` or a server-side HTTP client gets 204'd with no error.** Server-side integrators **must** either set a browser-style `User-Agent` header or pass the real client UA via `at.userAgent` in the body. See the proxying note under Required Parameters.
-- **Auth is unchanged** — same `Authorization: Bearer PUBLIC_KEY`. Invalid/missing token → **401**.
+- **Auth is unchanged** — same `X-Falcon-Public-Key: PUBLIC_KEY`. Invalid/missing token → **401**.
 
 **Example: `POST` with PII and line items in the body (JavaScript)**
 
@@ -117,7 +118,7 @@ await fetch(
   {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${publicKey}`,
+      "X-Falcon-Public-Key": publicKey,
       "Content-Type": "application/json",
       // Server-side callers only: set a browser-style UA (or pass at.userAgent below),
       // otherwise bot detection returns a silent 204.
@@ -143,7 +144,7 @@ await fetch(
 
 ```bash
 curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0j1k2l3m4n&sessionId=session_abc123" \
-  -H "Authorization: Bearer pub_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" \
+  -H "X-Falcon-Public-Key: pub_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef" \
   -H "Content-Type: application/json" \
   -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
   -d '{
@@ -162,7 +163,7 @@ curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i
 
 ```bash
 curl -X GET "https://pr-api.falconlabs.us/api/odata?placementId=clx4d5e6f7g8h9i0j1k2l3m4n&sessionId=session_abc123&count=4&at.email=customer@example.com&at.firstname=John&at.lastname=Doe&at.orderid=ORDER-12345&at.category=Apparel&at.subcategory=Shoes&at.amount=125.50&at.currency=USD&at.country=US" \
-  -H "Authorization: Bearer pub_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+  -H "X-Falcon-Public-Key: pub_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
 ```
 
 ### Success Response (200 OK)
