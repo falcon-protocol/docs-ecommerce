@@ -32,7 +32,7 @@ supply:
 |---|---|---|
 | `isPreview` | on the compute call | `true` = generate + store + return the offer. |
 | `hasPreview` | on the render call | `true` = echo the stored offer. |
-| `sessionId` | yes, on every preview and checkout-placement request | Stable, unguessable id, **identical** on the compute and render calls. Missing → `400`. |
+| `sessionId` | yes, on every preview and checkout-placement request | A value that's **unique per shopper session** (e.g. a checkout token), sent **identically** on the compute and render calls. Missing → `400`. |
 | `count` | optional | Number of offers to return. Honored as sent, and falls back to the placement/template default when omitted — **not** fixed to 1. |
 
 There is **no `isCheckout` request parameter** — checkout tracking is derived from the
@@ -60,15 +60,15 @@ POST /api/odata                            POST /api/odata
 ### Compute (`isPreview=true`)
 
 - Generates the offer and returns it in the response (your client may also cache it locally).
-- **Stores the offer server-side** under `(publisher, sessionId)` — this is the default
-  behavior, with a server-controlled TTL (default **1 day**).
+- **Stores the offer server-side** against your `sessionId` — this is the default behavior, with
+  a server-controlled TTL (default **1 day**).
 - **Idempotent:** a second compute call with the same `sessionId` replays the stored offer
   instead of regenerating, so the shopper sees the identical offer.
 - On a [Checkout placement](#tracking-checkout-events), emits the `ad_checkout` analytics event.
 
 ### Render (`hasPreview=true`)
 
-- Looks up the stored offer by `(publisher, sessionId)` and echoes it.
+- Looks up the offer stored for that `sessionId` and echoes it.
 - **Hit** → the stored offer.
 - **Miss** (nothing stored — the TTL expired, or the compute call never ran) → an **empty
   `offers` array** (render nothing). Falcon can optionally enable "serve a fresh offer on miss"
@@ -205,12 +205,13 @@ Tracking is driven by the URLs on the offer object, and is done **on the render 
 
 ## Linking the two calls
 
-The compute and render calls are tied together **only by `sessionId`** — it's also what links
-the recorded request back to the checkout exposure for attribution. Send the exact same value on
-both.
+The compute and render calls are tied together **only by `sessionId`** — the value must be the
+**same** where the offer is previewed and where it's rendered, and it's also what links the
+recorded request back to the checkout exposure for attribution. Use a value that's **unique per
+shopper session**, such as a checkout token.
 
-- **Shopify:** use the `checkoutToken` as `sessionId` — it's the one id present on both the
-  checkout and thank-you pages, and it survives the handoff (`localStorage` does not).
+- **Shopify:** the `checkoutToken` is a good fit — it's present on both the checkout and
+  thank-you pages and survives the handoff (`localStorage` does not).
 - `sessionId` must be under 128 characters and may not contain `' " ; \` `` ` `` or `--`.
 - If the two calls happen in different contexts (email → landing page → thank-you), carry the
   same `sessionId` across all of them.
