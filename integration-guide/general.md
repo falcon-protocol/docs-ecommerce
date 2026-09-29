@@ -114,7 +114,6 @@ FalconGeneralSDK.init({
 - **Rendering inside your own UI.** If the offer must render inside your container (for example in a modal) rather than as an overlay, tell the Falcon team so your placement is configured as embedded.
 - **Calling from your server instead.** Send the shopper's IP and user agent as `at.clientIp` and `at.userAgent` in the body. Otherwise the request looks like it comes from your server and bot detection returns `204 No Content`.
 - **`isPreview` is enough.** You don't need `isCheckout` or `count`.
-
 - **`sessionId` rules.** Required on both calls (a missing one returns `400`). Use any opaque string under 128 characters that doesn't contain `'` `"` `;` `\` `` ` `` or `--`.
 
 ## Migrating from the Unified SDK
