@@ -4,92 +4,111 @@ title: "Gift with Purchase — Integration Guide"
 
 # Gift with Purchase — Integration Guide
 
-How to show a Gift with Purchase offer on the checkout page and then render the **same**
-offer on the thank-you page after purchase.
+How to compute an offer at one point in a shopper's journey (e.g. the checkout page) and render
+the **same** offer later (e.g. the thank-you page after purchase).
 
-This is done with two [`/api/odata`](../odata-api) calls linked by a shared `sessionId`, both
-carrying a `previewFlow` param:
+It's a two-call flow over [`/api/odata`](../odata-api), linked by a single `sessionId` you
+supply:
 
-1. **Checkout page** — request an offer with `previewFlow`. Show it as a **non-clickable
-   preview** (a teaser of the gift the shopper will get).
-2. **Thank-you page** — replay that same offer with `previewFlow` + `hasPreview`. Here it
-   becomes the **clickable / redeemable** gift, and the purchase is attributed to it.
+| Call | Param | Where it runs | What it does |
+|---|---|---|---|
+| **Compute** | `isPreview=true` | e.g. checkout page | Generates the offer, stores it server-side, and returns it. |
+| **Render** | `hasPreview=true` | e.g. thank-you page | Echoes the previously computed offer. |
+
+> `previewFlow` is no longer used — ignore any older docs that reference it. `isPreview` /
+> `hasPreview` are the only preview params.
 
 > **Prerequisites:** a working publisher **Public Key** and a **`placementId`** for the
 > checkout and thank-you placements. See [Prerequisites](../prerequisites) for credentials,
 > [Placements API](../placements-api) for provisioning placements, and [OData API](../odata-api)
 > for the base request contract (auth, `POST` vs `GET`, `at.*` attributes). This guide covers
-> the Gift-with-Purchase-specific behavior on top of that.
+> the preview-specific behavior on top of that.
 
 ---
 
-## Preview flows (`previewFlow`)
+## Request parameters
 
-A single param, `previewFlow`, marks a request as a preview **and** declares how the offer is
-stored between the two calls and for how long. Pick the value that matches your funnel:
+| Param | Required | Notes |
+|---|---|---|
+| `isPreview` | on the compute call | `true` = generate + store + return the offer. |
+| `hasPreview` | on the render call | `true` = echo the stored offer. |
+| `sessionId` | yes, on every preview and checkout-placement request | Stable, unguessable id, **identical** on the compute and render calls. Missing → `400`. |
+| `count` | optional | Number of offers to return. Honored as sent, and falls back to the placement/template default when omitted — **not** fixed to 1. |
 
-| `previewFlow` | Storage | Server TTL | On a render miss |
-|---|---|---|---|
-| `client` | Client-side cache (localStorage) — no server storage | — | Returns an empty body; render from your own client cache |
-| `checkout` | Server-side pin + replay | 3 hours | Falls through to a fresh carousel |
-| `email` | Server-side pin + replay | 1 week | Falls through to a fresh carousel |
-
-- Use **`checkout`** for a normal checkout → thank-you flow, and **`email`** when the two calls
-  can be far apart (e.g. an email → landing page → thank-you journey) and you need the longer
-  window. Use **`client`** only if you'd rather cache and re-render the offer yourself with no
-  server-side storage.
-- **The TTL is server-controlled** — it's fixed per flow and can't be supplied by the
-  publisher.
-
-There are two kinds of call, distinguished by whether `hasPreview` is present:
-
-- **Compute call** — `previewFlow=<value>` **without** `hasPreview`. Generates the offer, saves
-  the preview, and (for the `checkout` and `email` flows) pins it in Redis against the
-  `sessionId`. This is **idempotent**: a repeated compute call with the same `sessionId` replays
-  the pinned offer instead of generating a new one.
-- **Render call** — `previewFlow=<value>` **+ `hasPreview=true`**. Replays the pinned offer on a
-  hit. This is the thank-you call.
-
-Use the **same `previewFlow` value** on both calls, and note that `previewFlow` requires a
-`sessionId`.
+There is **no `isCheckout` request parameter** — checkout tracking is derived from the
+placement type instead (see below).
 
 ---
 
 ## How it works
 
-The offer shown at checkout must survive to the thank-you page — both to render the same
-offer the shopper already saw, and to attribute the purchase to it. Two calls that share one
+The offer computed on the first page must survive to the second, both to render the same offer
+the shopper already saw and to attribute the purchase to it. Two calls that share one
 `sessionId` do this:
 
 ```text
-Checkout page (compute)                    Thank-you page (render)
+Compute (e.g. checkout)                    Render (e.g. thank-you)
 ───────────────────────                    ───────────────────────
 POST /api/odata                            POST /api/odata
-  previewFlow=checkout                       previewFlow=checkout
-  isCheckout=true                            hasPreview=true
-  count=1                                    sessionId=abc123     ← SAME sessionId
-  sessionId=abc123          ───────────────→ → replays the same offer
-  → returns 1 offer                            (render as the redeemable gift)
+  isPreview=true                             hasPreview=true
+  sessionId=abc123          ───────────────→ sessionId=abc123     ← SAME sessionId
+  → generates, stores,                       → echoes the stored offer
+    and returns the offer                      (render as the redeemable gift)
     (render as non-clickable preview)
 ```
 
-- The **compute** call generates and returns the offer, and (for `checkout` / `email`) pins it
-  against the `sessionId`.
-- The **render** call, with the same `sessionId` and `hasPreview=true`, replays that exact
-  offer — no new offer is generated, so the shopper sees the same one and the purchase
-  attributes to it.
+### Compute (`isPreview=true`)
+
+- Generates the offer and returns it in the response (your client may also cache it locally).
+- **Stores the offer server-side** under `(publisher, sessionId)` — this is the default
+  behavior, with a server-controlled TTL (default **1 day**).
+- **Idempotent:** a second compute call with the same `sessionId` replays the stored offer
+  instead of regenerating, so the shopper sees the identical offer.
+- On a [Checkout placement](#tracking-checkout-events), emits the `ad_checkout` analytics event.
+
+### Render (`hasPreview=true`)
+
+- Looks up the stored offer by `(publisher, sessionId)` and echoes it.
+- **Hit** → the stored offer.
+- **Miss** (nothing stored — the TTL expired, or the compute call never ran) → an **empty
+  `offers` array** (render nothing). Falcon can optionally enable "serve a fresh offer on miss"
+  per publisher; it's **off by default**.
 
 ---
 
-## Step 1 — Checkout page
+## Tracking checkout events
 
-Make the **compute** call: request one offer with `previewFlow=checkout` and `count=1`, and no
-`hasPreview`. Because this call happens on the checkout page, also send `isCheckout=true` to
-mark it as a checkout-page event. Keep the routing params (`placementId`, `sessionId`, `count`,
-`previewFlow`, `isCheckout`) in the query string; put customer data (`at.*`) in the JSON body.
+The `ad_checkout` analytics event is derived from the **placement type**, not a request flag.
+It fires automatically whenever a request hits a placement whose type is `CHECKOUT_PAGE`.
+
+To track checkout events for your preview flow, the compute call must target a placement created
+as a **Checkout placement** (`type = CHECKOUT_PAGE`).
+
+- ✅ Compute call (`isPreview=true`) on a Checkout placement → generates the offer **and** emits
+  `ad_checkout`.
+- ⚠️ Compute call on a non-checkout placement → still generates / stores / returns the offer, but
+  **no** `ad_checkout` event is recorded.
+- A request to a Checkout placement **without** `isPreview` (e.g. a control shopper, or a plain
+  checkout load) still emits `ad_checkout` and returns an empty `offers` array — this is what
+  makes checkout-entry measurable for **every** shopper.
+
+Checkout placements require `sessionId` on every request (the derived checkout state makes
+`sessionId` mandatory). Send the same `sessionId` you'll use on the thank-you render.
+
+> If you don't need checkout-event tracking, use any placement type — the preview compute/echo
+> still works. The flow is not limited to checkout; it works for checkout and non-checkout
+> journeys alike.
+
+---
+
+## Step 1 — Compute (e.g. checkout page)
+
+Make the compute call with `isPreview=true` and a `sessionId` you can reproduce later. Keep
+routing params (`placementId`, `sessionId`) in the query string; put customer data (`at.*`) in
+the JSON body.
 
 ```bash
-curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=<CHECKOUT_PLACEMENT_ID>&sessionId=abc123&count=1&previewFlow=checkout&isCheckout=true" \
+curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=<CHECKOUT_PLACEMENT_ID>&sessionId=abc123&isPreview=true" \
   -H "X-Falcon-Public-Key: PUBLIC_KEY" \
   -H "Content-Type: application/json" \
   -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" \
@@ -102,16 +121,16 @@ curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=<CHECKOUT_PLACE
 ```
 
 Render the returned offer as a **non-clickable preview** — a teaser of the gift. Do not make
-it redeemable and do not fire tracking here; the offer is only actioned on the thank-you page.
+it redeemable and do not fire tracking here; the offer is only actioned on the render page.
+(Want exactly one offer? Add `&count=1` — otherwise the placement default applies.)
 
-## Step 2 — Thank-you page
+## Step 2 — Render (e.g. thank-you page)
 
-Make the **render** call: replay the same offer with `previewFlow=checkout`, `hasPreview=true`,
-and the **same `sessionId`**. Resend the same customer data (including `at.email`) so both calls
-carry a consistent identity.
+Make the render call with `hasPreview=true` and the **same `sessionId`**. Resend the same
+customer data (including `at.email`) so both calls carry a consistent identity.
 
 ```bash
-curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=<THANKYOU_PLACEMENT_ID>&sessionId=abc123&previewFlow=checkout&hasPreview=true" \
+curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=<THANKYOU_PLACEMENT_ID>&sessionId=abc123&hasPreview=true" \
   -H "X-Falcon-Public-Key: PUBLIC_KEY" \
   -H "Content-Type: application/json" \
   -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" \
@@ -124,46 +143,38 @@ curl -X POST "https://pr-api.falconlabs.us/api/odata?placementId=<THANKYOU_PLACE
 ```
 
 Render the returned offer as the **clickable / redeemable** gift, and fire tracking (see
-[Tracking](#tracking)). It is the same offer shown at checkout, now attributed to the purchase.
-
-> **Not just checkout.** The two-call preview/replay flow isn't limited to the checkout →
-> thank-you path. For journeys where the render call can be much later — e.g. an email → landing
-> page → thank-you flow — use `previewFlow=email` on both calls to get the 1-week window instead
-> of the 3-hour `checkout` window. In that case the first call isn't a checkout-page event, so
-> omit `isCheckout=true` from it.
-
----
-
-## Rendering the thank-you offer
-
-What the render (`hasPreview`) call returns depends on the `previewFlow` you chose:
-
-- **`checkout` / `email` (server-side pin + replay):** on a hit, the thank-you response contains
-  the same offer and you render it directly — nothing needs to persist in the browser. On a
-  **miss** (the pin expired past its TTL, or the compute call never landed), the render call
-  **falls through to a fresh carousel** rather than the pinned gift — so guard for the offer
-  being different from, or absent relative to, the one shown at checkout.
-- **`client` (no server storage):** the thank-you response comes back with an **empty body**.
-  You render the gift from the offer you cached in `localStorage` on the checkout page.
+[Tracking](#tracking)). It is the same offer shown on the compute page, now attributed to the
+purchase. If `offers` comes back empty, there's no gift for this shopper — render nothing.
 
 ---
 
 ## Response shape
 
-Both calls return the same JSON object — the standard OData response (see
-[OData API](../odata-api) for the complete contract). For Gift with Purchase you request
-`count=1`, so `offers` holds a single offer:
+Preview calls always return **HTTP `200`** with the standard offer-response body — never `204`
+or `404`. See [OData API](../odata-api) for the complete contract.
+
+**Offer present:**
 
 ```jsonc
 {
-  "offers": [ /* one offer for count=1 */ ],
-  "template": 21,            // numeric template id
-  "templateData": { "brandName": "...", "privacyUrl": "..." },
+  "offers": [ { /* ...offer... */ } ],
   "siteStatus": "active",
-  "siteImages": [ /* ... */ ],
-  "withOverlayTrigger": false
+  "template": 10,            // numeric template id
+  "templateData": { /* ... */ },
+  "siteImages": [],
+  "withOverlayTrigger": false,
+  "ttl": 300,
+  "isTestMode": false
 }
 ```
+
+**Empty** (no stored offer, or a suppressed / control shopper):
+
+```jsonc
+{ "offers": [], "siteStatus": "active" }
+```
+
+`offers: []` renders nothing — treat it as "no gift for this shopper," **not** an error.
 
 Each offer carries what you need to render the gift plus its tracking URLs:
 
@@ -181,47 +192,62 @@ Each offer carries what you need to render the gift plus its tracking URLs:
 
 ## Tracking
 
-Tracking is driven by the URLs on the offer object, and is done **on the thank-you page**
-(the checkout preview is not tracked). See [Impression API](../impression-api) and
+Tracking is driven by the URLs on the offer object, and is done **on the render page**
+(the compute-page preview is not tracked). See [Impression API](../impression-api) and
 [Click API](../click-api) for the full event contract.
 
 - **Impression:** issue an unauthenticated `GET` to `beaconUrl` when you display the gift.
 - **Click / redeem:** navigate the shopper to `clickUrl` (the click is recorded on that
   redirect — there is no separate click beacon to fire).
-- **Dismiss:** issue an unauthenticated `GET` to `closeUrl` if the shopper closes the offer.
+- **Dismiss:** issue an unauthenticated `GET` to `closeUrl` if the shopper dismisses the offer.
+
+---
+
+## Linking the two calls
+
+The compute and render calls are tied together **only by `sessionId`** — it's also what links
+the recorded request back to the checkout exposure for attribution. Send the exact same value on
+both.
+
+- **Shopify:** use the `checkoutToken` as `sessionId` — it's the one id present on both the
+  checkout and thank-you pages, and it survives the handoff (`localStorage` does not).
+- `sessionId` must be under 128 characters and may not contain `' " ; \` `` ` `` or `--`.
+- If the two calls happen in different contexts (email → landing page → thank-you), carry the
+  same `sessionId` across all of them.
+
+## Configuration (Falcon-side, not request params)
+
+These are set by Falcon per publisher, never passed in the request:
+
+| Setting | Default | Meaning |
+|---|---|---|
+| Stored-offer TTL | 1 day | How long the computed offer is retained for the render call. |
+| Serve-on-miss | off (empty) | Whether a render miss falls back to a fresh offer instead of an empty response. |
 
 ---
 
 ## Rules
 
-- **`sessionId` is the link.** `previewFlow` requires a `sessionId`, and you must send the exact
-  same value on both calls (a missing `sessionId` returns `400`). Use any opaque string you can
-  reproduce on both pages (e.g. a cart token); it must be under 128 characters and may not
-  contain `' " ; \` `` ` `` or `--`. If checkout and thank-you happen in different contexts
-  (email → landing page → thank-you), carry the same `sessionId` across all of them.
-- **`previewFlow`, `hasPreview`, and `isCheckout` are top-level params**, not `at.*` attributes.
-  Send the same `previewFlow` value on both calls; add `hasPreview=true` only on the render
-  (thank-you) call.
-- **`isCheckout=true` marks a checkout-page event.** Send it on the call that happens on the
-  checkout page so the event is attributed to that surface. Omit it where the call isn't on the
-  checkout page — the thank-you render call, or the first call of an `email` flow that starts
-  somewhere other than checkout.
+- **`sessionId` is the link.** `isPreview` / `hasPreview` (and Checkout placements) require a
+  `sessionId`, and you must send the exact same value on both calls — a missing `sessionId`
+  returns `400`.
+- **`isPreview` and `hasPreview` are top-level params**, not `at.*` attributes. Send
+  `isPreview=true` on the compute call and `hasPreview=true` on the render call.
 - **Auth:** send the publisher Public Key in the `X-Falcon-Public-Key: PUBLIC_KEY` header.
   (`Authorization: Bearer PUBLIC_KEY` is still accepted and takes precedence when both are sent,
   but it is being phased out — prefer `X-Falcon-Public-Key`.)
 - **Use `POST`** and put customer data (`at.*`) in the body; keep routing params
-  (`placementId`, `sessionId`, `count`, `previewFlow`, `hasPreview`, `isCheckout`) in the query
-  string. Send
+  (`placementId`, `sessionId`, `isPreview` / `hasPreview`, `count`) in the query string. Send
   identifiers as **strings** (`"1234"`, not `1234`) — a raw JSON number is silently rounded by
   `JSON.parse` before the server sees it.
 - **Send a real browser-style `User-Agent`** (header or `at.userAgent`) and the shopper's
   `at.clientIp`. Server-to-server calls without these are attributed to your server and get a
   silent `204 No Content` from bot detection.
 - **Send `at.orderid` on both calls** so the purchase joins to the offer.
-- **Make sure the checkout call has completed before the thank-you call.** The thank-you call
-  replays what the checkout call persisted; if it arrives first the offer won't be found (and a
-  server-side flow will fall through to a fresh carousel). The server retries the lookup once
-  after a few seconds, but leave a gap where you can.
+- **Make sure the compute call has completed before the render call.** The render call echoes
+  what the compute call stored; if it arrives first the lookup misses and returns an empty
+  `offers` array. The server retries the lookup once after a few seconds, but leave a gap where
+  you can.
 
 > **Staging:** Use `https://staging-pr-api.falconlabs.us/api/odata` with your staging Public
 > Key while testing. See [Staging Environment](../staging-environment) for the full environment
@@ -231,11 +257,11 @@ Tracking is driven by the URLs on the offer object, and is done **on the thank-y
 
 ## Checklist
 
-1. Confirm you have a publisher Public Key and both placement IDs (checkout + thank-you).
-2. Choose your `previewFlow`: `checkout` (3h), `email` (1 week), or `client` (self-cached).
-3. Generate a stable `sessionId` for the shopper's journey.
-4. Checkout (compute): `POST /api/odata?...&count=1&previewFlow=<flow>&isCheckout=true` → render
-   a non-clickable preview. (Drop `isCheckout=true` if the first call isn't on the checkout page.)
-5. Thank-you (render): `POST /api/odata?...&previewFlow=<flow>&hasPreview=true` (same
-   `sessionId`) → render the redeemable gift and fire impression/dismiss tracking.
-6. Verify the thank-you page returns and shows the same offer and the purchase attributes to it.
+1. Confirm you have a publisher Public Key and both placement IDs. For checkout-event tracking,
+   create the compute placement as a **Checkout placement** (`type = CHECKOUT_PAGE`).
+2. Generate a stable `sessionId` for the shopper's journey (Shopify: use the `checkoutToken`).
+3. Compute: `POST /api/odata?...&isPreview=true` (same `sessionId`) → render a non-clickable
+   preview.
+4. Render: `POST /api/odata?...&hasPreview=true` (same `sessionId`) → render the redeemable gift
+   and fire impression/dismiss tracking. Handle an empty `offers` array as "no gift."
+5. Verify the render page shows the same offer and the purchase attributes to it.
