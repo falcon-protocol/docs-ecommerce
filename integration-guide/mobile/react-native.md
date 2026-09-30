@@ -87,7 +87,7 @@ function newSessionId(): string {
 export function FalconPlacement({
   apiKey,
   placement,
-  host = 'https://promo.falconlabs.us',
+  host = 'https://pr.falconlabs.us',
   embedded = false,
   isSandbox = false,
   attributes,
