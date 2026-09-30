@@ -4,11 +4,11 @@ title: "Mobile Integration"
 
 # Mobile Integration
 
-Falcon Perks can be displayed in native iOS and Android apps using a **WebView**. Your app loads a Falcon-hosted page inside a WebView, and communication between the WebView and your native code happens through a JavaScript bridge.
+Falcon Perks can be displayed in iOS, Android and React Native apps using a **WebView**. Your app loads a Falcon-hosted page inside a WebView, and communication between the WebView and your native code happens through a JavaScript bridge.
 
 ## How it works
 
-1. Your app opens a `WKWebView` (iOS) or `WebView` (Android) pointing to the Falcon WebView URL
+1. Your app opens a `WKWebView` (iOS), `WebView` (Android) or `react-native-webview` `WebView` (React Native) pointing to the Falcon WebView URL
 2. The Falcon UI loads and displays perks inside the WebView
 3. User interactions (clicks, closes) are sent from the WebView to your native app via a JavaScript bridge
 4. Your native code handles these events (e.g., opening click URLs in the system browser)
@@ -31,6 +31,7 @@ The WebView communicates with your native app by sending JSON messages through p
 
 - **iOS**: `window.webkit.messageHandlers.iosNativeListener.postMessage(message)`
 - **Android**: `window.Android.postMessage(JSON.stringify(message))`
+- **React Native**: `window.ReactNativeWebView.postMessage(JSON.stringify(message))`, received in the `WebView`'s `onMessage`
 
 ### Message format
 
@@ -102,6 +103,7 @@ Understanding the full lifecycle of events helps you integrate correctly:
 
 - [iOS Integration](/integration-guide/mobile/ios) - Swift + WKWebView
 - [Android Integration](/integration-guide/mobile/android) - Kotlin + WebView
+- [React Native / Expo Integration](/integration-guide/mobile/react-native) - react-native-webview
 
 ## Requirements
 
@@ -109,6 +111,7 @@ Understanding the full lifecycle of events helps you integrate correctly:
 | --- | --- |
 | iOS | 15.0+ |
 | Android | API 24 (Android 7.0)+ |
+| React Native / Expo | `react-native-webview` (see the [React Native guide](/integration-guide/mobile/react-native#requirements)) |
 
 ## Credentials
 
