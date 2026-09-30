@@ -1,6 +1,6 @@
 ---
 layout: blank-page
-title: Terms and Conditions
+title: disney_de
 ---
 
 ## **Teilnahmebedingungen** or **Angebotsbedingungen**
