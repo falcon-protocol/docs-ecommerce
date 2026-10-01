@@ -4,7 +4,7 @@ title: "Shopify Ad Unit (2.0)"
 
 # Shopify Ad Unit (2.0)
 
-Add the Falcon offers unit to your Shopify app using Preact and Shopify's web components (API version 2026-04). You mount one component, `FalconOffers`, and pass it two required props. It reads the order and the shopper from Shopify, requests offers, and renders them. You pull updates with one command.
+Add the Falcon offers unit to your Shopify app using Preact and Shopify's web components (API version 2026-04). You mount one component, `FalconOffers`, and pass it three required props. It reads the order and the shopper from Shopify, requests offers, and renders them. You pull updates with one command. Two builds ship, `full/` and `lite/`; [§4](#4-what-is-in-the-templates-folder) says which to pick.
 
 From your Falcon contact you need, per environment: a **public key** and **one placement id per surface** (the thank-you page and the order-status page are separate placements).
 
@@ -40,7 +40,7 @@ Each extension needs:
 - Dependencies `preact` and `@preact/signals`.
 - `network_access = true`. The unit calls `/api/odata` and `/api/features/evaluate` on the base URL above, and fires tracking requests for each offer it shows.
 
-The thank-you page and the order-status page are two Shopify extensions, each with its own `shopify.extension.toml` and `tsconfig.json`. Both import the same `preact/` folder.
+The thank-you page and the order-status page are two Shopify extensions, each with its own `shopify.extension.toml` and `tsconfig.json`. Both import the same build folder, `full/` or `lite/` (see [§4](#4-what-is-in-the-templates-folder)).
 
 The unit reads the `shopify` global itself, so your entry file does not need to read it and needs no `shopify.d.ts` for the unit's sake.
 
@@ -118,31 +118,49 @@ npm run falcon:init
 
 ## 4. What is in the templates folder
 
-The `preact/` folder contains:
+Two builds ship, side by side. They take the same props and emit the same events, so moving between them is the import path.
+
+| Folder  | What it is                                                                                                             |
+| ------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `full/` | Everything: Template 15 and 17, the offer overlay, the countdown and redeem card, social proof, experiments. ~11.3 KB. |
+| `lite/` | One self-contained file for integrators with a few kilobytes to spare. Template 15, the carousel, tracking. ~4.0 KB.   |
+
+The `full/` folder contains:
 
 | File              | Description                                   |
 | ----------------- | --------------------------------------------- |
 | `offers.tsx`      | `FalconOffers` — the only file you import     |
 | `renderer.tsx`    | Template routing, overlay, redeem card (int.) |
 | `provider.tsx`    | Configuration (internal)                      |
-| `fallback.tsx`    | Uptic template (internal)                     |
-| `brandcollab.tsx` | Brand Collaboration template (internal)       |
+| `fallback.tsx`    | Template 15 (internal)                        |
+| `brandcollab.tsx` | Template 17 (internal)                        |
 | `attributes.tsx`  | Shopper-attributes context (internal)         |
 | `configs.tsx`     | Shared constants (internal)                   |
 | `utils.tsx`       | Shared utils, hooks and UI (internal)         |
 
 Import `offers.tsx` and nothing else. The other files reference each other by relative path, so sync the whole folder — copying individual files breaks them.
 
+### The lite build
+
+`lite/offers.tsx` is one file with no imports of its own, so you can copy it alone. It makes the offers request and nothing else: no feature-evaluation request, and therefore none of what that request decides. Pick it when your extension bundle is near Shopify's script limit.
+
+What you give up against `full/`: Template 17, the offer overlay, the countdown strip and redeem card, social proof and badges, sitelinks, and every experiment Falcon runs. Template 15 is drawn by hand from the full build's markup, so the unit looks the same. What you keep: the labels in the shopper's language, the attribution row, the final template choice and the first-name greeting, because the server decides those and sends them with the offers. `onError` never fires `features_failed` in this build.
+
+```tsx
+import { FalconOffers } from '<your-preferred-path>/lite/offers';
+```
+
 `CHANGELOG.md` at the root of the folder is the record of what changed in each version. Read it before every sync.
 
 ## 5. `FalconOffers`
 
 ```tsx
-import { FalconOffers } from '<your-preferred-path>/preact/offers';
+import { FalconOffers } from '<your-preferred-path>/full/offers';
 
 <FalconOffers
   publicKey={publicKey}
   placementId={placementId}
+  identity={identity}
   onEvent={track}
   onError={logFalconError}
 />;
@@ -154,14 +172,21 @@ import { FalconOffers } from '<your-preferred-path>/preact/offers';
 interface FalconOffersProps {
   publicKey: string; // Falcon API public key, per environment
   placementId: string; // The placement for this surface (thank-you and order-status are separate placements)
+  identity: Identity; // Hashes you computed — see below
   environment?: 'production' | 'staging'; // Which Falcon API to call; default 'production'
   deny?: DeniableField[]; // Shopper fields Falcon must not collect — see below
   onEvent?: (event: FalconEvent) => void; // Optional, for your analytics — see §7
   onError?: (error: FalconError) => void; // Optional, for your logging — see §7
 }
+
+interface Identity {
+  hashedEmail?: string;
+  hashedPhone?: string;
+  hashedCustomerId?: string;
+}
 ```
 
-Two required props, four optional. That is the entire API.
+Three required props, four optional. That is the entire API.
 
 The shipped files carry no TypeScript types. Copy the interface above into your own code, and copy the event and error types from [§7](#7-events-and-errors).
 
@@ -174,9 +199,187 @@ The public key and the placement id are scoped to one environment and are never 
 
 Mount it once per extension, at the top level of what you render. It renders its own `<s-query-container>`, so do not add one around it. When there is nothing to show it renders nothing; [§7](#7-events-and-errors) lists every case.
 
+### Identifying the shopper
+
+The unit does not hash anything. Shopify's extension sandbox has no Web Crypto, so hashing inside the unit meant shipping the whole SHA-256 algorithm in your bundle; you compute the hashes wherever suits you and pass them in. Every field is optional. Leave one out and it is not sent, and Falcon does not use it.
+
+```tsx
+<FalconOffers
+  publicKey={publicKey}
+  placementId={placementId}
+  identity={{
+    hashedEmail: sha256(normalize(email)),
+    hashedPhone: sha256(normalizePhone(phone)),
+    hashedCustomerId: sha256(customerNumericId),
+  }}
+/>
+```
+
+The rules, which Falcon applies on its own surfaces and which your hashes must match exactly, or a returning shopper is never recognised:
+
+- **SHA-256**, output as lower-case hex.
+- **Email**: trim whitespace, then lower-case. `" Ann@Example.com "` hashes as `ann@example.com`.
+- **Phone**: E.164, digits with a leading `+` and nothing else. `+1 (555) 000-1234` hashes as `+15550001234`.
+- **Customer id**: the bare number as a string. For `gid://shopify/Customer/5` hash `5`, not the `gid://` form.
+
+Check your implementation against this pair before going live: `ann@example.com` must hash to `71d4f55f72fa128dfb468a1a3901507c804b74316488744d769d7f4b16696476`.
+
+Any SHA-256 implementation works — your server, or `crypto.subtle` outside the extension sandbox. Inside it there is no Web Crypto, so here is a self-contained version you can paste as is, normalizers included:
+
+```typescript
+/** Trim, lower-case. `" Ann@Example.com "` → `ann@example.com`. */
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+/** E.164: a leading `+` and digits, nothing else. `+1 (555) 000-1234` → `+15550001234`. */
+export function normalizePhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  return digits ? `+${digits}` : '';
+}
+
+/** The bare number. `gid://shopify/Customer/5` → `5`. */
+export function customerNumericId(gid: string): string {
+  return gid.split('/').pop() ?? '';
+}
+```
+
+And the SHA-256 itself, pure JS for use inside the sandbox:
+
+```typescript
+export function sha256Hex(str: string): string {
+  const K: number[] = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1,
+    0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+    0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
+    0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147,
+    0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+    0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
+    0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a,
+    0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+  ];
+
+  function rotr(n: number, x: number): number {
+    return (x >>> n) | (x << (32 - n));
+  }
+
+  // Convert string to UTF-8 byte array
+  const bytes: number[] = [];
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    if (code < 0x80) {
+      bytes.push(code);
+    } else if (code < 0x800) {
+      bytes.push(0xc0 | (code >> 6), 0x80 | (code & 0x3f));
+    } else if (code >= 0xd800 && code <= 0xdbff) {
+      const next = str.charCodeAt(++i);
+      const cp = ((code - 0xd800) << 10) + (next - 0xdc00) + 0x10000;
+      bytes.push(
+        0xf0 | (cp >> 18),
+        0x80 | ((cp >> 12) & 0x3f),
+        0x80 | ((cp >> 6) & 0x3f),
+        0x80 | (cp & 0x3f),
+      );
+    } else {
+      bytes.push(
+        0xe0 | (code >> 12),
+        0x80 | ((code >> 6) & 0x3f),
+        0x80 | (code & 0x3f),
+      );
+    }
+  }
+
+  // Pre-processing: padding
+  const bitLength = bytes.length * 8;
+  bytes.push(0x80);
+  while (bytes.length % 64 !== 56) {
+    bytes.push(0);
+  }
+
+  // Append length as 64-bit big-endian
+  for (let i = 56; i >= 0; i -= 8) {
+    bytes.push((bitLength / Math.pow(2, i)) & 0xff);
+  }
+
+  // Initialize hash values
+  let h0 = 0x6a09e667;
+  let h1 = 0xbb67ae85;
+  let h2 = 0x3c6ef372;
+  let h3 = 0xa54ff53a;
+  let h4 = 0x510e527f;
+  let h5 = 0x9b05688c;
+  let h6 = 0x1f83d9ab;
+  let h7 = 0x5be0cd19;
+
+  // Process each 512-bit block
+  for (let offset = 0; offset < bytes.length; offset += 64) {
+    const w: number[] = new Array(64);
+
+    for (let i = 0; i < 16; i++) {
+      w[i] =
+        (bytes[offset + i * 4] << 24) |
+        (bytes[offset + i * 4 + 1] << 16) |
+        (bytes[offset + i * 4 + 2] << 8) |
+        bytes[offset + i * 4 + 3];
+    }
+
+    for (let i = 16; i < 64; i++) {
+      const s0 = rotr(7, w[i - 15]) ^ rotr(18, w[i - 15]) ^ (w[i - 15] >>> 3);
+      const s1 = rotr(17, w[i - 2]) ^ rotr(19, w[i - 2]) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+    }
+
+    let a = h0,
+      b = h1,
+      c = h2,
+      d = h3,
+      e = h4,
+      f = h5,
+      g = h6,
+      h = h7;
+
+    for (let i = 0; i < 64; i++) {
+      const S1 = rotr(6, e) ^ rotr(11, e) ^ rotr(25, e);
+      const ch = (e & f) ^ (~e & g);
+      const temp1 = (h + S1 + ch + K[i] + w[i]) | 0;
+      const S0 = rotr(2, a) ^ rotr(13, a) ^ rotr(22, a);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const temp2 = (S0 + maj) | 0;
+
+      h = g;
+      g = f;
+      f = e;
+      e = (d + temp1) | 0;
+      d = c;
+      c = b;
+      b = a;
+      a = (temp1 + temp2) | 0;
+    }
+
+    h0 = (h0 + a) | 0;
+    h1 = (h1 + b) | 0;
+    h2 = (h2 + c) | 0;
+    h3 = (h3 + d) | 0;
+    h4 = (h4 + e) | 0;
+    h5 = (h5 + f) | 0;
+    h6 = (h6 + g) | 0;
+    h7 = (h7 + h) | 0;
+  }
+
+  return [h0, h1, h2, h3, h4, h5, h6, h7]
+    .map((v) => (v >>> 0).toString(16).padStart(8, '0'))
+    .join('');
+}
+```
+
+A missing identifier costs you targeting, not rendering. `hashedEmail` matters most: it is how Falcon recognises a returning shopper across orders. `hashedPhone` and `hashedCustomerId` are the fallbacks when there is no email. Pass none of the three and every order is treated as a new shopper.
+
 ### Denying shopper fields
 
-By default the unit sends what Shopify gives it. Name any field in `deny` and it is dropped before anything leaves the page, including its hash:
+By default the unit sends what Shopify gives it. Name any field in `deny` and it is dropped before anything leaves the page:
 
 ```tsx
 <FalconOffers
@@ -200,9 +403,9 @@ Order facts always travel and cannot be denied: `orderId`, `amount`, `shippingAm
 
 What denying costs you, so the choice is an informed one:
 
-- `email` and `firstName` matter most. The email is how Falcon recognises a returning shopper across orders, and the first name appears in the unit's own copy, so without it the offer reads generically.
-- `phoneNumber` and `customerId` are the fallbacks when there is no email. Deny all three and each order is treated as a new shopper.
-- `country`, `provinceCode` and `billingZipcode` decide which regional campaigns can bid, so denying them narrows the pool of offers.
+- `firstName` appears in the unit's own copy, so without it the offer reads generically.
+- `email`, `phoneNumber` and `customerId` are the raw values. Recognising a returning shopper runs on the hashes you pass in `identity`, so denying the raw field does not by itself stop that; leave the hash out of `identity` too if you want the shopper anonymous.
+- `country`, `provinceCode` and `billingZipcode` decide which regional campaigns are eligible, so denying them narrows the pool of offers.
 - `lastName`, `city`, `shippingZipcode` and `billingAddress` change little on their own.
 
 An unknown name is ignored rather than rejected, so a typo cannot break your checkout. Falcon can also narrow collection from its side, and the two run together: a field travels only when both allow it.
@@ -217,7 +420,7 @@ import '@shopify/ui-extensions/preact';
 
 import { useAppMetafields } from '@shopify/ui-extensions/checkout/preact';
 
-import { FalconOffers } from '../../../falcon-templates/preact/offers';
+import { FalconOffers } from '../../../falcon-templates/full/offers';
 import { logFalconError, track } from '../../../src/falcon/track';
 import { render } from 'preact';
 
@@ -287,9 +490,9 @@ type FalconEvent =
 - `decline` — the shopper declined that offer.
 - `end` — the carousel ran out, or the shopper closed the offer overlay. It can fire more than once per mount, because the unit can restart.
 
-`bannerId` identifies the offer creative. The unit drops double clicks internally, so each `click` and `decline` is one real user action.
+`bannerId` identifies the offer creative. Each `click` and `decline` you receive is one real user action.
 
-Do not fire your own impression pixel. The unit already counts every showing.
+Do not fire your own impression pixel. The unit already reports impressions.
 
 ### Errors
 
@@ -347,7 +550,7 @@ Keep the public key, the placement ids and the environment in one config object 
    - one `GET` for the first offer's tracking URL.
 4. Decline every offer in turn. Each decline fires one more tracking `GET`. After the last one, `onEvent` receives `{ type: 'end' }` and the unit disappears. On some placements a redeem card replaces it instead, and on some the first decline opens the offer overlay. Ask your Falcon contact which of these are switched on for your placements, so you know which outcome is the correct one.
 5. Repeat on the order-status page.
-6. Release build: `environment="production"` (or omit the prop), production public key and placement ids. CI can fetch the folder on its own, see [§11](#11-ci-cd-setup).
+6. Release build: `environment="production"` (or omit the prop), production public key and placement ids. CI can fetch the folder on its own, see [§11](#11-cicd-setup).
 
 The Shopify editor previews the page with a sample order, so the unit renders there too, even before Falcon switches the site live.
 
@@ -442,11 +645,11 @@ Your CI/CD environment has no access to the private repository by default, so th
 
 ## 12. What the unit does for you
 
-It reads the order, the shopper's contact details, the address, the cart lines, the amount and the language from `shopify`, and sends them to `/api/odata`. Email, phone and customer id also travel as SHA-256 hashes for identity matching, and the customer id is sent as a hash only.
+It reads the order, the shopper's contact details, the address, the cart lines, the amount and the language from `shopify`, and sends them to `/api/odata` together with the hashes you passed in `identity`.
 
-It requests offers and configuration, renders the Uptic or Brand Collaboration template Falcon serves for the placement, and runs the carousel. Some placements open the remaining offers in an overlay, and return to the same position when the page loads again after a click. Some shoppers see a countdown strip above the card, and a redeem card once it expires; tapping that card restarts the carousel. Every showing is counted once.
+It requests offers and configuration, renders Template 15 or Template 17 as Falcon serves it for the placement, and runs the carousel. Some placements open the remaining offers in an overlay, and return to the same position when the page loads again after a click. Some shoppers see a countdown strip above the card, and a redeem card once it expires; tapping that card restarts the carousel.
 
-Static labels render in the shopper's language when the configuration request succeeds, and in English when it does not. The unit stores the overlay position and a short-lived configuration cache in Shopify's extension storage.
+Static labels render in the shopper's language when the configuration request succeeds, and in English when it does not.
 
 ## 13. Support
 
