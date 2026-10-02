@@ -78,7 +78,7 @@ class PerksActivity : AppCompatActivity() {
 
     fun loadPerks(apiKey: String, placementId: String) {
         val sessionId = UUID.randomUUID().toString()
-        val url = "https://promo.falconlabs.us/ui/webview" +
+        val url = "https://pr.falconlabs.us/ui/webview" +
             "?placement=$placementId" +
             "&apiKey=$apiKey" +
             "&sessionId=$sessionId"
@@ -132,7 +132,7 @@ Pass user and order attributes to improve offer targeting. Use `Uri.Builder` to 
 ```kotlin
 fun loadPerks(apiKey: String, placementId: String, email: String? = null, firstName: String? = null, orderId: String? = null) {
     val sessionId = UUID.randomUUID().toString()
-    val uri = Uri.parse("https://promo.falconlabs.us/ui/webview").buildUpon()
+    val uri = Uri.parse("https://pr.falconlabs.us/ui/webview").buildUpon()
         .appendQueryParameter("placement", placementId)
         .appendQueryParameter("apiKey", apiKey)
         .appendQueryParameter("sessionId", sessionId)
@@ -216,7 +216,7 @@ class FalconPerksActivity : AppCompatActivity() {
 
         // Build URL with attributes
         val sessionId = UUID.randomUUID().toString()
-        val uri = Uri.parse("https://promo.falconlabs.us/ui/webview").buildUpon()
+        val uri = Uri.parse("https://pr.falconlabs.us/ui/webview").buildUpon()
             .appendQueryParameter("placement", placementId)
             .appendQueryParameter("apiKey", apiKey)
             .appendQueryParameter("sessionId", sessionId)
@@ -291,7 +291,7 @@ If you're using Compose, wrap the WebView in an `AndroidView`:
 fun FalconPerksWebView(apiKey: String, placementId: String) {
     val context = LocalContext.current
     val sessionId = remember { UUID.randomUUID().toString() }
-    val url = "https://promo.falconlabs.us/ui/webview" +
+    val url = "https://pr.falconlabs.us/ui/webview" +
         "?placement=$placementId&apiKey=$apiKey&sessionId=$sessionId"
 
     AndroidView(
