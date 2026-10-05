@@ -6,8 +6,6 @@ title: "Advanced: Custom Attributes"
 
 `at.pubSub1`, `at.pubSub2`, and `at.pubSub3` are optional, free-form pass-through attributes you can append to the [OData ad-serving request](/integration-guide/publisher-integration/odata-api) (`POST /api/odata`) to capture your own dimensions — the kinds of things you may want to break your traffic down by, or that give Falcon additional signal to help understand and optimize it over time. Typical uses are an audience segment or persona, an affiliate ID, a traffic source, or a campaign ID. You decide what each slot means.
 
-They are **pass-through only.** Falcon does not use them for offer targeting, ranking, or any real-time decisioning on the request, and does not treat them as PII.
-
 ## Parameters
 
 - `at.pubSub1` (string, max 100 characters): Opaque, partner-defined custom attribute
