@@ -136,6 +136,16 @@
             {
               "text": "Impression API",
               "link": "/integration-guide/publisher-integration/impression-api"
+            },
+            {
+              "text": "Advanced",
+              "collapsed": true,
+              "items": [
+                {
+                  "text": "Custom Attributes",
+                  "link": "/integration-guide/publisher-integration/advanced/custom-attributes"
+                }
+              ]
             }
           ]
         },
