@@ -222,6 +222,8 @@ interface FalconAdsAttributes {
   subcategory?: string;
   /** Colour scheme of your page. "dark" renders the widget's dark palette */
   theme?: "dark" | "light";
+  /** Background for the dark palette, hex only. Too light a colour is ignored */
+  darkBgColor?: string;
   /** Order total as a string (e.g. "99.99") */
   amount?: string;
   /** Customer first name */

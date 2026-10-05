@@ -270,6 +270,9 @@ interface CustomAttributes {
   // Colour scheme of your page. "dark" renders the widget's dark palette.
   theme?: "dark" | "light";
 
+  // Background for the dark palette, hex only. Too light a colour is ignored.
+  darkBgColor?: string;
+
   // Customer first name.
   firstname?: string;
 

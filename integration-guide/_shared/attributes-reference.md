@@ -27,6 +27,7 @@ Pass user and order data via `attributes` for revenue attribution, offer targeti
 | `ccbin` | Optional | First 6 digits of the credit card number (BIN) | String |
 | `confirmationref` | Optional | Merchant/seller name, or your own internal confirmation reference if separate from `orderId`. Displayed in the offer headline on some templates | String |
 | `theme` | Optional | Colour scheme of the page the widget sits on. Pass `"dark"` when your page uses a dark background so the widget renders its dark palette. Any other value, or omitting it, renders the default light widget | `"dark"` or `"light"` |
+| `darkBgColor` | Optional | Background colour for the widget's dark palette, so the card matches your page. Hex only, three or six digits, with or without the leading hash. Ignored with `theme: "light"`, and ignored when the colour is too light for the widget's white text, in which case the default dark background is used | `"#1B2A4A"` or `"1b2a4a"` |
 
 \* Pass either `hashedEmail` or `email`, not both. If both are present, `hashedEmail` takes priority. Without one of them (or `orderId`), the SDK still loads and displays offers, but there's nothing to match the impression back to the order, so attribution won't work — this isn't enforced as a hard error, so it's easy to miss during testing.
 
