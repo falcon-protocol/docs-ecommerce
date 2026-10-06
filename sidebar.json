@@ -165,6 +165,10 @@
               "link": "/integration-guide/reporting-api"
             },
             {
+              "text": "DSAR API",
+              "link": "/integration-guide/dsar-api"
+            },
+            {
               "text": "Embedded SDK Callbacks",
               "link": "/integration-guide/embedded-sdk-callbacks"
             },
