@@ -200,7 +200,7 @@ Mount it once per extension, at the top level of what you render. It renders its
 
 ### Identifying the shopper
 
-The unit does not hash anything. Shopify's extension sandbox has no Web Crypto, so hashing inside the unit meant shipping the whole SHA-256 algorithm in your bundle; you compute the hashes wherever suits you and pass them in. The prop and every field in it are optional. Leave a field out and it is not sent; leave the prop out and no hashes are sent. Either way the unit still collects the raw identifiers, and Falcon hashes those itself by the same rules, as the next section describes.
+You don't have to hash anything. The unit sends the raw email and phone, and Falcon hashes them itself. Pass hashes in `identity` only when you deny the raw value but still want Falcon to recognise a returning shopper. The prop and every field in it are optional, and a hash you pass takes priority over the raw value. The unit itself hashes nothing, because Shopify's extension sandbox has no Web Crypto; compute the hashes wherever suits you.
 
 ```tsx
 <FalconOffers
