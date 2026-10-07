@@ -43,6 +43,6 @@ const [activeOfferIndex, setActiveOfferIndex] = useState(0);
 
 Three things to check after the swap:
 
-- **Identity.** `identity` is required. Pass the hashes you were already sending as `at.hashedEmail`, `at.hashedPhone` and `at.hashedCustomerShopifyId`; the rules in [Identifying the shopper](./shopify-ad-unit-2#identifying-the-shopper) are the ones you were following.
+- **Identity.** Pass the hashes you were already sending as `at.hashedEmail` and `at.hashedPhone`; the rules in [Identifying the shopper](./shopify-ad-unit-2#identifying-the-shopper) are the ones you were following. Stop hashing the customer id: the unit now sends it as is.
 - **Impressions.** The unit reports impressions itself. Drop any you fire server-side and read the `impression` event from `onEvent` instead.
 - **Session ids.** The format changed, and nothing on your side depends on it. Sessions from before the migration simply look different in reports.
