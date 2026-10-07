@@ -200,7 +200,7 @@ Mount it once per extension, at the top level of what you render. It renders its
 
 ### Identifying the shopper
 
-The unit does not hash anything. Shopify's extension sandbox has no Web Crypto, so hashing inside the unit meant shipping the whole SHA-256 algorithm in your bundle; you compute the hashes wherever suits you and pass them in. The prop and every field in it are optional. Leave a field out and it is not sent; leave the prop out and no hashes are sent. Either way the unit still collects the raw identifiers, as the next section describes.
+The unit does not hash anything. Shopify's extension sandbox has no Web Crypto, so hashing inside the unit meant shipping the whole SHA-256 algorithm in your bundle; you compute the hashes wherever suits you and pass them in. The prop and every field in it are optional. Leave a field out and it is not sent; leave the prop out and no hashes are sent. Either way the unit still collects the raw identifiers, and Falcon hashes those itself by the same rules, as the next section describes.
 
 ```tsx
 <FalconOffers
@@ -367,7 +367,7 @@ export function sha256Hex(str: string): string {
 }
 ```
 
-A missing identifier costs you targeting, not rendering. `hashedEmail` matters most: it is how Falcon recognises a returning shopper across orders. `hashedPhone` is the fallback when there is no email. Pass neither and every order is treated as a new shopper.
+A missing identifier costs you targeting, not rendering. `hashedEmail` matters most: it is how Falcon recognises a returning shopper across orders. `hashedPhone` is the fallback when there is no email. When you pass no hash but the raw value is sent, Falcon hashes it itself by these rules. With neither the hash nor the raw value, every order is treated as a new shopper.
 
 ### Denying shopper fields
 
@@ -396,7 +396,7 @@ Order facts always travel and cannot be denied: `orderId`, `amount`, `shippingAm
 What denying costs you, so the choice is an informed one:
 
 - `firstName` appears in the unit's own copy, so without it the offer reads generically.
-- `email` and `phoneNumber` are the raw values. Recognising a returning shopper runs on the hashes you pass in `identity`, so denying the raw field does not by itself stop that; leave the hash out of `identity` too if you want the shopper anonymous.
+- `email` and `phoneNumber` are the raw values. Falcon recognises a returning shopper by the hash you pass in `identity`, or by hashing the raw value itself. Denying the raw field does not stop recognition while you still pass its hash; leave the hash out of `identity` too if you want the shopper anonymous.
 - `customerId` travels as is and has no hash. Denying it removes it completely.
 - `country`, `provinceCode` and `billingZipcode` decide which regional campaigns are eligible, so denying them narrows the pool of offers.
 - `lastName`, `city`, `shippingZipcode` and `billingAddress` change little on their own.
@@ -407,7 +407,7 @@ What denying costs you, so the choice is an informed one:
 | ------------------ | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Sent               | Passed            | Both. The fullest targeting.                                                                                         |
 | Denied             | Passed            | The hash only. Falcon still recognises a returning shopper without ever receiving the raw value. Often the best fit. |
-| Sent               | Not passed        | The raw value only. Targeting works for this order, but the shopper is not matched across orders.                    |
+| Sent               | Not passed        | The raw value. Falcon hashes it itself, so the shopper is still recognised across orders.                            |
 | Denied             | Not passed        | Nothing. The shopper is anonymous to Falcon.                                                                         |
 
 An unknown name is ignored rather than rejected, so a typo cannot break your checkout. Falcon can also narrow collection from its side, and the two run together: a field travels only when both allow it.
