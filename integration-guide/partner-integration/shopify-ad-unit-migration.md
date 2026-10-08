@@ -8,7 +8,7 @@ This guide is for partners already running a 1.x integration. For a first-time s
 
 Delete from your code:
 
-- The offers request (`/api/odata`) and the session id. Keep your hashing: the unit no longer hashes, you pass the hashes in `identity`.
+- The offers request (`/api/odata`) and the session id. If you hash email and phone today, keep it and pass the hashes in `identity`. Hashing is optional: without it, Falcon hashes the raw values itself.
 - `FeatureManagementProvider`, its `userContext`, `storage`, `extensionTarget`, `apiEndpoint`, `loadingElement` and `disableClientImpressions`.
 - `Renderer` and every prop you passed it: `offers`, `activeOffer`, `activeOfferIndex`, `reachedEndOfOffers`, `clickOffer`, `handleNoThanks`, `onOverlayDismissed`, `onRestartOffers`, `siteImages`, `withOverlayTrigger`, `templateId`, `templateData`, `extensionTarget`, `firstName`, `email`, `language`.
 - Your carousel state and the `<s-query-container>` around the unit.

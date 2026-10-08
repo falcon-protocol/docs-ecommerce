@@ -236,11 +236,19 @@
               "link": "/integration-guide/partner-integration/reporting-api"
             },
             {
-              "text": "Shopify Ad Unit (1.x)",
+              "text": "Shopify Ad Unit (2.0)",
+              "link": "/integration-guide/partner-integration/shopify-ad-unit-2"
+            },
+            {
+              "text": "Migrating to Shopify Ad Unit 2.0",
+              "link": "/integration-guide/partner-integration/shopify-ad-unit-migration"
+            },
+            {
+              "text": "Shopify Ad Unit (1.x, legacy)",
               "link": "/integration-guide/partner-integration/shopify-ad-unit-1"
             },
             {
-              "text": "Shopify Ad Unit — Integration Guide",
+              "text": "Shopify Ad Unit 1.x — Integration Guide (legacy)",
               "link": "/integration-guide/partner-integration/shopify-ad-unit-integration-guide"
             },
             {
