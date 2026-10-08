@@ -244,14 +244,6 @@
               "link": "/integration-guide/partner-integration/shopify-ad-unit-migration"
             },
             {
-              "text": "Shopify Ad Unit (1.x, legacy)",
-              "link": "/integration-guide/partner-integration/shopify-ad-unit-1"
-            },
-            {
-              "text": "Shopify Ad Unit 1.x — Integration Guide (legacy)",
-              "link": "/integration-guide/partner-integration/shopify-ad-unit-integration-guide"
-            },
-            {
               "text": "Complete Custom Integration Example",
               "link": "/integration-guide/partner-integration/complete-integration-example"
             },
