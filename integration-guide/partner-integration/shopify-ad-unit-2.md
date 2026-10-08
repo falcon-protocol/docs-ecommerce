@@ -120,10 +120,10 @@ npm run falcon:init
 
 Two builds ship, side by side. They take the same props and emit the same events, so moving between them is the import path.
 
-| Folder  | What it is                                                                                                             |
-| ------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `full/` | Everything: Template 15 and 17, the offer overlay, the countdown and redeem card, social proof, experiments. ~11.3 KB. |
-| `lite/` | One self-contained file for integrators with a few kilobytes to spare. Template 15, the carousel, tracking. ~4.0 KB.   |
+| Folder  | What it is                                                                     |
+| ------- | ------------------------------------------------------------------------------ |
+| `full/` | The default. Use it unless your extension is near Shopify's script size limit. |
+| `lite/` | One self-contained file, for extensions near Shopify's script size limit.      |
 
 The `full/` folder contains:
 
@@ -142,9 +142,7 @@ Import `offers.tsx` and nothing else. The other files reference each other by re
 
 ### The lite build
 
-`lite/offers.tsx` is one file with no imports of its own, so you can copy it alone. It makes the offers request and nothing else: no feature-evaluation request, and therefore none of what that request decides. Pick it when your extension bundle is near Shopify's script limit.
-
-What you give up against `full/`: Template 17, the offer overlay, the countdown strip and redeem card, social proof and badges, sitelinks, and every experiment Falcon runs. Template 15 is drawn by hand from the full build's markup, so the unit looks the same. What you keep: the labels in the shopper's language, the attribution row, the final template choice and the first-name greeting, because the server decides those and sends them with the offers. `onError` never fires `features_failed` in this build.
+`lite/offers.tsx` is one file with no imports of its own, so you can copy it alone. Use it only when your extension is near Shopify's script size limit, because it leaves out part of what `full/` renders. `onError` never fires `features_failed` in this build.
 
 ```tsx
 import { FalconOffers } from '<your-preferred-path>/lite/offers';
