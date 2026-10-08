@@ -142,7 +142,7 @@ Import `offers.tsx` and nothing else. The other files reference each other by re
 
 ### The lite build
 
-`lite/offers.tsx` is one file with no imports of its own, so you can copy it alone. Use it only when your extension is near Shopify's script size limit, because it leaves out part of what `full/` renders. `onError` never fires `features_failed` in this build.
+`lite/offers.tsx` is one file with no imports of its own, so you can copy it alone. Use it only when your extension is near Shopify's script size limit, because it leaves out part of what `full/` renders. Lite always draws Template 15 and has no offer overlay. `onError` never fires `features_failed` in this build.
 
 ```tsx
 import { FalconOffers } from '<your-preferred-path>/lite/offers';
