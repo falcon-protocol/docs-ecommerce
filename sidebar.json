@@ -264,6 +264,10 @@
               "collapsed": true,
               "items": [
                 {
+                  "text": "Shopify SDK 2.0 Advanced Features",
+                  "link": "/integration-guide/partner-integration/advanced/shopify-ad-unit-2-advanced"
+                },
+                {
                   "text": "Embedded SDK Callbacks",
                   "link": "/integration-guide/partner-integration/advanced/embedded-sdk-callbacks"
                 },
