@@ -16,7 +16,7 @@ Falcon Perks can be displayed in iOS, Android and React Native apps using a **We
 ## WebView URL
 
 ```text
-https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&sessionId=SESSION_ID
+https://pr.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&sessionId=SESSION_ID
 ```
 
 | Parameter | Required | Description |
@@ -59,7 +59,7 @@ When you receive a `click` event, open the `clickUrl` in the system browser or a
 You can pass user and order attributes to improve offer targeting and personalization. Attributes are passed as `at.*` query parameters on the WebView URL:
 
 ```text
-https://promo.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&sessionId=SESSION_ID&at.email=user@example.com&at.firstname=John&at.country=US&at.orderId=ORD-123&at.amount=99.99
+https://pr.falconlabs.us/ui/webview?placement=PLACEMENT_ID&apiKey=API_KEY&sessionId=SESSION_ID&at.email=user@example.com&at.firstname=John&at.country=US&at.orderId=ORD-123&at.amount=99.99
 ```
 
 | Parameter | Description |

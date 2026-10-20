@@ -57,7 +57,7 @@ class FalconPerksViewController: UIViewController, WKScriptMessageHandler {
 ```swift
 func loadPerks(apiKey: String, placementId: String) {
     let sessionId = UUID().uuidString
-    let urlString = "https://promo.falconlabs.us/ui/webview"
+    let urlString = "https://pr.falconlabs.us/ui/webview"
         + "?placement=\(placementId)"
         + "&apiKey=\(apiKey)"
         + "&sessionId=\(sessionId)"
@@ -105,7 +105,7 @@ Pass user and order attributes to improve offer targeting. Build the URL using `
 ```swift
 func loadPerks(apiKey: String, placementId: String, email: String?, firstName: String?, orderId: String?) {
     let sessionId = UUID().uuidString
-    var components = URLComponents(string: "https://promo.falconlabs.us/ui/webview")!
+    var components = URLComponents(string: "https://pr.falconlabs.us/ui/webview")!
     components.queryItems = [
         URLQueryItem(name: "placement", value: placementId),
         URLQueryItem(name: "apiKey", value: apiKey),
@@ -182,7 +182,7 @@ class FalconPerksViewController: UIViewController,
 
         // Build URL with attributes
         let sessionId = UUID().uuidString
-        var components = URLComponents(string: "https://promo.falconlabs.us/ui/webview")!
+        var components = URLComponents(string: "https://pr.falconlabs.us/ui/webview")!
         components.queryItems = [
             URLQueryItem(name: "placement", value: placementId),
             URLQueryItem(name: "apiKey", value: apiKey),
