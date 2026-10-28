@@ -116,6 +116,37 @@ FalconGeneralSDK.init({
 - **`isPreview` is enough.** You don't need `isCheckout` or `count`.
 - **`sessionId` rules.** Required on both calls (a missing one returns `400`). Use any opaque string under 128 characters that doesn't contain `'` `"` `;` `\` `` ` `` or `--`.
 
+## Preload for Slow Connections
+
+On a slow mobile connection, most of the wait after `init()` is the ad frame itself loading. If you know an offer may follow, call `preload()` earlier, for example when the page loads or while the shopper fills in a form. It loads the ad frame in the background. It does not request offers, show anything or count an impression.
+
+```javascript
+// Early, while the shopper is still on the page
+FalconGeneralSDK.preload({
+  apiKey: "YOUR_API_KEY",
+  containerId: "falcon-ads-container",
+  placementId: "YOUR_PLACEMENT_ID",
+});
+
+// Later, after the conversion
+FalconGeneralSDK.init({
+  apiKey: "YOUR_API_KEY",
+  containerId: "falcon-ads-container", // same container as preload()
+  placementId: "YOUR_PLACEMENT_ID",    // same placement as preload()
+  attributes: { orderId: "ORD-123456" },
+});
+```
+
+`init()` with the same `placementId` and `containerId` reuses the preloaded frame, so only the offer request and the render are left. `preload()` is optional. Without it, `init()` works exactly as before.
+
+**Things to know:**
+
+- **Keep the same container.** It must be in the DOM when you call `preload()`, and it must be the same element you later pass to `init()`. It can stay hidden until then. Don't move it or re-create it, because a moved frame reloads from scratch.
+- **Pass attributes to `init()`.** `preload()` takes no attributes. Order and customer data go to `init()` as usual.
+- **Works with Fetch First, Render Later.** Call `preload()` before the fetch, then `init()` with `hasPreview: true` as described [above](#fetch-first-render-later).
+- **Call it once per placement.** A second `preload()` for the same placement replaces the first.
+- **Failures are harmless.** If the frame can't load in the background, `preload()` logs `[FalconGeneralSDK] Preload failed` and `init()` loads it as usual.
+
 ## Migrating from the Unified SDK
 
 | | Unified | General |
@@ -159,6 +190,21 @@ The method is fire-and-forget (`Promise<void>`). Errors are caught and logged to
 - `[FalconGeneralSDK] Authentication failed`
 - `[FalconGeneralSDK] Connection failed`
 - `[FalconGeneralSDK] Init failed`
+- `[FalconGeneralSDK] Preload failed`
+- `[Falcon] init() was called again for placement "{id}"`: a second `init()` replaced the unit already on the page. Call `init()` once per placement per page view.
+
+### `FalconGeneralSDK.preload(config)`
+
+```typescript
+FalconGeneralSDK.preload({
+  apiKey: string;      // Required
+  containerId: string; // Required — must exist in DOM, same container you pass to init()
+  placementId: string; // Required — same placement you pass to init()
+  sessionId?: string;  // Optional — init() can still set or replace it
+});
+```
+
+Optional. Loads the ad frame ahead of `init()`, see [Preload for Slow Connections](#preload-for-slow-connections). Like `init()`, it returns `Promise<void>`, catches its own errors and never breaks your page.
 
 ### `sessionId`
 
@@ -171,7 +217,13 @@ It is also required for [Fetch First, Render Later](#fetch-first-render-later), 
 ```typescript
 declare const FalconGeneralSDK: {
   init(config: FalconGeneralSDKConfig): Promise<void>;
+  preload(config: FalconGeneralSDKPreloadConfig): Promise<void>;
 };
+
+type FalconGeneralSDKPreloadConfig = Pick<
+  FalconGeneralSDKConfig,
+  "apiKey" | "containerId" | "placementId" | "sessionId"
+>;
 
 interface FalconGeneralSDKConfig {
   apiKey: string;
