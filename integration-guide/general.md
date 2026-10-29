@@ -147,6 +147,14 @@ FalconGeneralSDK.init({
 - **Call it once per placement.** A second `preload()` for the same placement replaces the first.
 - **Failures are harmless.** If the frame can't load in the background, `preload()` logs `[FalconGeneralSDK] Preload failed` and `init()` loads it as usual.
 
+## Loading the SDK More Than Once
+
+Several apps in one store can each load the SDK on the same page. You don't need your own guard for that.
+
+- **A second copy of the script keeps the first.** The page has one `FalconGeneralSDK`, and every caller works with the same units.
+- **A second `init()` for the same order keeps the unit.** Same `placementId` and same `attributes.orderId` while the unit is on the page: nothing reloads and no second offer request is made. Without an `orderId`, or with a different one, `init()` replaces the unit, so a single-page app can move on to the next order.
+- **AMD loaders are fine.** On pages with RequireJS, such as Wix sites, `window.FalconGeneralSDK` is set as usual, and `require(['FalconGeneralSDK'])` returns the same object.
+
 ## Migrating from the Unified SDK
 
 | | Unified | General |
@@ -191,7 +199,9 @@ The method is fire-and-forget (`Promise<void>`). Errors are caught and logged to
 - `[FalconGeneralSDK] Connection failed`
 - `[FalconGeneralSDK] Init failed`
 - `[FalconGeneralSDK] Preload failed`
-- `[Falcon] init() was called again for placement "{id}"`: a second `init()` replaced the unit already on the page. Call `init()` once per placement per page view.
+- `[Falcon] init() was called again for placement "{id}"`: a second `init()` replaced the unit already on the page. Call `init()` once per placement per page view, or pass the same `orderId` to keep the unit.
+- `[Falcon] init() was called again for placement "{id}" and the same order`: the unit already on the page was kept.
+- `[Falcon] FalconGeneralSDK was loaded more than once on this page`: the first copy of the script is kept.
 
 ### `FalconGeneralSDK.preload(config)`
 
