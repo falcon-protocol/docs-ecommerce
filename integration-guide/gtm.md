@@ -159,7 +159,7 @@ A Custom HTML tag runs no consent checks by default. To gate it, open **Advanced
 
 **The tag fires but no script is requested.** The container element was missing when the tag ran. Move the trigger later: DOM Ready, or your platform's order event.
 
-**The script loads but nothing renders.** Check the global name — `falcon-general-sdk.js` defines `FalconGeneralSDK`. If your page also loads RequireJS or another AMD loader, load the SDK outside GTM instead.
+**The script loads but nothing renders.** Check the global name — `falcon-general-sdk.js` defines `FalconGeneralSDK`.
 
 **Offers render but revenue is not attributed.** `orderId` was empty when the tag fired. Switch to the order event trigger, and check `orderId` for `#` and spaces.
 
