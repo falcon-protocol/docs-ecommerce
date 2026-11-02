@@ -8,6 +8,8 @@ title: "Embedded Web Integration"
 
 The Falcon SDK supports **embedded mode**, which renders promotional content directly within a container on your webpage, rather than as a fullscreen overlay. This allows for seamless integration of offers within your existing page layout (e.g., order confirmation pages, account dashboards, checkout flows).
 
+> **See also:** [Falcon PerkWall](/integration-guide/falcon-perkwall) — a branded perks page of up to 10 offers that you can drop in as an embedded block using this same integration.
+
 ## Quick Integration Guide
 
 ### Step 1: Get Your SDK Key

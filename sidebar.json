@@ -179,6 +179,10 @@
             {
               "text": "Falcon Rewarded Perks",
               "link": "/integration-guide/falcon-rewarded-perks"
+            },
+            {
+              "text": "Falcon PerkWall",
+              "link": "/integration-guide/falcon-perkwall"
             }
           ]
         },

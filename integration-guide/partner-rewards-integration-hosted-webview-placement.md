@@ -5,6 +5,8 @@ description: Falcon Partner Rewards is a hosted page that presents relevant offe
 
 # Partner Rewards: Webview Integration
 
+> **See also:** [Falcon PerkWall](/integration-guide/falcon-perkwall) — a branded perks page of up to 10 offers that you load as a hosted webview placement, just like this one.
+
 ## Before you begin
 
 The placement uses two identifiers, both preconfigured on the Falcon side and provided by your Falcon Labs account manager:
