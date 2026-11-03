@@ -34,7 +34,7 @@ title: "Frequently Asked Questions"
 
 ### Q: Do I need to implement impression tracking?
 
-**A**: Yes, call the `beaconUrl` when an offer is displayed to track impressions. This is critical for accurate reporting and campaign optimization.
+**A**: Yes, call the `beaconUrl` when an offer is displayed to track impressions. Since 15 August 2026 an order is only counted as a transaction if its offer was actually seen, so if you do not report impressions your transactions will not be counted at all. See [How transactions are counted](/integration-guide/partner-integration/reporting-api#how-transactions-are-counted).
 
 ### Q: Why am I only seeing test/mock offers instead of real ones?
 

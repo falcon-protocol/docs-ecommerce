@@ -73,7 +73,7 @@ The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) 
 | --- | --- | --- | --- |
 | `date` | string | Always | Format depends on `breakdownBy` — see below |
 | `clicks` | number | Always | Number of clicks on offers |
-| `transactions` | number | Always | Event count of requests that resulted in postback/conversion tracking |
+| `transactions` | number | Always | Orders attributed to your placements where the offer was actually seen — see [How transactions are counted](#how-transactions-are-counted) |
 | `revenue` | number | Always | Revenue generated. This is the only revenue field returned |
 | `site` | string | Always | Site name |
 | `siteId` | string | Always | |
@@ -82,6 +82,29 @@ The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) 
 | `country` | string \| null | When grouped by `COUNTRY` | ISO country code, or `null` when unknown |
 
 > **`date` format:** when `breakdownBy` is `NONE` (the default), `date` is the report's start date in `YYYY-MM-DD` form (e.g. `"2024-01-01"`). For any time breakdown (`DAY`, `WEEK`, `MONTH`), `date` is formatted as `DD/MM/YYYY` (e.g. `"15/01/2024"`).
+
+### How transactions are counted
+
+A `transactions` row counts an order **only if the offer was actually shown to the shopper on that order's ad request**:
+
+- **Web SDK** — the offer must have been *viewed*, meaning it met the IAB/MRC standard of at least 50% of the creative visible for at least one second. An offer that rendered below the fold and was never scrolled to does **not** count.
+- **All other integrations** — the offer must have registered an impression.
+
+An order placed on a page where the offer never rendered, or never came into view, is not counted.
+
+**Effective 15 August 2026.** Reports covering dates before then use the previous definition, which counted every attributed order regardless of whether the offer was seen. Historical figures have not been restated, so a report spanning that date contains both definitions.
+
+**What changed for you.** Reported transaction counts are lower from that date, and because revenue is unaffected, revenue-per-transaction is correspondingly higher. Your revenue does not change as a result of this. The size of the shift depends on how much of your traffic saw the offer.
+
+If your transaction counts dropped further than you expected, the usual cause is impressions not being reported — see [Making sure your impressions are counted](#making-sure-your-impressions-are-counted).
+
+### Making sure your impressions are counted
+
+Because transactions now depend on impressions, an integration that does not report impressions reliably will under-report transactions.
+
+- If you call the ad-serving API directly, you must call the offer's `beaconUrl` when the offer is displayed. Skipping it means the order is not counted as a transaction.
+- If you have set `disableClientImpressions`, confirm your server-side impression calls are firing for every displayed offer.
+- On Web SDK, offers rendered outside the viewport will not reach the viewed threshold. Placements positioned below the fold will legitimately show fewer transactions than the number of orders.
 
 ### Example Requests
 
@@ -115,7 +138,7 @@ The response is a bare array of row objects:
   {
     "date": "15/01/2024",
     "clicks": 85,
-    "transactions": 1250,
+    "transactions": 980,
     "revenue": 450.5,
     "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
     "placement": "Thank You Page Placement",
@@ -126,7 +149,7 @@ The response is a bare array of row objects:
   {
     "date": "16/01/2024",
     "clicks": 96,
-    "transactions": 1420,
+    "transactions": 1115,
     "revenue": 562.75,
     "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
     "placement": "Thank You Page Placement",
