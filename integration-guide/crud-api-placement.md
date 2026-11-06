@@ -1004,7 +1004,7 @@ curl -X POST http://localhost:4000/api/placements \
 - **Site Relationship**: Placements belong to sites (many-to-one)
 - **Publisher Relationship**: Placements are accessible through publisher ownership of sites
 - **Template System**: Placements use integer-based templates (1-15) for UI configuration
-- **Epom Integration**: Placements integrate with Epom ad network for ad serving
+- **Ad Serving**: Live placements are set up for ad serving automatically
 - **Test Mode**: `isLiveMode` determines whether placement serves live or test ads
 
 ## Special Notes
