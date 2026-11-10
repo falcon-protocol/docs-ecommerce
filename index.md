@@ -27,5 +27,8 @@ features:
   - title: Other Integrations
     details: Explore our full range of integration options.
     link: /integration-guide/overview
+  - title: For Advertisers
+    details: Features advertisers can use on the Falcon ads network.
+    link: /advertisers/overview
 ---
 
