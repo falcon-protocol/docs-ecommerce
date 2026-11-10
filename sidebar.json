@@ -284,6 +284,34 @@
           ]
         }
       ]
+    },
+    {
+      "text": "For Advertisers",
+      "link": "/advertisers/overview",
+      "items": [
+        {
+          "text": "Overview",
+          "link": "/advertisers/overview"
+        },
+        {
+          "text": "Suppression Lists",
+          "link": "/advertisers/suppression-lists/overview",
+          "items": [
+            {
+              "text": "Overview",
+              "link": "/advertisers/suppression-lists/overview"
+            },
+            {
+              "text": "Sending Your List",
+              "link": "/advertisers/suppression-lists/delivery"
+            },
+            {
+              "text": "File Format Reference",
+              "link": "/advertisers/suppression-lists/file-format"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
