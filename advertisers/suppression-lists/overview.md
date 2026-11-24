@@ -32,8 +32,9 @@ shopper whose email matches one of those hashes.
 
 ## How it works
 
-1. **Falcon sets you up.** You receive your advertiser ID, an upload location in
-   Amazon S3, and credentials that can write to it.
+1. **You set up access.** You give Falcon an identity from your own AWS
+   account, and Falcon gives you a role that identity can assume to upload,
+   along with your advertiser ID and upload location in Amazon S3.
 2. **You upload CSV files.** Each file holds SHA-256 hashes of customer emails.
    See [Sending Your List](/advertisers/suppression-lists/delivery) and the
    [File Format Reference](/advertisers/suppression-lists/file-format).
@@ -76,10 +77,16 @@ upload it, and use diffs for day-to-day changes.
   before storing it. The hashes you send are never stored or transmitted in
   their original form, and the ad-serving system can't reverse the stored
   values.
-- **Isolated upload location.** The upload bucket blocks public access and
-  encrypts files at rest with server-side encryption (SSE-S3, AES-256). Each
-  advertiser's upload location is isolated from every other advertiser's, and
-  your credentials can only write to your own location.
+- **Access through your own AWS account.** You upload from an identity in your
+  own AWS account that you manage. Falcon doesn't issue shared or long-lived
+  keys.
+- **Isolated upload location.** The upload bucket blocks public access,
+  requires HTTPS for every request, and encrypts files at rest with
+  server-side encryption (SSE-S3, AES-256). Each advertiser's upload location
+  is isolated from every other advertiser's, and your access can only write to
+  your own location.
+- **Short-lived files.** Falcon deletes uploaded files from the bucket shortly
+  after upload.
 
 For how Falcon handles personal data more generally, see the
 [Privacy Policy](/terms/privacy).
@@ -104,7 +111,7 @@ customers until Falcon removes it.
 
 ## Next steps
 
-- [Sending Your List](/advertisers/suppression-lists/delivery): credentials,
+- [Sending Your List](/advertisers/suppression-lists/delivery): access setup,
   upload location, and file naming.
 - [File Format Reference](/advertisers/suppression-lists/file-format): CSV
   format, hashing, examples, and validation rules.
