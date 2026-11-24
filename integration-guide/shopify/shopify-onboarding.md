@@ -20,9 +20,13 @@ Click **Next**. Already on Falcon? Click **link your store** instead.
 
 Enter your name and email, then accept the [Privacy Policy](https://falconlabs.us/privacy) and [Terms of Service](https://www.falconlabs.us/publisher-agreement). This creates your Falcon account.
 
+![Step 2: Your details](./images/2.png)
+
 ### Step 3: Store category
 
 Pick your main category, then your subcategory.
+
+![Step 3: Store category](./images/3.png)
 
 ### Step 4: Shopper audience (optional)
 
