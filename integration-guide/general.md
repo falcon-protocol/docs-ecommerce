@@ -107,9 +107,9 @@ FalconGeneralSDK.init({
 
 **Things to know:**
 
-- **Server-side replay is automatic.** The fetched offer is stored server-side by default (no setup needed) and the render step replays it.
+- **One-time setup.** Ask the Falcon team to enable server-side preview replay for your publisher. Without it, the render step comes back empty.
 - **Fetching without rendering is free.** A fetched offer that is never rendered records no order and no impression, so it does not affect your reporting.
-- **Replay window.** The fetched offer is held server-side for a server-controlled window (default 1 day). Render within it. After it expires — or if the fetch never ran — the render step comes back empty, so handle `onReady(false)`. (Falcon can optionally enable serving a fresh offer on a miss per publisher; it's off by default, and such an offer may differ from the one you fetched.)
+- **Replay window.** The fetched offer is held server-side for a window configured for your publisher. Render within it. After it expires, the render step requests a fresh offer instead, which may differ from the one you fetched or be empty, so handle `onReady(false)`.
 - **Render speed.** The render step reuses the offer you already fetched, so it is fast, but it still loads the ad frame. Add the SDK `<script>` when the page loads rather than when you open your modal, and reveal the ad area on `onReady(true)`.
 - **Rendering inside your own UI.** If the offer must render inside your container (for example in a modal) rather than as an overlay, tell the Falcon team so your placement is configured as embedded.
 - **Calling from your server instead.** Send the shopper's IP and user agent as `at.clientIp` and `at.userAgent` in the body. Otherwise the request looks like it comes from your server and bot detection returns `204 No Content`.
