@@ -38,7 +38,7 @@ Back in the app, click **Check Status**. Once a block shows **Connected**, click
 
 ![Step 5: Place offers](./images/onboarding/5-place-offers.png)
 
-Here's a video walkthrough of the Shopify Checkout Blocks step!
+Here's a video walkthrough of the Place Offers step!
 
 <video controls preload="metadata" playsinline style="width: 100%; border-radius: 8px;" src="https://d3n0ck9hnfafu5.cloudfront.net/onboardingAssets/Falcon_Shopify_Onboarding_Step5_Adding_Blocks_V3.mp4" poster="https://d3n0ck9hnfafu5.cloudfront.net/onboardingAssets/Falcon_Shopify_Onboarding_Step5_Adding_Blocks_Poster_V2.jpg"></video>
 
