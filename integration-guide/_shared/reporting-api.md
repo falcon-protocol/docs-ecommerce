@@ -67,7 +67,7 @@ GET /api/report
 
 The endpoint returns a **bare JSON array** of report rows. There is no `data` wrapper and no `summary` object — totals and averages are not computed by the API. Each element of the array is a single row.
 
-The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) are present on every row. The remaining fields appear only under the conditions noted below.
+The core fields (`date`, `clicks`, `transactions`, `revenue`, `adUnitDisplays`, `site`, `siteId`) are present on every row. The remaining fields appear only under the conditions noted below.
 
 | Field | Type | Present when | Notes |
 | --- | --- | --- | --- |
@@ -75,6 +75,7 @@ The core fields (`date`, `clicks`, `transactions`, `revenue`, `site`, `siteId`) 
 | `clicks` | number | Always | Number of clicks on offers |
 | `transactions` | number | Always | Event count of requests that resulted in postback/conversion tracking |
 | `revenue` | number | Always | Revenue generated. This is the only revenue field returned |
+| `adUnitDisplays` | number \| null | Always | Number of times the ad unit was displayed. See [Ad unit displays](#ad-unit-displays) |
 | `site` | string | Always | Site name |
 | `siteId` | string | Always | |
 | `placement` | string | On `PLACEMENT` reports | Placement name |
@@ -117,6 +118,7 @@ The response is a bare array of row objects:
     "clicks": 85,
     "transactions": 1250,
     "revenue": 450.5,
+    "adUnitDisplays": 1310,
     "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
     "placement": "Thank You Page Placement",
     "siteId": "clx0s1t2e3i4d5x6y7z8",
@@ -128,6 +130,7 @@ The response is a bare array of row objects:
     "clicks": 96,
     "transactions": 1420,
     "revenue": 562.75,
+    "adUnitDisplays": 1495,
     "placementId": "clx4d5e6f7g8h9i0j1k2l3m4n",
     "placement": "Thank You Page Placement",
     "siteId": "clx0s1t2e3i4d5x6y7z8",
@@ -138,6 +141,14 @@ The response is a bare array of row objects:
 ```
 
 ---
+
+#### Ad unit displays
+
+`adUnitDisplays` is the number of times the Falcon ad unit was displayed on your page during the row's period. It counts each display of the ad unit once, no matter how many offers it showed.
+
+It is reported for information only. It does not change how `revenue` or `transactions` are calculated, and revenue per transaction (RPT) does not depend on it.
+
+Ad unit displays are available from **1 July 2026**. Rows for earlier dates return `null`. A row whose period spans 1 July 2026 (for example a `MONTH` breakdown) counts only the displays from 1 July 2026 onward.
 
 #### Click-through rate (CTR)
 
