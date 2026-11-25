@@ -58,6 +58,7 @@ Pass customer and order data with the `at.` prefix for better targeting and anal
 - `at.hashedEmail` (string): Customer email, hashed on your end before sending (SHA-256 hex, lowercase, 64 characters). Takes priority over `at.email` if both are present
 - `at.email` (string): Customer email address, plain text, lowercase, trimmed — or a SHA-256 hash (see Email Hashing below)
 - `at.hashedPhone` (string): Customer phone, hashed the same way as `at.hashedEmail`
+- `at.customerId` (string): Your stable id for the customer, the same across sessions and devices. Any format; we hash it on our side. A Shopify id (`gid://shopify/Customer/5` or `5`) counts by its number
 - `at.hashedCustomerShopifyId` (string): Shopify customer id (numeric part), hashed the same way as `at.hashedEmail`
 - `at.firstname` or `at.fname` (string): Customer first name
 - `at.lastname` or `at.lname` (string): Customer last name
