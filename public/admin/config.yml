@@ -198,6 +198,34 @@ collections:
       - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
       - { label: Body, name: body, widget: markdown, modes: [raw] }
 
+  # ─── For Advertisers (advertisers/) ─────────────────────────────────────────
+  - name: advertisers
+    label: For Advertisers
+    label_singular: Advertiser page
+    folder: advertisers
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
+  # ─── Suppression Lists (advertisers/suppression-lists/) ─────────────────────
+  - name: advertisers-suppression-lists
+    label: "For Advertisers: Suppression Lists"
+    label_singular: Suppression Lists page
+    folder: advertisers/suppression-lists
+    create: true
+    summary: '{{title}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title, name: title, widget: string, required: false }
+      - { label: Description, name: description, widget: string, required: false, hint: "Shown in Google results and link/social previews — not on the page itself. ~150 characters." }
+      - { label: Body, name: body, widget: markdown, modes: [raw] }
+
   # ─── Shared Snippets (reusable content embedded via @include) ────────────────
   # Files in integration-guide/_shared/ are pulled into multiple pages with
   # <!--@include-->; editing a snippet updates every page that embeds it. They
