@@ -44,7 +44,7 @@ POST /api/site
   "genderDemographics": "mixed",
   "domain": "mobile.acme-ecommerce.com",
   "status": "active",
-  "createEpomZone": true,
+  "createAdZone": true,
   "categoryName": "Fashion & Apparel"
 }
 ```
@@ -61,7 +61,7 @@ POST /api/site
   - Valid values: `male`, `female`, `mixed`, `other`
 - `domain`: Optional, trimmed (use actual domain, avoid myshopify.com when possible)
 - `status`: Optional, must be "active" or "inactive" (defaults to "pending")
-- `createEpomZone`: Optional, boolean (defaults to true)
+- `createAdZone`: Optional, boolean (defaults to true). Creates the ad zone the site needs to serve live ads. Set it to `false` for a test-mode setup.
 - `categoryName`: Optional, must exactly match existing category name (case-sensitive)
 
 > **Important for Ad Optimization:** Providing accurate demographic and business data (`orderVolume`, `averageOrder`, `ageDemographics`, `genderDemographics`, `categoryName`) is critical for delivering relevant offers and maximizing revenue.
@@ -391,7 +391,7 @@ curl -X POST https://pr-api.falconlabs.us/api/site \
     "genderDemographics": "mixed",
     "domain": "mobile.acme-ecommerce.com",
     "status": "active",
-    "createEpomZone": true,
+    "createAdZone": true,
     "categoryName": "Fashion & Apparel"
   }'
 ```

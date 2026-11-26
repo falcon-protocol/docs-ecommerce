@@ -128,7 +128,7 @@ Creates a new site for the authenticated publisher.
   "genderDemographics": "mixed",
   "domain": "example.com",
   "status": "active",
-  "createEpomZone": true,
+  "createAdZone": true,
   "categoryName": "Category Name"
 }
 ```
@@ -143,7 +143,7 @@ Creates a new site for the authenticated publisher.
 - `genderDemographics`: Optional, must be valid GenderDemo enum value
 - `domain`: Optional, trimmed
 - `status`: Optional, must be valid AccountStatus enum (defaults to "pending")
-- `createEpomZone`: Optional, boolean (defaults to true)
+- `createAdZone`: Optional, boolean (defaults to true). Creates the ad zone the site needs to serve live ads. Set it to `false` for a test-mode setup.
 - `categoryName`: Optional, must exactly match existing category name (case-sensitive)
 
 **Response** (201):
@@ -622,7 +622,7 @@ curl -X POST http://localhost:4000/api/site \
     "genderDemographics": "female",
     "domain": "mobile.acme-ecommerce.com",
     "status": "active",
-    "createEpomZone": true,
+    "createAdZone": true,
     "categoryName": "Fashion & Apparel"
   }'
 ```
@@ -990,4 +990,4 @@ curl -X GET "http://localhost:4000/api/site?skip=-5&take=200" \
 - **Publisher Relationship**: Sites belong to publishers (one-to-many)
 - **Placement Relationship**: Sites can have multiple placements (one-to-many)
 - **Category System**: Sites can be associated with categories from the taxonomy system
-- **Epom Integration**: Sites can automatically create corresponding Epom zones when `createEpomZone` is true
+- **Ad Serving**: Sites automatically get an ad zone when `createAdZone` is true
